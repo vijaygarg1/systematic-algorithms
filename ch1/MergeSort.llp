@@ -1,0 +1,39 @@
+// Recursive merge sort: split, sort halves, merge.
+
+void MergeSort(int[] A, int low, int high) {
+  if (low < high) {
+    int mid = (low + high) / 2;
+    MergeSort(A, low, mid);
+    MergeSort(A, mid + 1, high);
+    Merge(A, low, mid, high);
+  }
+}
+
+// Auxiliary: in-place merge of A[low..mid] and A[mid+1..high].
+void Merge(int[] A, int low, int mid, int high) {
+  int[] B = new int[A.length];
+  forall k in [low..high] : B[k] = A[k];
+  int i = low;
+  int j = mid + 1;
+  int k = low;
+  while (i <= mid && j <= high) {
+    if (B[i] <= B[j]) {
+      A[k] = B[i];
+      i = i + 1;
+    } else {
+      A[k] = B[j];
+      j = j + 1;
+    };
+    k = k + 1;
+  };
+  while (i <= mid) {
+    A[k] = B[i];
+    i = i + 1;
+    k = k + 1;
+  };
+  while (j <= high) {
+    A[k] = B[j];
+    j = j + 1;
+    k = k + 1;
+  }
+}

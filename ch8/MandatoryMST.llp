@@ -1,0 +1,30 @@
+// Mandatory-edge constraint for MST: mandatory edges must be included.
+// M[j] is true iff edge j is mandatory.
+
+class MandatoryMST {
+  void MandatoryMST(boolean[] M, int[] u, int[] v, int[] parent, boolean[] G) {
+    forbidden (j) : M[j] && !G[j] =>
+      advance : if (find(u[j], parent) == find(v[j], parent)) {
+                  return null;
+                } else {
+                  G[j] = true;
+                  union(u[j], v[j], parent);
+                };
+  }
+
+  int find(int x, int[] parent) {
+    while (parent[x] != x) {
+      parent[x] = parent[parent[x]];
+      x = parent[x];
+    };
+    return x;
+  }
+
+  void union(int a, int b, int[] parent) {
+    int ra = find(a, parent);
+    int rb = find(b, parent);
+    if (ra != rb) {
+      parent[ra] = rb;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+// LLPDijkstra: Dijkstra as an LLP schedule with a min-heap of non-fixed
+// vertices keyed by d. The graph is supplied as adjacency lists
+// adj[j] and weight array w[j] --- omitted here for clarity; a double
+// compiler front-end would flesh these out.
+
+class LLPDijkstra {
+  int[] LLPDijkstra(int[]  dIn) {
+    int[]  d = infinity;
+    boolean[] fixed = false;
+
+    setMode(PriorityQueue);
+    setPriority(d[j], min);
+
+    // A j is forbidden if not yet fixed and its current d matches the head
+    // of the heap. The advance fixes it and relaxes its outgoing edges
+    // (the relaxation code would be expanded here in a full front-end).
+    forbidden (j) : !fixed[j] =>
+      advance : fixed[j] = true;
+    return d;
+  }
+}

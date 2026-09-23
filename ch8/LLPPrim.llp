@@ -1,0 +1,83 @@
+// LLP-Prim: each non-root vertex advances when the global cross-cut is its lightest edge.
+
+class LLPPrim {
+  double[] LLPPrim(int[] parent, boolean[] fixed,
+                   double[][] W, double[] C, int root) {
+    forbidden (j) : !fixed[j]
+                 && argMinCrossCut(j) >= 1
+                 && minCrossCut(j) <= globalMinCrossCut()
+                 && C[j] < minCrossCut(j)  =>
+      advance : {
+        int i = argMinCrossCut(j);
+        parent[j] = i;
+        C[j] = W[i][j];
+        propagateFixed();
+      };
+    return C;
+  }
+
+  // Min weight of an edge (i, j) with fixed[i] = true; infinity if no
+  // such edge exists yet.
+  double minCrossCut(int j) {
+    double best = infinity;
+    int i = 1;
+    while (i <= n) {
+      if (fixed[i] && W[i][j] < best) {
+        best = W[i][j];
+      };
+      i = i + 1;
+    };
+    return best;
+  }
+
+  // The vertex i that achieves the minimum in minCrossCut(j); -1 when
+  // no fixed neighbour is incident to j.
+  int argMinCrossCut(int j) {
+    int besti = 0 - 1;
+    double best = infinity;
+    int i = 1;
+    while (i <= n) {
+      if (fixed[i] && W[i][j] < best) {
+        best = W[i][j];
+        besti = i;
+      };
+      i = i + 1;
+    };
+    return besti;
+  }
+
+  // Global minimum of minCrossCut(j) over every non-fixed j, equivalently
+  // the lightest edge in the cross-cut set E'(C).  Returns infinity when
+  // E' is empty (all vertices fixed, or graph disconnected).
+  double globalMinCrossCut() {
+    double best = infinity;
+    int j = 1;
+    while (j <= n) {
+      if (!fixed[j]) {
+        double m = minCrossCut(j);
+        if (m < best) {
+          best = m;
+        };
+      };
+      j = j + 1;
+    };
+    return best;
+  }
+
+  // Mark every vertex whose parent chain now reaches a fixed vertex as
+  // fixed.  Idempotent; reaches a fixpoint in at most n rounds.
+  void propagateFixed() {
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+      int j = 1;
+      while (j <= n) {
+        if (!fixed[j] && fixed[parent[j]]) {
+          fixed[j] = true;
+          changed = true;
+        };
+        j = j + 1;
+      };
+    }
+  }
+}

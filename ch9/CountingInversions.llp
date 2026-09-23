@@ -1,0 +1,48 @@
+// Count inversions in O(n log n) via merge sort.
+
+class CountingInversions {
+  int count(int[] A, int low, int high) {
+    if (low >= high) {
+      return 0;
+    };
+    int mid = (low + high) / 2;
+    int invLeft = count(A, low, mid);
+    int invRight = count(A, mid + 1, high);
+    int invMerge = mergeAndCount(A, low, mid, high);
+    return invLeft + invRight + invMerge;
+  }
+
+  // Merge A[low..mid] and A[mid+1..high] and return the number of
+  // cross-half inversions (every right element placed early counts as
+  // many inversions as left elements still pending).
+  int mergeAndCount(int[] A, int low, int mid, int high) {
+    int[] B = new int[A.length];
+    forall k in [low..high] : B[k] = A[k];
+    int i = low;
+    int j = mid + 1;
+    int k = low;
+    int inv = 0;
+    while (i <= mid && j <= high) {
+      if (B[i] <= B[j]) {
+        A[k] = B[i];
+        i = i + 1;
+      } else {
+        A[k] = B[j];
+        j = j + 1;
+        inv = inv + (mid - i + 1);
+      };
+      k = k + 1;
+    };
+    while (i <= mid) {
+      A[k] = B[i];
+      i = i + 1;
+      k = k + 1;
+    };
+    while (j <= high) {
+      A[k] = B[j];
+      j = j + 1;
+      k = k + 1;
+    };
+    return inv;
+  }
+}

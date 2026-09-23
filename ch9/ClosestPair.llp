@@ -1,0 +1,39 @@
+// Divide-and-conquer closest-pair-of-points (squared distance).
+
+class ClosestPair {
+  double[] find(int lo, int hi, double[] Px, double[] Py) {
+    double[] G = infinity;
+    ClosestPair(lo, hi, Px, Py, G);
+    return G;
+  }
+
+  // Recursive aux: scan/refine G[0] for points in Px[lo..hi].
+  void ClosestPair(int lo, int hi, double[] Px, double[] Py, double[] G) {
+    if (hi <= lo) {
+      // empty range -- nothing to do
+    } else {
+      if (hi - lo <= 2) {
+        forall i in [lo..hi-1] :
+          forall j in [i+1..hi] :
+            if ((Px[i] - Px[j]) * (Px[i] - Px[j])
+               + (Py[i] - Py[j]) * (Py[i] - Py[j]) < G[0]) {
+              G[0] = (Px[i] - Px[j]) * (Px[i] - Px[j])
+                    + (Py[i] - Py[j]) * (Py[i] - Py[j]);
+            }
+      } else {
+        int mid = (lo + hi) / 2;
+        [ ClosestPair(lo, mid, Px, Py, G) [] ClosestPair(mid+1, hi, Px, Py, G) ];
+        // Combine: scan the strip.
+        forall i in [lo..hi-1] :
+          forall j in [i+1..hi] :
+            if ((Px[i] - Px[mid]) * (Px[i] - Px[mid]) < G[0]
+               && (Px[j] - Px[mid]) * (Px[j] - Px[mid]) < G[0]
+               && (Px[i] - Px[j]) * (Px[i] - Px[j])
+                 + (Py[i] - Py[j]) * (Py[i] - Py[j]) < G[0]) {
+              G[0] = (Px[i] - Px[j]) * (Px[i] - Px[j])
+                    + (Py[i] - Py[j]) * (Py[i] - Py[j]);
+            }
+      }
+    }
+  }
+}

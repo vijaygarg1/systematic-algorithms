@@ -1,0 +1,31 @@
+// Recursive DFS recording discovery and finish times.
+
+class DFS {
+  int[] traverse(set<int>[] dep) {
+    int n = dep.length;
+    int[] G = new int[n];
+    int[] parent = new int[n];
+    int[] discovered = new int[n];
+    int[] finished = new int[n];
+    forall i in [0..n-1] : parent[i] = -1;
+    int[] t = new int[1];
+    t[0] = 1;
+    visit(0, dep, G, parent, discovered, finished, t);
+    return discovered;
+  }
+
+  // Recursive aux: visits j, then descends into unvisited neighbours.
+  void visit(int j, set<int>[] dep, int[] G, int[] parent,
+             int[] discovered, int[] finished, int[] t) {
+    G[j] = 1;
+    discovered[j] = t[0];
+    t[0] = t[0] + 1;
+    forall k in dep[j] :
+      if (G[k] == 0) {
+        parent[k] = j;
+        visit(k, dep, G, parent, discovered, finished, t);
+      };
+    finished[j] = t[0];
+    t[0] = t[0] + 1;
+  }
+}

@@ -1,0 +1,73 @@
+// Ford-Fulkerson max-flow via DFS-found augmenting paths.
+
+class FordFulkerson {
+  int[][] maxflow(int[][] c, int s, int t) {
+    int n = c.length;
+    int[][] f      = new int[n][n];
+    int[]   parent = new int[n];
+    boolean done = false;
+    while (!done) {
+      int found = augmentingPath(c, f, s, t, parent);
+      if (found == 0) {
+        done = true;
+      } else {
+        // Bottleneck residual capacity along the path.
+        int bottleneck = 2147483647;
+        int v = t;
+        while (v != s) {
+          int u = parent[v];
+          int r = residual(c, f, u, v);
+          if (r < bottleneck) {
+            bottleneck = r;
+          };
+          v = u;
+        };
+        // Push bottleneck units along the path; subtract on reverse.
+        v = t;
+        while (v != s) {
+          int u = parent[v];
+          f[u][v] = f[u][v] + bottleneck;
+          f[v][u] = f[v][u] - bottleneck;
+          v = u;
+        }
+      }
+    };
+    return f;
+  }
+
+  // DFS in the residual graph; returns 1 iff t is reachable from s.
+  // On success, parent[v] holds the predecessor of v on the path.
+  int augmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
+    int n = c.length;
+    boolean[] seen = new boolean[n];
+    int[] stack    = new int[n];
+    int top = 0;
+    stack[top] = s;
+    top = top + 1;
+    seen[s] = true;
+    parent[s] = s;
+    while (top > 0) {
+      top = top - 1;
+      int u = stack[top];
+      if (u == t) {
+        return 1;
+      };
+      int v = 0;
+      while (v < n) {
+        if (!seen[v] && residual(c, f, u, v) > 0) {
+          seen[v] = true;
+          parent[v] = u;
+          stack[top] = v;
+          top = top + 1;
+        };
+        v = v + 1;
+      }
+    };
+    return 0;
+  }
+
+  // Residual capacity of edge (u, v) under the current flow f.
+  int residual(int[][] c, int[][] f, int u, int v) {
+    return c[u][v] - f[u][v];
+  }
+}

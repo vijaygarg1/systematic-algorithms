@@ -1,0 +1,13 @@
+// GCD1: descending GCD via Euclidean reduction.
+// Forbidden when G[j] > G[i]; advance reduces G[j] by mod.
+
+int[] GCD1(int[] A) {
+  int[] G = 0;
+  forall k in [0..n-1] : G[k] = A[k];
+  forbidden (j) : exists i in [0..n-1] pick i : G[j] > G[i] =>
+    advance :
+      if (G[j] % G[i] == 0) { G[j] = G[i];
+        } else { G[j] = G[j] % G[i];
+      };
+  return G;
+}

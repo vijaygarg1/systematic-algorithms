@@ -1,0 +1,68 @@
+// LLP parallel H_n-approximation for Set Cover: pick every set that maximises coverage among neighbours and is lex-minimal among ties.
+
+class LLPLexicallyFirstSetCover {
+  boolean[] LLPLexicallyFirstSetCover(int[][] S) {
+    boolean[] G = false;
+    forbidden (j) : isLexMaxCov(j, S, G) =>
+      advance : G[j] = true;
+    return G;
+  }
+
+  // True iff set j currently covers at least one uncovered element and
+  // ties (s_j, s_k) are won by lex-minimal index for every neighbour k
+  // (a neighbour shares an uncovered element with j).
+  boolean isLexMaxCov(int j, int[][] S, boolean[] G) {
+    if (G[j]) { return false; };
+    int m = G.length;
+    int cov_j = coverage(j, S, G);
+    if (cov_j == 0) { return false; };
+    int k = 0;
+    while (k < m) {
+      if (k != j && !G[k] && shareUncovered(j, k, S, G)) {
+        int cov_k = coverage(k, S, G);
+        if (cov_k > cov_j) { return false; };
+        if (cov_k == cov_j && k < j) { return false; };
+      };
+      k = k + 1;
+    };
+    return true;
+  }
+
+  // |s_j ∩ R| where R is the set of currently uncovered elements.
+  int coverage(int j, int[][] S, boolean[] G) {
+    int u = S[j].length;
+    int count = 0;
+    int e = 0;
+    while (e < u) {
+      if (S[j][e] == 1 && !isCovered(e, S, G)) {
+        count = count + 1;
+      };
+      e = e + 1;
+    };
+    return count;
+  }
+
+  // True iff element e is covered by some currently-selected set.
+  boolean isCovered(int e, int[][] S, boolean[] G) {
+    int m = G.length;
+    int s = 0;
+    while (s < m) {
+      if (G[s] && S[s][e] == 1) { return true; };
+      s = s + 1;
+    };
+    return false;
+  }
+
+  // True iff sets j and k share at least one currently-uncovered element.
+  boolean shareUncovered(int j, int k, int[][] S, boolean[] G) {
+    int u = S[j].length;
+    int e = 0;
+    while (e < u) {
+      if (S[j][e] == 1 && S[k][e] == 1 && !isCovered(e, S, G)) {
+        return true;
+      };
+      e = e + 1;
+    };
+    return false;
+  }
+}

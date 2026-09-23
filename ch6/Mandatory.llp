@@ -1,0 +1,22 @@
+// Mandatory-subset constraint: certain intervals must be selected.
+// S[j] is true iff interval j is mandatory.
+
+class Mandatory {
+  boolean[] Mandatory(boolean[] S, boolean[] G) {
+    forbidden (j) : S[j] && !G[j] =>
+      advance : if (overlaps(j, G)) { return null; }
+                else { G[j] = true; };
+  }
+
+  boolean overlaps(int j, boolean[] G) {
+    boolean result = false;
+    int k = 0;
+    while (k < G.length) {
+      if (G[k] && k != j && s[k] < f[j] && s[j] < f[k]) {
+        result = true;
+      };
+      k = k + 1;
+    };
+    return result;
+  }
+}

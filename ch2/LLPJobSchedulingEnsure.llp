@@ -1,0 +1,8 @@
+// LLP job scheduling, ensure-sugar form of the same recurrence.
+
+int[] LLPJobSchedulingEnsure(int[]       t, set<int>[]  pre) {
+  int[]       G = 0;
+  forall k in [0..n] : G[k] = t[k];
+  ensure (j) : G[j] >= max i in pre[j] : G[i] + t[j];
+  return G;
+}

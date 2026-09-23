@@ -1,0 +1,17 @@
+// Par-QuadCRT: simultaneous quadratic congruences x^2 ≡ a[j] (mod m[j]).
+// Generalises Par-CRT to a non-linear local predicate.  G[j] is initialised
+// to the smallest non-negative root of x^2 ≡ a[j] (mod m[j]); the
+// forbidden / advance pair drives every G[j] up to a common value that
+// satisfies all r congruences simultaneously.
+//
+// The advance jumps G[j] forward by multiples of m[j] until x^2 ≡ a[j].
+// In the worst case one walks the period of m[j] (cost O(m[j]) per
+// advance); for prime m[j] the two square roots can be precomputed.
+
+int[] ParQuadCRT(int[] m, int[] a, int[] roots) {
+  int[] G = 0;
+  forall k in [0..n-1] : G[k] = roots[k];
+  forbidden (j) : exists i in [0..n-1] pick i : G[j] < G[i] =>
+    advance : G[j] = G[j] + ((G[i] - G[j] + m[j] - 1) / m[j]) * m[j];
+  return G;
+}

@@ -1,0 +1,8 @@
+// LLP-Sort2: forbidden when some k > j has A[j] > A[k]; swap them.
+
+class LLPSort2 {
+  void LLPSort2(int[] A) {
+    forbidden (j) : exists k in [j+1..n-1] pick k : A[j] > A[k]  =>
+      advance : swap(A[j], A[k]);
+  }
+}

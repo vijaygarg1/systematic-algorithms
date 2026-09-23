@@ -1,0 +1,27 @@
+// Bitonic sorting network: ascending half + descending half + merge.
+
+class BitonicSort {
+  void sort(int[] A, int low, int n, int dir) {
+    if (n > 1) {
+      int m = n / 2;
+      [ sort(A, low, m, 1) [] sort(A, low + m, m, 0) ];
+      bitonicMerge(A, low, n, dir);
+    }
+  }
+
+  // Bitonic merge: merges a bitonic sequence A[low..low+n-1] into a
+  // monotonic one (ascending if dir=1, descending if dir=0).
+  void bitonicMerge(int[] A, int low, int n, int dir) {
+    if (n > 1) {
+      int m = n / 2;
+      int i = low;
+      while (i < low + m) {
+        int j = i + m;
+        if (dir == 1 && A[i] > A[j]) { swap(A[i], A[j]); };
+        if (dir == 0 && A[i] < A[j]) { swap(A[i], A[j]); };
+        i = i + 1;
+      };
+      [ bitonicMerge(A, low, m, dir) [] bitonicMerge(A, low + m, m, dir) ];
+    }
+  }
+}

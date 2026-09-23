@@ -1,0 +1,35 @@
+// Classical in-degree zero queue algorithm for DAG layering.
+
+class Layering {
+  int[] layer(set<int>[] pre, set<int>[] succ) {
+    int n = pre.length;
+    int[] G = new int[n];
+    int[] indeg = new int[n];
+    forall j in [0..n-1] :
+      forall i in pre[j] : indeg[j] = indeg[j] + 1;
+    int[] Q = new int[n];
+    int head = 0;
+    int tail = 0;
+    forall j in [0..n-1] :
+      if (indeg[j] == 0) {
+        G[j] = 0;
+        Q[tail] = j;
+        tail = tail + 1;
+      };
+    while (head < tail) {
+      int j = Q[head];
+      head = head + 1;
+      forall k in succ[j] : {
+        indeg[k] = indeg[k] - 1;
+        if (indeg[k] == 0) {
+          int best = 0;
+          forall i in pre[k] : if (G[i] + 1 > best) { best = G[i] + 1; };
+          G[k] = best;
+          Q[tail] = k;
+          tail = tail + 1;
+        }
+      };
+    };
+    return G;
+  }
+}

@@ -1,0 +1,15 @@
+// LLP-Layering: each j advances once all predecessors are fixed.
+
+class LLPLayering {
+  int[] LLPLayering(set<int>[] pre) {
+    int[]      G      = 0;
+    boolean[]     fixed  = false;
+    forbidden (j) :
+      !fixed[j] && forall i in pre[j] : fixed[i]  =>
+      advance : {
+        G[j] = max(0, max i in pre[j] : G[i] + 1);
+        fixed[j] = true;
+      };
+    return G;
+  }
+}

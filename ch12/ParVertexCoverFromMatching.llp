@@ -1,0 +1,48 @@
+// König's-theorem construction of a vertex cover of size |M| from a max matching.
+
+class ParVertexCoverFromMatching {
+  boolean[] ParVertexCoverFromMatching(int[][] adj, int[] matchL) {
+    int L = adj.length;
+    int R = adj[0].length;
+    boolean[] C       = new boolean[L + R];
+    int[]     partner = new int[L + R];
+    int i = 0;
+    while (i < L + R) {
+      partner[i] = 0 - 1;
+      i = i + 1;
+    };
+    // Step 1: every matched edge (u, v) puts the L endpoint u into C
+    // and records the partner pointers in both directions.
+    int u = 0;
+    while (u < L) {
+      int v = matchL[u];
+      if (v != 0 - 1) {
+        C[u]            = true;
+        partner[u]      = L + v;
+        partner[L + v]  = u;
+      };
+      u = u + 1;
+    };
+    // Step 2: cover any uncovered edge (u, v) (with u in L, v in R)
+    // not in M.  At least one endpoint must already be matched, since
+    // M is maximum; flip the cover from that endpoint's partner.
+    u = 0;
+    while (u < L) {
+      int v = 0;
+      while (v < R) {
+        if (adj[u][v] == 1 && !C[u] && !C[L + v]) {
+          if (partner[u] != 0 - 1) {
+            C[partner[u]] = false;
+            C[u]          = true;
+          } else {
+            C[partner[L + v]] = false;
+            C[L + v]          = true;
+          }
+        };
+        v = v + 1;
+      };
+      u = u + 1;
+    };
+    return C;
+  }
+}

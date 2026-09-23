@@ -1,0 +1,8 @@
+// LLP-Sort1 (transposition form): forbidden = inversion, advance = swap.
+
+class LLPSort1 {
+  void LLPSort1(int[] A) {
+    forbidden (j) : j < n - 1 && A[j] > A[j+1] =>
+      advance : swap(A[j], A[j+1]);
+  }
+}

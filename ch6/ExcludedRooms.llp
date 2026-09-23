@@ -1,0 +1,17 @@
+// ExcludedRooms: composition program enforcing that course j is not
+// assigned a room from its excluded set R[j].  Composed onto
+// LLP-IntervalPartition via predicate conjunction:
+//   [ LLP-IntervalPartition(s, f, G) && ExcludedRooms(R, G) ].
+
+class ExcludedRooms {
+  int[] ExcludedRooms(set<int>[] R, set<int>[] pre, int[] G) {
+    int n = G.length;
+    forbidden (j) : G[j] in R[j] =>
+      advance : {
+        G[j] = min r in [1..n] :
+          !(r in R[j]) &&
+          forall k in pre[j] : G[k] != r;
+      };
+    return G;
+  }
+}

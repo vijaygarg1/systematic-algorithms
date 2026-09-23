@@ -1,0 +1,13 @@
+// Fast connected components: SlowComponents accelerated by a
+// pointer-jumping clause G[j] >= G[G[j]], which doubles the effective
+// reach of the label-propagation step at each round and brings the
+// number of rounds down from O(diameter) to O(log diameter).
+
+class FastComponents {
+  int[] FastComponents(set<int>[] adj) {
+    int[]      G = _i;
+    ensure (j) : G[j] >= G[G[j]];
+    ensure (j) : G[j] >= max i in adj[j] : G[i];
+    return G;
+  }
+}

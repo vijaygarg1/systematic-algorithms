@@ -1,0 +1,24 @@
+// Mandatory: composition program forcing the intervals in subset S
+// into the schedule.  Halts with "infeasible" (returns null) when two
+// mandatory intervals overlap.  Composed onto LLP-IntervalScheduling
+// via predicate conjunction:
+//   [ LLP-IntervalScheduling(s, f, G) && Mandatory(S, G) ].
+
+class MandatoryIntervals {
+  boolean[] MandatoryIntervals(int[] s, int[] f, boolean[] S) {
+    int n = s.length;
+    boolean[] G = false;
+    forbidden (j) : S[j] && !G[j] =>
+      advance : {
+        if (exists k in [0..n-1] : G[k] && overlap(j, k, s, f)) {
+          return null;
+        };
+        G[j] = true;
+      };
+    return G;
+  }
+
+  boolean overlap(int j, int k, int[] s, int[] f) {
+    return s[j] < f[k] && s[k] < f[j];
+  }
+}

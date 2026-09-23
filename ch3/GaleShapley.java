@@ -1,0 +1,47 @@
+// Classical Gale-Shapley man-optimal stable-matching loop.
+
+import java.util.*;
+
+public class GaleShapley {
+  public int[] match(int[][] mpref, int[][] rank) {
+    int n = (mpref.length - 1);
+    int[] G = new int[(n + 1)];
+    int[] partner = new int[(n + 1)];
+    boolean[] free = new boolean[(n + 1)];
+    for (int i = 1; i <= n; i++) {
+      free[i] = true;
+    }
+    boolean done = false;
+    while ((!done)) {
+      int i = 1;
+      while (((i <= n) && (!free[i]))) {
+        i = (i + 1);
+      }
+      if ((i > n)) {
+        done = true;
+      } else {
+        G[i] = (G[i] + 1);
+        int z = mpref[i][G[i]];
+        if ((partner[z] == 0)) {
+          partner[z] = i;
+          free[i] = false;
+        } else {
+          if ((rank[z][i] < rank[z][partner[z]])) {
+            free[partner[z]] = true;
+            partner[z] = i;
+            free[i] = false;
+          }
+        }
+      }
+    }
+    return G;
+  }
+
+  public static void main(String[] args) {
+    int[][] mpref = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] rank = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    GaleShapley prog = new GaleShapley();
+    int[] result = prog.match(mpref, rank);
+    System.out.println(Arrays.toString(result));
+  }
+}

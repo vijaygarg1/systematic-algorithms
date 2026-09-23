@@ -1,0 +1,16 @@
+// LLP form of Gale-Shapley on the proposal-vector lattice.
+
+class LLPStableMarriage {
+  int[] LLPStableMarriage(int[][] mpref, int[][] rank, int[]   I) {
+    int[]   G = 0;
+    forall k in [0..n-1] : G[k] = I[k];
+    forbidden (j) :
+      exists i in [0..n-1] :
+        exists k in [0..G[i]] :
+          mpref[j][G[j]] == mpref[i][k]
+          && rank[mpref[j][G[j]]][i] < rank[mpref[j][G[j]]][j]
+    =>
+      advance : G[j] = G[j] + 1;
+    return G;
+  }
+}

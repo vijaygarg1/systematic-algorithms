@@ -1,0 +1,13 @@
+// Constrained-Stable-Matching: stable matching with precedence constraints.
+// always: z = mpref[j][G[j]]
+
+class ConstrainedStableMatching {
+  void ConstrainedStableMatching(int[][] mpref, int[][] rank) {
+    int[] G = 0;
+    forbidden (j) :
+      G[j] == 0
+      || (exists i in [0..n-1] : exists k in [0..G[i]] : mpref[j][G[j]] == mpref[i][k] && rank[mpref[j][G[j]]][i] < rank[mpref[j][G[j]]][j])
+    =>
+      advance : G[j] = G[j] + 1;
+  }
+}

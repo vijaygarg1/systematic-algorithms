@@ -1,0 +1,14 @@
+// Classical divide-and-conquer planar convex hull.
+// Split by median x-coordinate, recursively hull each half, merge via
+// the upper and lower common tangents (computable in O(n) sequentially).
+
+Point[] convexHull(Point[] P) {
+  if (|P| <= 3) { return bruteForceHull(P); };
+  sort P by x-coordinate;
+  Point[] P_L = first ceil(|P| / 2) points of P;
+  Point[] P_R = remaining points of P;
+  Point[] H_L = convexHull(P_L);
+  Point[] H_R = convexHull(P_R);
+  (upperTangent, lowerTangent) = findTangents(H_L, H_R);
+  return mergeHulls(H_L, H_R, upperTangent, lowerTangent);
+}

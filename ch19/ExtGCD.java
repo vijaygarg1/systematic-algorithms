@@ -1,0 +1,53 @@
+// Extended Euclidean algorithm: maintains Bezout coefficients alongside GCD reduction.
+
+import java.util.*;
+
+public class ExtGCD {
+  public int[] ExtGCD(int a, int b) {
+    int[] G = new int[2];
+    G[0] = a;
+    G[1] = b;
+    int[] H0 = new int[2];
+    int[] H1 = new int[2];
+    H0[0] = 1;
+    H0[1] = 0;
+    H1[0] = 0;
+    H1[1] = 1;
+    while ((G[0] != G[1])) {
+      if ((G[0] > G[1])) {
+        int q = 0;
+        if (((G[1] != 0) && ((G[0] % G[1]) == 0))) {
+          q = ((G[0] / G[1]) - 1);
+        } else {
+          q = (G[0] / G[1]);
+        }
+        G[0] = (G[0] - (q * G[1]));
+        H0[0] = (H0[0] - (q * H1[0]));
+        H0[1] = (H0[1] - (q * H1[1]));
+      } else {
+        int q = 0;
+        if (((G[0] != 0) && ((G[1] % G[0]) == 0))) {
+          q = ((G[1] / G[0]) - 1);
+        } else {
+          q = (G[1] / G[0]);
+        }
+        G[1] = (G[1] - (q * G[0]));
+        H1[0] = (H1[0] - (q * H0[0]));
+        H1[1] = (H1[1] - (q * H0[1]));
+      }
+    }
+    int[] result = new int[3];
+    result[0] = G[0];
+    result[1] = H0[0];
+    result[2] = H0[1];
+    return result;
+  }
+
+  public static void main(String[] args) {
+    int a = 0;
+    int b = 0;
+    ExtGCD prog = new ExtGCD();
+    int[] result = prog.ExtGCD(a, b);
+    System.out.println(Arrays.toString(result));
+  }
+}

@@ -1,0 +1,15 @@
+// LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation.
+
+class LLPBellmanFord {
+  int[] LLPBellmanFord(set<int>[] pre, int[][] w) {
+    int[] G = infinity;
+    G[0] = 0;
+    forbidden (j) :
+      exists i in pre[j] : G[j] > G[i] + w[i][j]
+    =>
+      advance :
+        forall k in [0..n] :
+          G[k] = min(G[k], min i in pre[k] : G[i] + w[i][k]);
+    return G;
+  }
+}

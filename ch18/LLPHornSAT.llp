@@ -1,0 +1,36 @@
+// LLP Horn SAT: forbidden when an implication's antecedents are all true
+// but the consequent x_j is false; advance sets x_j to true.
+
+class LLPHornSAT {
+  boolean[] LLPHornSAT(int[][] body, int[] head) {
+    int n = head.length;
+    boolean[] G = new boolean[n];
+    forbidden (j) : hornImplied(j, G, body, head) =>
+      advance : G[j] = true;
+    return G;
+  }
+
+  boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
+    if (G[j]) {
+      return false;
+    };
+    int c = 0;
+    while (c < body.length) {
+      if (head[c] == j) {
+        boolean allTrue = true;
+        int k = 0;
+        while (k < body[c].length) {
+          if (!G[body[c][k]]) {
+            allTrue = false;
+          };
+          k = k + 1;
+        };
+        if (allTrue) {
+          return true;
+        }
+      };
+      c = c + 1;
+    };
+    return false;
+  }
+}

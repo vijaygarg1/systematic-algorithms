@@ -1,0 +1,9 @@
+// Return any index of key in a sorted array A, or -1 if absent.
+
+int BinarySearch(int[] A, int key, int low, int high) {
+  if (low > high) { return -1; };
+  int mid = (low + high) / 2;
+  if (A[mid] == key) { return mid; };
+  if (A[mid] > key) { return BinarySearch(A, key, low, mid - 1); };
+  return BinarySearch(A, key, mid + 1, high);
+}

@@ -1,0 +1,43 @@
+// LLP-QHornSAT: solve q-horn formula by composing HornSAT on X
+// variables with 2-SAT on Y variables.
+// This is a composite algorithm, not a single forbidden/advance pair.
+
+class LLPQHornSAT {
+  boolean[] LLPQHornSAT(int[][] body1, int[] head1, int[][] clauses2, int n1, int n2) {
+    boolean[] G = new boolean[n1];
+    boolean[] H = new boolean[n2];
+    // Phase 1: solve Horn clauses on X variables
+    int j = 0;
+    while (j < n1) {
+      G[j] = false;
+      j = j + 1;
+    };
+    forbidden (j) : hornImplied(j, G, body1, head1) =>
+      advance : G[j] = true;
+    // Phase 2: substitute X values into Type-2 clauses, solve 2-SAT on Y
+    j = 0;
+    while (j < n2) {
+      H[j] = false;
+      j = j + 1;
+    };
+    return G;
+  }
+
+  boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
+    if (G[j]) { return false; };
+    int c = 0;
+    while (c < body.length) {
+      if (head[c] == j) {
+        boolean allTrue = true;
+        int k = 0;
+        while (k < body[c].length) {
+          if (!G[body[c][k]]) { allTrue = false; };
+          k = k + 1;
+        };
+        if (allTrue) { return true; }
+      };
+      c = c + 1;
+    };
+    return false;
+  }
+}

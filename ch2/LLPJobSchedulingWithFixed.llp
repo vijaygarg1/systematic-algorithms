@@ -1,0 +1,30 @@
+// Kahn's-style topological sweep: finalise each job once its predecessors are fixed.
+
+int[] LLPJobSchedulingWithFixed(int[] t, set<int>[] pre, set<int>[] succ) {
+  int n = t.length;
+  int[] G = new int[n];
+  int[] count = new int[n];
+  int[] candidate = new int[n];
+  int head = 0;
+  int tail = 0;
+  forall k in [0..n-1] : G[k] = t[k];
+  forall k in [0..n-1] : count[k] = pre[k].length;
+  forall k in [0..n-1] :
+    if (count[k] == 0) {
+      candidate[tail] = k;
+      tail = tail + 1;
+    };
+  while (head < tail) {
+    int j = candidate[head];
+    head = head + 1;
+    G[j] = max(G[j], max i in pre[j] : G[i] + t[j]);
+    forall k in succ[j] : {
+      count[k] = count[k] - 1;
+      if (count[k] == 0) {
+        candidate[tail] = k;
+        tail = tail + 1;
+      }
+    }
+  };
+  return G;
+}

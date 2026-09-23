@@ -1,0 +1,37 @@
+// MandatoryEdges: composition program forcing the edges in subset M
+// into the spanning tree.  Halts "infeasible" (returns null) when a
+// mandatory edge closes a cycle with previously committed mandatory
+// edges; equivalently, when M itself is not acyclic.  Composed onto
+// LLP-Kruskal via predicate conjunction:
+//   [ LLP-Kruskal(E, w, G) && MandatoryEdges(M, G) ].
+
+class MandatoryEdges {
+  boolean[] MandatoryEdges(int[] u, int[] v, boolean[] M, int[] parent) {
+    boolean[] G = false;
+    forbidden (j) : M[j] && !G[j] =>
+      advance : {
+        if (find(u[j], parent) == find(v[j], parent)) {
+          return null;
+        };
+        G[j] = true;
+        union(u[j], v[j], parent);
+      };
+    return G;
+  }
+
+  int find(int x, int[] parent) {
+    while (parent[x] != x) {
+      parent[x] = parent[parent[x]];
+      x = parent[x];
+    };
+    return x;
+  }
+
+  void union(int a, int b, int[] parent) {
+    int ra = find(a, parent);
+    int rb = find(b, parent);
+    if (ra != rb) {
+      parent[ra] = rb;
+    }
+  }
+}

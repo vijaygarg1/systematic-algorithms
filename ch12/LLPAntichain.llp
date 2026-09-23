@@ -1,0 +1,13 @@
+// LLP-Antichain: maximum antichain by advancing chain indices to dominate-free positions.
+
+class LLPAntichain {
+  int[] LLPAntichain(int[][] chains, int[] len, boolean[][] leq) {
+    int[] G = 0;
+    forbidden (j) :
+      G[j] < len[j] && (exists k in [0..n-1] : k != j && leq[chains[j][G[j]]][chains[k][G[k]]])
+    =>
+      advance :
+        G[j] = G[j] + 1;
+    return G;
+  }
+}

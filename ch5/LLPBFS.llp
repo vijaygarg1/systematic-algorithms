@@ -1,0 +1,9 @@
+// LLP-BFS: forbidden when G[j] > min_{i in pre[j]} G[i] + 1.
+// style: fixpoint
+
+class LLPBFS {
+  void LLPBFS(set<int>[] pre, int[]      G) {
+    forbidden (j) : G[j] > (min i in pre[j] : G[i] + 1)  =>
+      advance : G[j] = min i in pre[j] : G[i] + 1;
+  }
+}

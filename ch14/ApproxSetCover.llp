@@ -1,0 +1,45 @@
+// Greedy H_n-approximation for Set Cover: repeatedly pick the set covering the most uncovered elements.
+
+class ApproxSetCover {
+  boolean[] ApproxSetCover(int[][] S, int n) {
+    int m = S.length;
+    boolean[] C        = new boolean[m];
+    boolean[] covered  = new boolean[n];
+    boolean done = false;
+    while (!done) {
+      int bestIdx   = 0 - 1;
+      int bestCover = 0;
+      int s = 0;
+      while (s < m) {
+        if (!C[s]) {
+          int count = 0;
+          int e = 0;
+          while (e < n) {
+            if (S[s][e] == 1 && !covered[e]) {
+              count = count + 1;
+            };
+            e = e + 1;
+          };
+          if (count > bestCover) {
+            bestCover = count;
+            bestIdx   = s;
+          }
+        };
+        s = s + 1;
+      };
+      if (bestIdx == 0 - 1) {
+        done = true;
+      } else {
+        C[bestIdx] = true;
+        int e = 0;
+        while (e < n) {
+          if (S[bestIdx][e] == 1) {
+            covered[e] = true;
+          };
+          e = e + 1;
+        }
+      }
+    };
+    return C;
+  }
+}

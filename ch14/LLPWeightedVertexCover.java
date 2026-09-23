@@ -1,0 +1,86 @@
+// LLP-WeightedVertexCover: primal-dual 2-approximation for weighted vertex cover.
+// Edges are indexed by pairs; G[e] is the price on edge e.
+// forbidden: edge {u,v} is slack (neither endpoint tight).
+// advance: raise G[e] by the uniform step r.
+
+import java.util.*;
+
+public class LLPWeightedVertexCover {
+  public void LLPWeightedVertexCover(int[][] adj, double[] w) {
+    int nv = w.length;
+    double[][] G = new double[nv][nv];
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+      double r = computeStep(adj, w, G, nv);
+      if ((r <= 0.0)) {
+        changed = false;
+      }
+      int u = 0;
+      while ((u < nv)) {
+        int v = (u + 1);
+        while ((v < nv)) {
+          if ((((adj[u][v] == 1) && (!tight(u, adj, w, G, nv))) && (!tight(v, adj, w, G, nv)))) {
+            G[u][v] = (G[u][v] + r);
+            G[v][u] = (G[v][u] + r);
+            changed = true;
+          }
+          v = (v + 1);
+        }
+        u = (u + 1);
+      }
+    }
+  }
+
+  public boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {
+    double sum = 0.0;
+    int u = 0;
+    while ((u < nv)) {
+      if ((adj[u][v] == 1)) {
+        sum = (sum + G[u][v]);
+      }
+      u = (u + 1);
+    }
+    return (sum >= w[v]);
+  }
+
+  public double computeStep(int[][] adj, double[] w, double[][] G, int nv) {
+    double r = Integer.MAX_VALUE;
+    int v = 0;
+    while ((v < nv)) {
+      int slackDeg = 0;
+      int u = 0;
+      while ((u < nv)) {
+        if ((((adj[u][v] == 1) && (!tight(u, adj, w, G, nv))) && (!tight(v, adj, w, G, nv)))) {
+          slackDeg = (slackDeg + 1);
+        }
+        u = (u + 1);
+      }
+      if ((slackDeg > 0)) {
+        double sum = 0.0;
+        u = 0;
+        while ((u < nv)) {
+          if ((adj[u][v] == 1)) {
+            sum = (sum + G[u][v]);
+          }
+          u = (u + 1);
+        }
+        double ratio = ((w[v] - sum) / slackDeg);
+        if ((ratio < r)) {
+          r = ratio;
+        }
+      }
+      v = (v + 1);
+    }
+    return r;
+  }
+
+  public static void main(String[] args) {
+    int[][] adj = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    double[] w = new double[] {1.0, 2.0, 3.0, 4.0};
+    LLPWeightedVertexCover prog = new LLPWeightedVertexCover();
+    prog.LLPWeightedVertexCover(adj, w);
+    System.out.println(Arrays.deepToString(adj));
+    System.out.println(Arrays.toString(w));
+  }
+}

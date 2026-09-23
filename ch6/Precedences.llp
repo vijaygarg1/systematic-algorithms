@@ -1,0 +1,13 @@
+// Precedences: composition program enforcing precedence constraints
+// pre(j) on job starts.  Each job j cannot start until every i in
+// pre(j) has finished (start G[i] plus processing time t[i]).
+// Composed onto LLP-MinMaxLateness via predicate conjunction:
+//   [ LLP-MinMaxLateness(t, d, G) && Precedences(pre, t, G) ].
+
+class Precedences {
+  int[] Precedences(set<int>[] pre, int[] t, int[] G) {
+    forbidden (j) : exists i in pre[j] : G[j] < G[i] + t[i] =>
+      advance : G[j] = max i in pre[j] : G[i] + t[i];
+    return G;
+  }
+}

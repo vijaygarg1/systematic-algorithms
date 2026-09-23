@@ -1,0 +1,10 @@
+// Return the first index i with A[i] = key, or -1 if absent.
+
+int LinearSearch(int[] A, int key) {
+  int i = 0;
+  while (i < A.length) {
+    if (A[i] == key) { return i; };
+    i = i + 1;
+  };
+  return -1;
+}

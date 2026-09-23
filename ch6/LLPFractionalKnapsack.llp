@@ -1,0 +1,38 @@
+// LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each fraction G[j] in [0,1] to its target G*[j] derived from prefix-sum of weights vs capacity W.
+
+class LLPFractionalKnapsack {
+  double[] LLPFractionalKnapsack(double[] v, double[] w, double W) {
+    double[] G = 0.0;
+    forbidden (j) :
+      G[j] < target(j)
+    =>
+      advance : G[j] = target(j);
+    return G;
+  }
+
+  // G*[j]: 1 while the cumulative weight stays under W, the
+  // partial fraction at the breakpoint, then 0 thereafter.
+  double target(int j) {
+    double prev = prefixWeight(j - 1);
+    double cur  = prev + w[j];
+    if (cur <= W) {
+      return 1.0;
+    } else {
+      if (prev >= W) {
+        return 0.0;
+      } else {
+        return (W - prev) / w[j];
+      }
+    }
+  }
+
+  double prefixWeight(int upto) {
+    double s = 0.0;
+    int i = 0;
+    while (i <= upto) {
+      s = s + w[i];
+      i = i + 1;
+    };
+    return s;
+  }
+}

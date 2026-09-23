@@ -1,0 +1,28 @@
+// LLP-IntervalPartition: assign each course j to the least free room not used by any overlapping earlier course in pre[j]; advance fixes j once all of its pre-set is fixed.
+
+class LLPIntervalPartition {
+  int[] LLPIntervalPartition(set<int>[] pre) {
+    int[]      G     = 1;
+    boolean[]  fixed = false;
+    forbidden (j) :
+      !fixed[j] && forall i in pre[j] : fixed[i]
+    =>
+      advance : {
+        G[j] = leastFreeRoom(j);
+        fixed[j] = true;
+      };
+    return G;
+  }
+
+  int leastFreeRoom(int j) {
+    int r = 1;
+    boolean conflict = true;
+    while (conflict) {
+      conflict = false;
+      forall i in pre[j] :
+        if (G[i] == r) { conflict = true; };
+      if (conflict) { r = r + 1; }
+    };
+    return r;
+  }
+}

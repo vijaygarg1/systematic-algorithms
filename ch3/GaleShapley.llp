@@ -1,0 +1,38 @@
+// Classical Gale-Shapley man-optimal stable-matching loop.
+
+class GaleShapley {
+  int[] match(int[][] mpref, int[][] rank) {
+    int n = mpref.length - 1;
+    int[] G = new int[n + 1];
+    int[] partner = new int[n + 1];
+    boolean[] free = new boolean[n + 1];
+    forall i in [1..n] : free[i] = true;
+
+    // Each iteration picks any free man and lets him propose to his next
+    // preference.  Loop until no free man remains.
+    boolean done = false;
+    while (!done) {
+      // Linear scan for any free man.
+      int i = 1;
+      while (i <= n && !free[i]) { i = i + 1; };
+      if (i > n) {
+        done = true;
+      } else {
+        G[i] = G[i] + 1;
+        int z = mpref[i][G[i]];
+        if (partner[z] == 0) {
+          partner[z] = i;
+          free[i] = false;
+        } else {
+          if (rank[z][i] < rank[z][partner[z]]) {
+            free[partner[z]] = true;
+            partner[z] = i;
+            free[i] = false;
+          }
+          // else: i stays free; he will try his next preference next round.
+        }
+      }
+    };
+    return G;
+  }
+}

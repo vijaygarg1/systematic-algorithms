@@ -1,0 +1,31 @@
+// Conjunctive predicate detection: forbidden when G[j] -> G[i] (happened-before);
+// advance increments G[j] to the next local state.
+
+class ConjunctiveAlgorithm {
+  int[] ConjunctiveAlgorithm(int[][] vc, int[] T) {
+    int n = vc.length;
+    int[] G = new int[n];
+    forall k in [0..n-1] : G[k] = 1;
+    forbidden (j) : happenedBefore(j, G, vc) =>
+      advance : {
+        if (G[j] >= T[j]) {
+          return G;
+        } else {
+          G[j] = G[j] + 1;
+        }
+      };
+    return G;
+  }
+
+  boolean happenedBefore(int j, int[] G, int[][] vc) {
+    int n = G.length;
+    int i = 0;
+    while (i < n) {
+      if (i != j && vc[j * n + G[j]][i] >= G[i]) {
+        return true;
+      };
+      i = i + 1;
+    };
+    return false;
+  }
+}

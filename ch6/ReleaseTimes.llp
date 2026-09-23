@@ -1,0 +1,12 @@
+// ReleaseTimes: composition program enforcing that job j cannot start
+// before its release time r[j].  Composed onto LLP-MinMaxLateness via
+// predicate conjunction:
+//   [ LLP-MinMaxLateness(t, d, G) && ReleaseTimes(r, G) ].
+
+class ReleaseTimes {
+  int[] ReleaseTimes(int[] r, int[] G) {
+    forbidden (j) : G[j] < r[j] =>
+      advance : G[j] = r[j];
+    return G;
+  }
+}

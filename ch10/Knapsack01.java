@@ -1,0 +1,49 @@
+// 0/1 knapsack: O(nW) bottom-up table fill.
+
+import java.util.*;
+
+public class Knapsack01 {
+  public int[][] solve(int[] w, int[] v, int W) {
+    int n = (w.length - 1);
+    int[][] G = new int[(n + 1)][(W + 1)];
+    int c = 0;
+    while ((c <= W)) {
+      G[0][c] = 0;
+      c = (c + 1);
+    }
+    int i = 0;
+    while ((i <= n)) {
+      G[i][0] = 0;
+      i = (i + 1);
+    }
+    i = 1;
+    while ((i <= n)) {
+      c = 1;
+      while ((c <= W)) {
+        if ((w[i] > c)) {
+          G[i][c] = G[(i - 1)][c];
+        } else {
+          int skip = G[(i - 1)][c];
+          int take = (G[(i - 1)][(c - w[i])] + v[i]);
+          if ((take > skip)) {
+            G[i][c] = take;
+          } else {
+            G[i][c] = skip;
+          }
+        }
+        c = (c + 1);
+      }
+      i = (i + 1);
+    }
+    return G;
+  }
+
+  public static void main(String[] args) {
+    int[] w = new int[] {1, 4, 7};
+    int[] v = new int[] {2, 3, 5, 8};
+    int W = 10;
+    Knapsack01 prog = new Knapsack01();
+    int[][] result = prog.solve(w, v, W);
+    System.out.println(Arrays.deepToString(result));
+  }
+}

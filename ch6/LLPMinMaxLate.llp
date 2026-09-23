@@ -1,0 +1,12 @@
+// LLP-MinMaxLate: schedule jobs (sorted by deadline) by raising each start time G[j] to the prefix sum of earlier processing times.
+
+class LLPMinMaxLate {
+  int[] LLPMinMaxLate(int[] t, int[] d) {
+    int[] G = 0;
+    forbidden (j) :
+      G[j] < (sum i in [0..j-1] : t[i])
+    =>
+      advance : G[j] = sum i in [0..j-1] : t[i];
+    return G;
+  }
+}

@@ -1,0 +1,11 @@
+// Move n disks from source to target through aux (Towers of Hanoi).
+
+void Hanoi(int n, int source, int aux, int target) {
+  if (n == 1) {
+    // Move disk from `source` to `target`.
+  } else {
+    Hanoi(n - 1, source, target, aux);
+    // Move disk from `source` to `target`.
+    Hanoi(n - 1, aux, source, target);
+  }
+}

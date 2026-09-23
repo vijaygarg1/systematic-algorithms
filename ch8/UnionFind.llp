@@ -1,0 +1,32 @@
+// Disjoint-set with path compression in find and union-by-rank.
+
+class UnionFind {
+  // Find the root of x's set, applying path compression.
+  int find(int[] parent, int x) {
+    if (parent[x] != x) {
+      parent[x] = find(parent, parent[x]);
+    };
+    return parent[x];
+  }
+
+  // Union the sets containing x and y by rank.  Returns true iff a
+  // merge actually happened (false if already in the same set).
+  boolean union(int[] parent, int[] rank, int x, int y) {
+    int rx = find(parent, x);
+    int ry = find(parent, y);
+    if (rx == ry) {
+      return false;
+    };
+    if (rank[rx] < rank[ry]) {
+      parent[rx] = ry;
+    } else {
+      if (rank[rx] > rank[ry]) {
+        parent[ry] = rx;
+      } else {
+        parent[ry] = rx;
+        rank[rx] = rank[rx] + 1;
+      }
+    };
+    return true;
+  }
+}

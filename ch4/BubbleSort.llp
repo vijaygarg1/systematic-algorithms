@@ -1,0 +1,18 @@
+// Bubble sort: repeated adjacent compare-and-swap until a clean pass.
+
+class BubbleSort {
+  void sort(int[] A) {
+    boolean found = true;
+    while (found) {
+      found = false;
+      int j = 0;
+      while (j < A.length - 1) {
+        if (A[j] > A[j + 1]) {
+          found = true;
+          swap(A[j], A[j + 1]);
+        };
+        j = j + 1;
+      }
+    }
+  }
+}

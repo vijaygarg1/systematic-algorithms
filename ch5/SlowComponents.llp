@@ -1,0 +1,9 @@
+// Connected components by ensure-clause label propagation.
+
+class SlowComponents {
+  int[] SlowComponents(set<int>[] adj) {
+    int[]      G = _i;
+    ensure (j) : G[j] >= max i in adj[j] : G[i];
+    return G;
+  }
+}

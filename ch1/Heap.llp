@@ -1,0 +1,49 @@
+// Min-heap on an int[]: build, heapify, insert, extract-min.
+
+class Heap {
+  // Build a min-heap from an unsorted prefix A[0..n-1].
+  void build(int[] A, int n) {
+    int i = n / 2 - 1;
+    while (i >= 0) {
+      heapify(A, i, n);
+      i = i - 1;
+    }
+  }
+
+  // Restore the heap property at i, given heap size n.
+  void heapify(int[] A, int i, int n) {
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+    if (left < n && A[left] < A[smallest]) { smallest = left; };
+    if (right < n && A[right] < A[smallest]) { smallest = right; };
+    if (smallest != i) {
+      swap(A[i], A[smallest]);
+      heapify(A, smallest, n);
+    }
+  }
+
+  // Insert key into heap occupying A[0..n-1]; returns new heap size n+1.
+  int insert(int[] A, int key, int n) {
+    n = n + 1;
+    int i = n - 1;
+    while (i > 0 && A[(i - 1) / 2] > key) {
+      A[i] = A[(i - 1) / 2];
+      i = (i - 1) / 2;
+    };
+    A[i] = key;
+    return n;
+  }
+
+  // Remove and return the minimum (root).  Caller passes the current
+  // heap size n and is responsible for updating it to n-1.  Returns
+  // Integer.MIN_VALUE when the heap is empty.
+  int extractMin(int[] A, int n) {
+    if (n < 1) { return -2147483648; };
+    int min = A[0];
+    A[0] = A[n - 1];
+    n = n - 1;
+    heapify(A, 0, n);
+    return min;
+  }
+}

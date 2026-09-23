@@ -1,0 +1,14 @@
+// LLP form of Johnson reweighting: raise prices G[j] until every reduced edge weight is non-negative.
+
+class LLPJohnson {
+  int[] LLPJohnson(set<int>[] pre, int[][] w) {
+    int[] G = 0;
+    forbidden (j) :
+      exists i in pre[j] : G[j] < G[i] - w[i][j]
+    =>
+      advance :
+        forall k in [0..n] :
+          G[k] = max(G[k], max i in pre[k] : G[i] - w[i][k]);
+    return G;
+  }
+}

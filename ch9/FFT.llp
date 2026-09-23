@@ -1,0 +1,17 @@
+// Recursive FFT: evaluate a coefficient vector at the N-th roots of unity.
+
+complex[] fft(complex[] a, complex omega, int N) {
+  if (N == 1) { return [a[0]]; };
+  complex[] a_even = a[0], a[2], ..., a[N-2];
+  complex[] a_odd  = a[1], a[3], ..., a[N-1];
+  complex[] fft_even = fft(a_even, omega * omega, N / 2);
+  complex[] fft_odd  = fft(a_odd,  omega * omega, N / 2);
+  complex[] result = array(N);
+  complex z = 1;
+  forall k in [0..N/2-1] {
+    result[k]         = fft_even[k] + z * fft_odd[k];
+    result[k + N / 2] = fft_even[k] - z * fft_odd[k];
+    z = z * omega;
+  };
+  return result;
+}

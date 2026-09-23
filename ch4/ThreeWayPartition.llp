@@ -1,0 +1,27 @@
+// Dutch-flag partition: split A[low..high) into <, =, > pivot regions.
+
+class ThreeWayPartition {
+  int[] partition(int[] A, int pivot, int low, int high) {
+    int p = low;
+    int q = low;
+    int k = high;
+    while (q < k) {
+      if (A[q] < pivot) {
+        swap(A[p], A[q]);
+        p = p + 1;
+        q = q + 1;
+      } else {
+        if (A[q] > pivot) {
+          k = k - 1;
+          swap(A[q], A[k]);
+        } else {
+          q = q + 1;
+        }
+      }
+    };
+    int[] result = new int[2];
+    result[0] = p;
+    result[1] = q;
+    return result;
+  }
+}

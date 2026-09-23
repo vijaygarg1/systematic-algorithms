@@ -1,0 +1,45 @@
+// Classical Kruskal MST: sort edges, union-find with rank and path-compression.
+
+class Kruskal {
+  boolean[] mst(int n, int[] U, int[] V, int[] W) {
+    int m = U.length;
+    boolean[] inTree = new boolean[m];
+    int[] parent = new int[n];
+    int[] rank = new int[n];
+    forall i in [0..n-1] : parent[i] = i;
+    int chosen = 0;
+    int e = 0;
+    while (e < m && chosen < n - 1) {
+      int u = U[e];
+      int v = V[e];
+      // Inline find with path compression on `u` and `v`.
+      int ru = root(parent, u);
+      int rv = root(parent, v);
+      if (ru != rv) {
+        inTree[e] = true;
+        chosen = chosen + 1;
+        // Union by rank.
+        if (rank[ru] < rank[rv]) {
+          parent[ru] = rv;
+        } else {
+          if (rank[ru] > rank[rv]) {
+            parent[rv] = ru;
+          } else {
+            parent[rv] = ru;
+            rank[ru] = rank[ru] + 1;
+          }
+        }
+      };
+      e = e + 1;
+    };
+    return inTree;
+  }
+
+  // Aux: find with path compression.
+  int root(int[] parent, int x) {
+    if (parent[x] != x) {
+      parent[x] = root(parent, parent[x]);
+    };
+    return parent[x];
+  }
+}

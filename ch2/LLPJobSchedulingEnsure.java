@@ -1,0 +1,50 @@
+// LLP job scheduling, ensure-sugar form of the same recurrence.
+
+import java.util.*;
+
+public class LLPJobSchedulingEnsure {
+  int n;
+  int[] t;
+  int[][] pre;
+  int[] G;
+
+  private boolean forbidden(int j) {
+    int t1 = Integer.MIN_VALUE;
+    for (int i : pre[j]) {
+      int v = (G[i] + t[j]);
+      if (v > t1) t1 = v;
+    }
+    return (!(G[j] >= t1));
+  }
+
+  private void advance(int j) {
+    int m = Integer.MIN_VALUE;
+    for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
+    G[j] = m;
+  }
+
+  public int[] LLPJobSchedulingEnsure(int[] t, int[][] pre) {
+    this.t = t;
+    this.pre = pre;
+    this.n = t.length;
+    this.G = t.clone();
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int j = 0; j < n; j++) {
+          if (forbidden(j)) {
+            advance(j);
+            changed = true;
+          }
+        }
+      }
+    }
+    return G;
+  }
+
+  public static void main(String[] args) {
+    // Demo harness for LLPJobSchedulingEnsure.
+    // Construct with hard-coded inputs and call the entry method.
+  }
+}

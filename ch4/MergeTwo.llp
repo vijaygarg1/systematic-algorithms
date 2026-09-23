@@ -1,0 +1,33 @@
+// Merge two sorted arrays B and C into a new sorted D.
+
+class MergeTwo {
+  int[] merge(int[] B, int[] C) {
+    int m = B.length;
+    int n = C.length;
+    int[] D = new int[m + n];
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    while (i < m && j < n) {
+      if (B[i] < C[j]) {
+        D[k] = B[i];
+        i = i + 1;
+      } else {
+        D[k] = C[j];
+        j = j + 1;
+      };
+      k = k + 1;
+    };
+    while (i < m) {
+      D[k] = B[i];
+      i = i + 1;
+      k = k + 1;
+    };
+    while (j < n) {
+      D[k] = C[j];
+      j = j + 1;
+      k = k + 1;
+    };
+    return D;
+  }
+}

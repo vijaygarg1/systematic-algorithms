@@ -1,0 +1,8 @@
+// Reachability as a 1-bit LLP: forbidden = unreached vertex with reached predecessor.
+
+class LLPTraversal {
+  void LLPTraversal(set<int>[] pre, boolean[]     G) {
+    forbidden (j) : !G[j] && (exists i in pre[j] : G[i]) =>
+      advance : G[j] = true;
+  }
+}

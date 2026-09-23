@@ -1,0 +1,8 @@
+// LLP pointer-jumping kernel of Borůvka's algorithm.
+
+class LLPBoruvka {
+  void LLPBoruvka(int[]  G) {
+    forbidden (j) : G[j] != G[G[j]]  =>
+      advance : G[j] = G[G[j]];
+  }
+}

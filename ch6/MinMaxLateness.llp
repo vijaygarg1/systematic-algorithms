@@ -1,0 +1,16 @@
+// Min-max-lateness scheduling: greedy by earliest deadline.
+
+class MinMaxLateness {
+  int[] schedule(int[] t, int[] d) {
+    int n = t.length;
+    int[] G = new int[n];
+    int last = 0;
+    int i = 0;
+    while (i < n) {
+      G[i] = last;
+      last = last + t[i];
+      i = i + 1;
+    };
+    return G;
+  }
+}

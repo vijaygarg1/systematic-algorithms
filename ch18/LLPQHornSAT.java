@@ -14,7 +14,6 @@ public class LLPQHornSAT {
   boolean[] G;
   boolean[] H;
   int j;
-  int j;
 
   private boolean _forbidden0(int j) {
     if (!(hornImplied(j, G, body1, head1))) return false;
@@ -32,10 +31,8 @@ public class LLPQHornSAT {
     this.n1 = n1;
     this.n2 = n2;
     this.n = head1.length;
-    this.G = new boolean[n];
-    for (int i = 0; i < n; i++) this.G[i] = new boolean[n1];
-    this.H = new boolean[n];
-    for (int i = 0; i < n; i++) this.H[i] = new boolean[n2];
+    this.G = new boolean[n1];
+    this.H = new boolean[n2];
     this.j = 0;
     while ((j < n1)) {
       G[j] = false;

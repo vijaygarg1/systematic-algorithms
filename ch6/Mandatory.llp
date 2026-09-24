@@ -2,13 +2,14 @@
 // S[j] is true iff interval j is mandatory.
 
 class Mandatory {
-  boolean[] Mandatory(boolean[] S, boolean[] G) {
+  boolean[] Mandatory(int[] s, int[] f, boolean[] S, boolean[] G) {
     forbidden (j) : S[j] && !G[j] =>
-      advance : if (overlaps(j, G)) { return null; }
+      advance : if (overlaps(j, G, s, f)) { return null; }
                 else { G[j] = true; };
+    return G;
   }
 
-  boolean overlaps(int j, boolean[] G) {
+  boolean overlaps(int j, boolean[] G, int[] s, int[] f) {
     boolean result = false;
     int k = 0;
     while (k < G.length) {

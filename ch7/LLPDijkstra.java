@@ -10,6 +10,7 @@ public class LLPDijkstra {
   int[] dIn;
   int[] d;
   boolean[] fixed;
+  int j;
   PriorityQueue<Integer> forbiddenHeap;
 
   private boolean forbidden(int j) {
@@ -17,7 +18,7 @@ public class LLPDijkstra {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     fixed[j] = true;
   }
 
@@ -36,7 +37,7 @@ public class LLPDijkstra {
     for (int j = 0; j < n; j++) forbiddenHeap.add(j);
     while (!forbiddenHeap.isEmpty()) {
       int j = forbiddenHeap.poll();
-      if (forbidden(j)) advance(j);
+      if (forbidden(j)) { this.j = j; advance(); }
     }
     return d;
   }

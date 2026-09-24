@@ -7,6 +7,7 @@ public class LLPIntervalPartition {
   int[][] pre;
   int[] G;
   boolean[] fixed;
+  int j;
 
   private boolean forbidden(int j) {
     if (fixed[j]) return false;
@@ -14,7 +15,7 @@ public class LLPIntervalPartition {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = leastFreeRoom(j);
     fixed[j] = true;
   }
@@ -31,7 +32,7 @@ public class LLPIntervalPartition {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

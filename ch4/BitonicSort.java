@@ -6,7 +6,7 @@ public class BitonicSort {
   public void sort(int[] A, int low, int n, int dir) {
     if ((n > 1)) {
       int m = (n / 2);
-      /* [ ... || ... ]: independent branches (sequential for now) */
+      /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
       sort(A, low, m, 1);
       // branch 1
@@ -29,7 +29,7 @@ public class BitonicSort {
         }
         i = (i + 1);
       }
-      /* [ ... || ... ]: independent branches (sequential for now) */
+      /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
       bitonicMerge(A, low, m, dir);
       // branch 1

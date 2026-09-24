@@ -9,6 +9,7 @@ public class LLPPrim {
   double[][] W;
   double[] C;
   int root;
+  int j;
 
   private boolean forbidden(int j) {
     if (fixed[j]) return false;
@@ -18,7 +19,7 @@ public class LLPPrim {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int i = argMinCrossCut(j);
     parent[j] = i;
     C[j] = W[i][j];
@@ -38,7 +39,7 @@ public class LLPPrim {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

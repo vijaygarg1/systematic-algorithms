@@ -6,7 +6,7 @@ public class MergeSort {
   public void sort(int lo, int hi, int[] G) {
     if ((lo < hi)) {
       int mid = ((lo + hi) / 2);
-      /* [ ... || ... ]: independent branches (sequential for now) */
+      /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
       sort(lo, mid, G);
       // branch 1

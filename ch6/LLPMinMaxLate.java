@@ -7,6 +7,7 @@ public class LLPMinMaxLate {
   int[] t;
   int[] d;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     int t1 = 0;
@@ -16,7 +17,7 @@ public class LLPMinMaxLate {
     return (G[j] < t1);
   }
 
-  private void advance(int j) {
+  private void advance() {
     int t2 = 0;
     for (int i = 0; i < j; i++) {
       t2 += t[i];
@@ -35,7 +36,7 @@ public class LLPMinMaxLate {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

@@ -4,8 +4,8 @@ import java.util.*;
 
 public class ClosestPair {
   public double[] find(int lo, int hi, double[] Px, double[] Py) {
-    double[] G = new double[n];
-    for (int i = 0; i < n; i++) G[i] = Double.POSITIVE_INFINITY;
+    double[] G = new double[1];
+    G[0] = Double.POSITIVE_INFINITY;
     ClosestPair(lo, hi, Px, Py, G);
     return G;
   }
@@ -23,7 +23,7 @@ public class ClosestPair {
         }
       } else {
         int mid = ((lo + hi) / 2);
-        /* [ ... || ... ]: independent branches (sequential for now) */
+        /* [ ... [] ... ]: parallel branches (sequential for now) */
         // branch 0
         ClosestPair(lo, mid, Px, Py, G);
         // branch 1

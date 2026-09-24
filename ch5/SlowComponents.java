@@ -6,6 +6,7 @@ public class SlowComponents {
   int n;
   int[][] adj;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     int t1 = Integer.MIN_VALUE;
@@ -16,7 +17,7 @@ public class SlowComponents {
     return (!(G[j] >= t1));
   }
 
-  private void advance(int j) {
+  private void advance() {
     int m = Integer.MIN_VALUE;
     for (int i : adj[j]) m = Math.max(m, G[i]);
     G[j] = m;
@@ -33,7 +34,7 @@ public class SlowComponents {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

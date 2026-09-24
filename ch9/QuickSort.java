@@ -6,7 +6,7 @@ public class QuickSort {
   public void sort(int lo, int hi, int[] G) {
     if ((lo < hi)) {
       int p = Partition(lo, hi, G);
-      /* [ ... || ... ]: independent branches (sequential for now) */
+      /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
       sort(lo, (p - 1), G);
       // branch 1

@@ -1,7 +1,6 @@
 // LLP assignment: minimum clearing price vector via step-jump price increments.
 // Each iteration: identify overdemanded items, raise each by step[j] = min slack
-// to the next critical price (the smallest amount that lets some bidder become
-// indifferent and break a tight edge). Strongly polynomial.
+// to the next critical price.
 
 import java.util.*;
 
@@ -72,7 +71,6 @@ public class LLPAssignment {
   public void raiseOverdemandedPrices(int[][] v, int[] C) {
     int n = C.length;
     int m = v.length;
-    // Snapshot bestSurplus[b] for every bidder before any prices change this round.
     int[] bestSurplus = new int[m];
     int b = 0;
     while ((b < m)) {
@@ -87,9 +85,6 @@ public class LLPAssignment {
       }
       b = (b + 1);
     }
-    // For each item j: count demand[j] and the per-item step (min slack across
-    // bidders whose top choice includes j). step[j] is how far we can raise
-    // C[j] before some bidder b becomes indifferent to another item.
     int[] step = new int[n];
     int[] demand = new int[n];
     int j = 0;
@@ -118,13 +113,11 @@ public class LLPAssignment {
         }
         b = (b + 1);
       }
-      // Integer arithmetic: a tied bidder gives slack 0; raise by at least 1.
       if ((step[j] < 1)) {
         step[j] = 1;
       }
       j = (j + 1);
     }
-    // Raise every overdemanded item simultaneously.
     j = 0;
     while ((j < n)) {
       if ((demand[j] > 1)) {
@@ -135,7 +128,7 @@ public class LLPAssignment {
   }
 
   public static void main(String[] args) {
-    int[][] v = new int[][] {{5, 3, 1}, {4, 4, 2}, {1, 2, 5}};
+    int[][] v = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     LLPAssignment prog = new LLPAssignment();
     int[] result = prog.LLPAssignment(v);
     System.out.println(Arrays.toString(result));

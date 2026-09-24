@@ -3,7 +3,7 @@
 // always: fixed[j] = (j == s) || (exists i : parent[j][i] && fixed[i])
 
 class LLPShortestPath {
-  void LLPShortestPath(int[][] pre, int[][] w) {
+  void LLPShortestPath(int s, int[][] pre, int[][] w) {
     int[] G = 0;
     boolean[] fixed = false;
     fixed[s] = true;

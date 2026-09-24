@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class Hanoi {
-  public static void Hanoi(int n, int source, int aux, int target) {
+  public void Hanoi(int n, int source, int aux, int target) {
     if ((n == 1)) {
     } else {
       Hanoi((n - 1), source, target, aux);
@@ -15,6 +15,7 @@ public class Hanoi {
     int n = 0;
     int aux = 0;
     int target = 0;
-    Hanoi(n, 0, aux, target);
+    Hanoi prog = new Hanoi();
+    prog.Hanoi(n, 0, aux, target);
   }
 }

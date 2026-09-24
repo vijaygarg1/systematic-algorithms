@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class Factorial {
-  public static int Factorial(int n) {
+  public int Factorial(int n) {
     if ((n == 0)) {
       return 1;
     }
@@ -12,7 +12,8 @@ public class Factorial {
 
   public static void main(String[] args) {
     int n = 0;
-    int result = Factorial(n);
+    Factorial prog = new Factorial();
+    int result = prog.Factorial(n);
     System.out.println(result);
   }
 }

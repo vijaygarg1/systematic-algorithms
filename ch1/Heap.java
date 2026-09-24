@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class Heap {
-  public static void build(int[] A, int n) {
+  public void build(int[] A, int n) {
     int i = ((n / 2) - 1);
     while ((i >= 0)) {
       heapify(A, i, n);
@@ -11,7 +11,7 @@ public class Heap {
     }
   }
 
-  public static void heapify(int[] A, int i, int n) {
+  public void heapify(int[] A, int i, int n) {
     int smallest = i;
     int left = ((2 * i) + 1);
     int right = ((2 * i) + 2);
@@ -27,7 +27,7 @@ public class Heap {
     }
   }
 
-  public static int insert(int[] A, int key, int n) {
+  public int insert(int[] A, int key, int n) {
     n = (n + 1);
     int i = (n - 1);
     while (((i > 0) && (A[((i - 1) / 2)] > key))) {
@@ -38,7 +38,7 @@ public class Heap {
     return n;
   }
 
-  public static int extractMin(int[] A, int n) {
+  public int extractMin(int[] A, int n) {
     if ((n < 1)) {
       return (-2147483648);
     }
@@ -51,7 +51,8 @@ public class Heap {
 
   public static void main(String[] args) {
     int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
-    build(A, A.length);
+    Heap prog = new Heap();
+    prog.build(A, A.length);
     System.out.println(Arrays.toString(A));
   }
 }

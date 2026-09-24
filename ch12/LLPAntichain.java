@@ -8,6 +8,7 @@ public class LLPAntichain {
   int[] len;
   boolean[][] leq;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -17,7 +18,7 @@ public class LLPAntichain {
     return ((G[j] < len[j]) && t1);
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = (G[j] + 1);
   }
 
@@ -33,7 +34,7 @@ public class LLPAntichain {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

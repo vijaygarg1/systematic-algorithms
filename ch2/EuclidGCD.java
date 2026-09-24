@@ -6,16 +6,17 @@ public class EuclidGCD {
   int n;
   int[] A;
   int[] G;
+  int j;
   int picked_i;
 
   private boolean forbidden(int j) {
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
       if ((G[j] > G[i])) { this.picked_i = i; return true; }
     }
     return false;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int i = picked_i;
     G[j] = (G[j] - G[i]);
   }
@@ -30,7 +31,7 @@ public class EuclidGCD {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

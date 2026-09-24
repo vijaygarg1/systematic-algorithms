@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class MergeSort {
-  public static void MergeSort(int[] A, int low, int high) {
+  public void MergeSort(int[] A, int low, int high) {
     if ((low < high)) {
       int mid = ((low + high) / 2);
       MergeSort(A, low, mid);
@@ -12,7 +12,7 @@ public class MergeSort {
     }
   }
 
-  public static void Merge(int[] A, int low, int mid, int high) {
+  public void Merge(int[] A, int low, int mid, int high) {
     int[] B = new int[A.length];
     for (int k = low; k <= high; k++) {
       B[k] = A[k];
@@ -44,7 +44,8 @@ public class MergeSort {
 
   public static void main(String[] args) {
     int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
-    MergeSort(A, 0, A.length);
+    MergeSort prog = new MergeSort();
+    prog.MergeSort(A, 0, A.length);
     System.out.println(Arrays.toString(A));
   }
 }

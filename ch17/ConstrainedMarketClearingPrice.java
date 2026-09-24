@@ -6,16 +6,16 @@ import java.util.*;
 public class ConstrainedMarketClearingPrice {
   int n;
   int[][] v;
-  int n;
   int m;
   int[] G;
+  int j;
 
   private boolean _forbidden0(int j) {
     if (!(isOverDemanded(j, v, G))) return false;
     return true;
   }
 
-  private void _advance0(int j) {
+  private void _advance0() {
     G[j] = (G[j] + 1);
   }
 
@@ -24,7 +24,6 @@ public class ConstrainedMarketClearingPrice {
     this.n = v[0].length;
     this.m = v.length;
     this.G = new int[n];
-    for (int i = 0; i < n; i++) this.G[i] = new int[n];
     for (int k = 0; k < n; k++) {
       G[k] = 0;
     }
@@ -34,7 +33,7 @@ public class ConstrainedMarketClearingPrice {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }

@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class GCD {
-  public static int GCD(int a, int b) {
+  public int GCD(int a, int b) {
     while ((a != b)) {
       if ((a > b)) {
         if (((a % b) == 0)) {
@@ -25,7 +25,8 @@ public class GCD {
   public static void main(String[] args) {
     int a = 0;
     int b = 0;
-    int result = GCD(a, b);
+    GCD prog = new GCD();
+    int result = prog.GCD(a, b);
     System.out.println(result);
   }
 }

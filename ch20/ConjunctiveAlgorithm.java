@@ -7,20 +7,21 @@ public class ConjunctiveAlgorithm {
   int n;
   int[][] vc;
   int[] T;
-  int n;
   int[] G;
+  int j;
 
   private boolean _forbidden0(int j) {
     if (!(happenedBefore(j, G, vc))) return false;
     return true;
   }
 
-  private void _advance0(int j) {
+  private int[] _advance0() {
     if ((G[j] >= T[j])) {
       return G;
     } else {
       G[j] = (G[j] + 1);
     }
+    return null;
   }
 
   public int[] ConjunctiveAlgorithm(int[][] vc, int[] T) {
@@ -29,7 +30,6 @@ public class ConjunctiveAlgorithm {
     this.n = T.length;
     this.n = vc.length;
     this.G = new int[n];
-    for (int i = 0; i < n; i++) this.G[i] = new int[n];
     for (int k = 0; k < n; k++) {
       G[k] = 1;
     }
@@ -39,7 +39,7 @@ public class ConjunctiveAlgorithm {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; int[] _r = _advance0(); if (_r != null) return _r;
             changed = true;
           }
         }

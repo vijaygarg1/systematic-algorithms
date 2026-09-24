@@ -9,6 +9,7 @@ public class ParCRT {
   int[] m;
   int[] b;
   int[] G;
+  int j;
   int picked_i;
 
   private boolean forbidden(int j) {
@@ -18,7 +19,7 @@ public class ParCRT {
     return false;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int i = picked_i;
     G[j] = (G[j] + (((((G[i] - G[j]) + m[j]) - 1) / m[j]) * m[j]));
   }
@@ -34,7 +35,7 @@ public class ParCRT {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

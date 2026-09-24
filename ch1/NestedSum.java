@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class NestedSum {
-  public static int NestedSum(int n) {
+  public int NestedSum(int n) {
     int total = 0;
     int i = 0;
     while ((i < n)) {
@@ -19,7 +19,8 @@ public class NestedSum {
 
   public static void main(String[] args) {
     int n = 0;
-    int result = NestedSum(n);
+    NestedSum prog = new NestedSum();
+    int result = prog.NestedSum(n);
     System.out.println(result);
   }
 }

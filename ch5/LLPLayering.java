@@ -7,6 +7,7 @@ public class LLPLayering {
   int[][] pre;
   int[] G;
   boolean[] fixed;
+  int j;
 
   private boolean forbidden(int j) {
     if (fixed[j]) return false;
@@ -14,7 +15,7 @@ public class LLPLayering {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int m = 0;
     for (int i : pre[j]) m = Math.max(m, (G[i] + 1));
     G[j] = m;
@@ -32,7 +33,7 @@ public class LLPLayering {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

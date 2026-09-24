@@ -6,6 +6,7 @@ public class LLPLexicallyFirstVertexCover {
   int n;
   int[][] adj;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -15,7 +16,7 @@ public class LLPLexicallyFirstVertexCover {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -28,7 +29,7 @@ public class LLPLexicallyFirstVertexCover {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

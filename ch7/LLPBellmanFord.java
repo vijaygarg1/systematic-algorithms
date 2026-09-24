@@ -7,6 +7,7 @@ public class LLPBellmanFord {
   int[][] pre;
   int[][] w;
   int[] G;
+  int j;
 
   private boolean _forbidden0(int j) {
     boolean t1 = false;
@@ -16,7 +17,7 @@ public class LLPBellmanFord {
     return t1;
   }
 
-  private void _advance0(int j) {
+  private void _advance0() {
     for (int k = 0; k <= n; k++) {
       int m = G[k];
       for (int i : pre[k]) m = Math.min(m, (G[i] + w[i][k]));
@@ -37,7 +38,7 @@ public class LLPBellmanFord {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }

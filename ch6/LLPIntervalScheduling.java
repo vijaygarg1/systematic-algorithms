@@ -7,6 +7,7 @@ public class LLPIntervalScheduling {
   int[] s;
   int[] f;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (G[j]) return false;
@@ -14,7 +15,7 @@ public class LLPIntervalScheduling {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -29,7 +30,7 @@ public class LLPIntervalScheduling {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

@@ -8,13 +8,14 @@ public class LLPFractionalKnapsack {
   double[] w;
   double W;
   double[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((G[j] < target(j)))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = target(j);
   }
 
@@ -30,7 +31,7 @@ public class LLPFractionalKnapsack {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

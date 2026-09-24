@@ -8,6 +8,7 @@ public class LLPStableMarriage {
   int[][] rank;
   int[] I;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -21,7 +22,7 @@ public class LLPStableMarriage {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = (G[j] + 1);
   }
 
@@ -37,7 +38,7 @@ public class LLPStableMarriage {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

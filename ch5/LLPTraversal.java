@@ -6,6 +6,7 @@ public class LLPTraversal {
   int n;
   int[][] pre;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -15,7 +16,7 @@ public class LLPTraversal {
     return ((!G[j]) && t1);
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -29,7 +30,7 @@ public class LLPTraversal {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

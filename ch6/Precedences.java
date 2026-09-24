@@ -1,30 +1,54 @@
-// Precedences: composition program enforcing G[j] >= G[i] + t[i] for
-// every i in pre(j).
+// Precedences: composition program enforcing precedence constraints
+// pre(j) on job starts.  Each job j cannot start until every i in
+// pre(j) has finished (start G[i] plus processing time t[i]).
+// Composed onto LLP-MinMaxLateness via predicate conjunction:
+// [ LLP-MinMaxLateness(t, d, G) && Precedences(pre, t, G) ].
 
 import java.util.*;
 
 public class Precedences {
-  public int[] run(Set<Integer>[] pre, int[] t, int[] G) {
-    int n = G.length;
-    boolean changed = true;
-    while (changed) {
-      changed = false;
-      for (int j = 0; j < n; j++) {
-        int target = G[j];
-        for (int i : pre[j]) {
-          int v = G[i] + t[i];
-          if (v > target) target = v;
+  int n;
+  int[][] pre;
+  int[] t;
+  int[] G;
+  int j;
+
+  private boolean forbidden(int j) {
+    boolean t1 = false;
+    for (int i : pre[j]) {
+      if ((G[j] < (G[i] + t[i]))) { t1 = true; break; }
+    }
+    return t1;
+  }
+
+  private void advance() {
+    int m = Integer.MIN_VALUE;
+    for (int i : pre[j]) m = Math.max(m, (G[i] + t[i]));
+    G[j] = m;
+  }
+
+  public int[] Precedences(int[][] pre, int[] t, int[] G) {
+    this.pre = pre;
+    this.t = t;
+    this.G = G;
+    this.n = pre.length;
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int j = 0; j < n; j++) {
+          if (forbidden(j)) {
+            this.j = j; advance();
+            changed = true;
+          }
         }
-        if (target > G[j]) { G[j] = target; changed = true; }
       }
     }
     return G;
   }
 
   public static void main(String[] args) {
-    Set<Integer>[] pre = new Set[]{ Set.of(), Set.of(0), Set.of(0, 1) };
-    int[] t = {3, 4, 2};
-    int[] G = {0, 0, 0};
-    System.out.println(Arrays.toString(new Precedences().run(pre, t, G)));
+    // Demo harness for Precedences.
+    // Construct with hard-coded inputs and call the entry method.
   }
 }

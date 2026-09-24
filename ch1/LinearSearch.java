@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class LinearSearch {
-  public static int LinearSearch(int[] A, int key) {
+  public int LinearSearch(int[] A, int key) {
     int i = 0;
     while ((i < A.length)) {
       if ((A[i] == key)) {
@@ -17,7 +17,8 @@ public class LinearSearch {
   public static void main(String[] args) {
     int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
     int key = 0;
-    int result = LinearSearch(A, key);
+    LinearSearch prog = new LinearSearch();
+    int result = prog.LinearSearch(A, key);
     System.out.println(result);
   }
 }

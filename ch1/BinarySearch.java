@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class BinarySearch {
-  public static int BinarySearch(int[] A, int key, int low, int high) {
+  public int BinarySearch(int[] A, int key, int low, int high) {
     if ((low > high)) {
       return (-1);
     }
@@ -20,7 +20,8 @@ public class BinarySearch {
   public static void main(String[] args) {
     int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
     int key = 0;
-    int result = BinarySearch(A, key, 0, A.length);
+    BinarySearch prog = new BinarySearch();
+    int result = prog.BinarySearch(A, key, 0, A.length);
     System.out.println(result);
   }
 }

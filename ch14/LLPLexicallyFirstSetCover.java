@@ -6,13 +6,14 @@ public class LLPLexicallyFirstSetCover {
   int n;
   int[][] S;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!(isLexMaxCov(j, S, G))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -25,7 +26,7 @@ public class LLPLexicallyFirstSetCover {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

@@ -7,15 +7,15 @@ public class LLPHornSAT {
   int n;
   int[][] body;
   int[] head;
-  int n;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!(hornImplied(j, G, body, head))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -25,14 +25,13 @@ public class LLPHornSAT {
     this.n = head.length;
     this.n = head.length;
     this.G = new boolean[n];
-    for (int i = 0; i < n; i++) this.G[i] = new boolean[n];
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

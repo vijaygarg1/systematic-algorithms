@@ -7,6 +7,7 @@ public class LLPJobSchedulingEnsure {
   int[] t;
   int[][] pre;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     int t1 = Integer.MIN_VALUE;
@@ -17,7 +18,7 @@ public class LLPJobSchedulingEnsure {
     return (!(G[j] >= t1));
   }
 
-  private void advance(int j) {
+  private void advance() {
     int m = Integer.MIN_VALUE;
     for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
     G[j] = m;
@@ -34,7 +35,7 @@ public class LLPJobSchedulingEnsure {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

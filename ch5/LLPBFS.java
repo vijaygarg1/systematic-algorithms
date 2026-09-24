@@ -1,4 +1,5 @@
 // LLP-BFS: forbidden when G[j] > min_{i in pre[j]} G[i] + 1.
+// style: fixpoint
 
 import java.util.*;
 
@@ -6,6 +7,7 @@ public class LLPBFS {
   int n;
   int[][] pre;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     int t1 = Integer.MAX_VALUE;
@@ -16,7 +18,7 @@ public class LLPBFS {
     return (G[j] > t1);
   }
 
-  private void advance(int j) {
+  private void advance() {
     int m = Integer.MAX_VALUE;
     for (int i : pre[j]) m = Math.min(m, (G[i] + 1));
     G[j] = m;
@@ -32,7 +34,7 @@ public class LLPBFS {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

@@ -6,22 +6,25 @@ import java.util.*;
 
 public class LLPShortestPath {
   int n;
+  int s;
   int[][] pre;
   int[][] w;
   int[] G;
   boolean[] fixed;
+  int j;
 
   private boolean _forbidden0(int j) {
     if (fixed[j]) return false;
     return true;
   }
 
-  private void _advance0(int j) {
+  private void _advance0() {
     G[j] = minCrossCut(j, pre, w, G, fixed);
     fixed[j] = true;
   }
 
-  public void LLPShortestPath(int[][] pre, int[][] w) {
+  public void LLPShortestPath(int s, int[][] pre, int[][] w) {
+    this.s = s;
     this.pre = pre;
     this.w = w;
     this.G = new int[n];
@@ -33,7 +36,7 @@ public class LLPShortestPath {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }
@@ -61,7 +64,7 @@ public class LLPShortestPath {
     int[][] pre = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     int[][] w = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     LLPShortestPath prog = new LLPShortestPath();
-    prog.LLPShortestPath(pre, w);
+    prog.LLPShortestPath(0, pre, w);
     System.out.println(Arrays.deepToString(pre));
     System.out.println(Arrays.deepToString(w));
   }

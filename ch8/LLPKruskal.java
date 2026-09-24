@@ -8,6 +8,7 @@ public class LLPKruskal {
   int[] v;
   int[] parent;
   boolean[] C;
+  int j;
 
   private boolean forbidden(int j) {
     if (C[j]) return false;
@@ -15,7 +16,7 @@ public class LLPKruskal {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     C[j] = true;
     union(u[j], v[j], parent);
   }
@@ -32,7 +33,7 @@ public class LLPKruskal {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

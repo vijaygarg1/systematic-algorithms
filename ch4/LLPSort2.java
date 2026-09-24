@@ -5,6 +5,7 @@ import java.util.*;
 public class LLPSort2 {
   int n;
   int[] A;
+  int j;
   int picked_k;
 
   private boolean forbidden(int j) {
@@ -14,7 +15,7 @@ public class LLPSort2 {
     return false;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int k = picked_k;
     { int tmp = A[j]; A[j] = A[k]; A[k] = tmp; }
   }
@@ -28,7 +29,7 @@ public class LLPSort2 {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

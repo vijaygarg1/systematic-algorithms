@@ -7,6 +7,7 @@ public class LLPJohnson {
   int[][] pre;
   int[][] w;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -16,7 +17,7 @@ public class LLPJohnson {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     for (int k = 0; k <= n; k++) {
       int m = G[k];
       for (int i : pre[k]) m = Math.max(m, (G[i] - w[i][k]));
@@ -35,7 +36,7 @@ public class LLPJohnson {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }

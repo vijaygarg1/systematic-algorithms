@@ -1,53 +1,109 @@
-// FPTAS for Knapsack: scale values down by scale = eps*M/n, then run the standard 0/1 DP on the scaled instance.
+// FPTAS for Knapsack: discard items that cannot fit, then scale profits by
+// mu = eps*M/nf (M = max profit among feasible items) and run the standard 0/1 DP
+// profit-indexed as D[i][p] = min weight to reach scaled profit >= p.  The table is
+// O(nf * V') with V' = O(nf^2/eps).  Fully polynomial.
 
 import java.util.*;
 
 public class FPTASKnapsack {
   public boolean[] FPTASKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
     int n = w.length;
-    int M = v[0];
-    int i = 1;
+    boolean[] S = new boolean[n];
+    int nf = 0;
+    int i = 0;
     while ((i < n)) {
-      if ((v[i] > M)) {
-        M = v[i];
+      if ((w[i] <= W)) {
+        nf = (nf + 1);
       }
       i = (i + 1);
     }
-    int[] vPrime = new int[n];
+    if ((nf == 0)) {
+      return S;
+    }
+    int[] fw = new int[nf];
+    int[] fv = new int[nf];
+    int[] orig = new int[nf];
+    int k = 0;
     i = 0;
     while ((i < n)) {
-      vPrime[i] = (((v[i] * n) * epsDen) / (epsNum * M));
+      if ((w[i] <= W)) {
+        fw[k] = w[i];
+        fv[k] = v[i];
+        orig[k] = i;
+        k = (k + 1);
+      }
       i = (i + 1);
     }
+    int M = fv[0];
+    i = 1;
+    while ((i < nf)) {
+      if ((fv[i] > M)) {
+        M = fv[i];
+      }
+      i = (i + 1);
+    }
+    int[] vPrime = new int[nf];
     int Vp = 0;
     i = 0;
-    while ((i < n)) {
+    while ((i < nf)) {
+      vPrime[i] = (((fv[i] * nf) * epsDen) / (epsNum * M));
       Vp = (Vp + vPrime[i]);
       i = (i + 1);
     }
-    int[][] dp = new int[(n + 1)][(W + 1)];
-    i = 1;
-    while ((i <= n)) {
-      int c = 0;
-      while ((c <= W)) {
-        dp[i][c] = dp[(i - 1)][c];
-        if ((w[(i - 1)] <= c)) {
-          int take = (dp[(i - 1)][(c - w[(i - 1)])] + vPrime[(i - 1)]);
-          if ((take > dp[i][c])) {
-            dp[i][c] = take;
-          }
+    int INF = 1;
+    i = 0;
+    while ((i < nf)) {
+      INF = (INF + fw[i]);
+      i = (i + 1);
+    }
+    int[][] D = new int[(nf + 1)][(Vp + 1)];
+    i = 0;
+    while ((i <= nf)) {
+      int p = 0;
+      while ((p <= Vp)) {
+        D[i][p] = INF;
+        if ((p == 0)) {
+          D[i][p] = 0;
         }
-        c = (c + 1);
+        p = (p + 1);
       }
       i = (i + 1);
     }
-    boolean[] S = new boolean[n];
-    int rem = W;
-    i = n;
+    i = 1;
+    while ((i <= nf)) {
+      int p = 1;
+      while ((p <= Vp)) {
+        D[i][p] = D[(i - 1)][p];
+        int prev = (p - vPrime[(i - 1)]);
+        if ((prev < 0)) {
+          prev = 0;
+        }
+        int take = (fw[(i - 1)] + D[(i - 1)][prev]);
+        if ((take < D[i][p])) {
+          D[i][p] = take;
+        }
+        p = (p + 1);
+      }
+      i = (i + 1);
+    }
+    int pStar = 0;
+    int q = 0;
+    while ((q <= Vp)) {
+      if ((D[nf][q] <= W)) {
+        pStar = q;
+      }
+      q = (q + 1);
+    }
+    int bp = pStar;
+    i = nf;
     while ((i > 0)) {
-      if ((dp[i][rem] != dp[(i - 1)][rem])) {
-        S[(i - 1)] = true;
-        rem = (rem - w[(i - 1)]);
+      if ((D[i][bp] < D[(i - 1)][bp])) {
+        S[orig[(i - 1)]] = true;
+        int prev = (bp - vPrime[(i - 1)]);
+        if ((prev < 0)) {
+          prev = 0;
+        }
+        bp = prev;
       }
       i = (i - 1);
     }

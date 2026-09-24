@@ -4,14 +4,25 @@
 //   [ LLP-IntervalPartition(s, f, G) && ExcludedRooms(R, G) ].
 
 class ExcludedRooms {
-  int[] ExcludedRooms(set<int>[] R, set<int>[] pre, int[] G) {
-    int n = G.length;
-    forbidden (j) : G[j] in R[j] =>
-      advance : {
-        G[j] = min r in [1..n] :
-          !(r in R[j]) &&
-          forall k in pre[j] : G[k] != r;
-      };
+  int[] ExcludedRooms(set<int>[] R, int[] G, set<int>[] pre) {
+    forbidden (j) : exists r in R[j] : G[j] == r =>
+      advance : G[j] = leastValidRoom(j);
     return G;
+  }
+
+  int leastValidRoom(int j) {
+    int r = 1;
+    boolean conflict = true;
+    while (conflict) {
+      conflict = false;
+      forall x in R[j] :
+        if (x == r) { conflict = true; };
+      if (!conflict) {
+        forall k in pre[j] :
+          if (G[k] == r) { conflict = true; };
+      };
+      if (conflict) { r = r + 1; }
+    };
+    return r;
   }
 }

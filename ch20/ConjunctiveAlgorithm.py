@@ -17,7 +17,7 @@ def conjunctive_algorithm(vc, T):
         for j in range(n):
             if happened_before(j, G, vc, n):
                 if G[j] >= T[j]:
-                    return G
+                    return None
                 else:
                     G[j] += 1
                     changed = True

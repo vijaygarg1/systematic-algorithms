@@ -7,7 +7,7 @@
 import java.util.*;
 
 public class LLPApproxKnapsack {
-  public int[][] LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
+  public int LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
     int n = w.length;
     int nf = 0;
     int i = 0;
@@ -92,7 +92,15 @@ public class LLPApproxKnapsack {
         i = (i + 1);
       }
     }
-    return D;
+    int pStar = 0;
+    int p = 0;
+    while ((p <= Vp)) {
+      if ((D[nf][p] <= W)) {
+        pStar = p;
+      }
+      p = (p + 1);
+    }
+    return pStar;
   }
 
   public static void main(String[] args) {
@@ -102,7 +110,7 @@ public class LLPApproxKnapsack {
     int epsNum = 0;
     int epsDen = 0;
     LLPApproxKnapsack prog = new LLPApproxKnapsack();
-    int[][] result = prog.LLPApproxKnapsack(w, v, W, epsNum, epsDen);
-    System.out.println(Arrays.deepToString(result));
+    int result = prog.LLPApproxKnapsack(w, v, W, epsNum, epsDen);
+    System.out.println(result);
   }
 }

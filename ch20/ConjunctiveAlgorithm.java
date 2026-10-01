@@ -5,6 +5,7 @@ import java.util.*;
 
 public class ConjunctiveAlgorithm {
   int n;
+  private static final int[] _NO_EARLY_EXIT = new int[0];
   int[][] vc;
   int[] T;
   int[] G;
@@ -17,11 +18,11 @@ public class ConjunctiveAlgorithm {
 
   private int[] _advance0() {
     if ((G[j] >= T[j])) {
-      return G;
+      return null;
     } else {
       G[j] = (G[j] + 1);
     }
-    return null;
+    return _NO_EARLY_EXIT;
   }
 
   public int[] ConjunctiveAlgorithm(int[][] vc, int[] T) {
@@ -39,7 +40,7 @@ public class ConjunctiveAlgorithm {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            this.j = j; int[] _r = _advance0(); if (_r != null) return _r;
+            this.j = j; int[] _r = _advance0(); if (_r != _NO_EARLY_EXIT) return _r;
             changed = true;
           }
         }

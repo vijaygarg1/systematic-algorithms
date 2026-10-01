@@ -1,22 +1,22 @@
-"""LLP housing market: forbidden when agent j is not in the submatching
-but wishes for a house that is in the submatching; advance increments proposal."""
+"""LLP housing market: forbidden when agent j is not in S(G) (the
+largest submatching) but wishes for a house held by an agent who is;
+advance moves j to its next preference. S(G) is the set of agents
+lying on a cycle of the wish functional graph (i -> wish(i))."""
+
+
+def wish(i, G, pref):
+    return pref[i][G[i]]
 
 
 def in_submatching(j, G, pref):
     n = len(G)
-    target = pref[j][G[j]]
-    for i in range(n):
-        if i != j and pref[i][G[i]] == target:
-            return False
-    return True
-
-
-def wish_in_submatching(j, G, pref):
-    n = len(G)
-    wish = pref[j][G[j]]
-    for i in range(n):
-        if pref[i][G[i]] == wish and in_submatching(i, G, pref):
+    cur = wish(j, G, pref)
+    steps = 1
+    while steps <= n:
+        if cur == j:
             return True
+        cur = wish(cur, G, pref)
+        steps += 1
     return False
 
 
@@ -27,7 +27,7 @@ def llp_housing_market(pref):
     while changed:
         changed = False
         for j in range(n):
-            if not in_submatching(j, G, pref) and wish_in_submatching(j, G, pref):
+            if not in_submatching(j, G, pref) and in_submatching(wish(j, G, pref), G, pref):
                 G[j] += 1
                 changed = True
     return G

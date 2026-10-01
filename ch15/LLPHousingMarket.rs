@@ -1,21 +1,20 @@
-// LLP housing market: forbidden when agent j is not in the
-// submatching but wishes for a house that is in the submatching;
-// advance increments the proposal index.
+// LLP housing market: forbidden when agent j is not in S(G) (the
+// largest submatching) but wishes for a house held by an agent who is;
+// advance moves j to its next preference. S(G) is the set of agents
+// lying on a cycle of the wish functional graph (i -> wish(i)).
+
+fn wish(i: usize, g: &[usize], pref: &[Vec<usize>]) -> usize {
+    pref[i][g[i]]
+}
 
 fn in_submatching(j: usize, g: &[usize], pref: &[Vec<usize>]) -> bool {
     let n = g.len();
-    let target = pref[j][g[j]];
-    for i in 0..n {
-        if i != j && pref[i][g[i]] == target { return false; }
-    }
-    true
-}
-
-fn wish_in_submatching(j: usize, g: &[usize], pref: &[Vec<usize>]) -> bool {
-    let n = g.len();
-    let wish = pref[j][g[j]];
-    for i in 0..n {
-        if pref[i][g[i]] == wish && in_submatching(i, g, pref) { return true; }
+    let mut cur = wish(j, g, pref);
+    let mut steps = 1;
+    while steps <= n {
+        if cur == j { return true; }
+        cur = wish(cur, g, pref);
+        steps += 1;
     }
     false
 }
@@ -27,7 +26,7 @@ fn llp_housing_market(pref: &[Vec<usize>]) -> Vec<usize> {
     while changed {
         changed = false;
         for j in 0..n {
-            if !in_submatching(j, &g, pref) && wish_in_submatching(j, &g, pref) {
+            if !in_submatching(j, &g, pref) && in_submatching(wish(j, &g, pref), &g, pref) {
                 g[j] += 1;
                 changed = true;
             }
@@ -38,10 +37,10 @@ fn llp_housing_market(pref: &[Vec<usize>]) -> Vec<usize> {
 
 fn main() {
     let pref: Vec<Vec<usize>> = vec![
+        vec![1, 2, 0, 3],
+        vec![0, 3, 1, 2],
+        vec![0, 1, 3, 2],
         vec![1, 0, 2, 3],
-        vec![0, 1, 2, 3],
-        vec![0, 1, 2, 3],
-        vec![3, 1, 0, 2],
     ];
     let g = llp_housing_market(&pref);
     println!("G: {:?}", g);

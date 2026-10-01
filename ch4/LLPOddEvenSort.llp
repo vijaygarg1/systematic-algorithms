@@ -1,8 +1,0 @@
-// LLP-Sort1 with alternating odd/even-phase scheduling for parallelism.
-
-class LLPOddEvenSort {
-  void LLPOddEvenSort(int[] A) {
-    forbidden (j) : j < n - 1 && A[j] > A[j+1] =>
-      advance : swap(A[j], A[j+1]);
-  }
-}

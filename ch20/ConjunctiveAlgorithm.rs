@@ -10,18 +10,23 @@ fn happened_before(j: usize, g: &[i32], vc: &[Vec<i32>]) -> bool {
     false
 }
 
-fn conjunctive_algorithm(vc: &[Vec<i32>], t: &[i32]) -> Vec<i32> {
+// Returns the satisfying global state, or None if none exists (some
+// process would need to advance past its last retained state).
+fn conjunctive_algorithm(vc: &[Vec<i32>], t: &[i32]) -> Option<Vec<i32>> {
     let n = t.len();
     let mut g = vec![1i32; n];
     let mut changed = true;
     while changed {
         changed = false;
         for j in 0..n {
-            if g[j] >= t[j] { continue; }
-            if happened_before(j, &g, vc) { g[j] += 1; changed = true; }
+            if happened_before(j, &g, vc) {
+                if g[j] >= t[j] { return None; }
+                g[j] += 1;
+                changed = true;
+            }
         }
     }
-    g
+    Some(g)
 }
 
 fn main() {
@@ -30,6 +35,8 @@ fn main() {
         vec![0, 0], vec![0, 0],
     ];
     let t = [2i32, 2];
-    let g = conjunctive_algorithm(&vc, &t);
-    println!("G: {:?}", g);
+    match conjunctive_algorithm(&vc, &t) {
+        Some(g) => println!("G: {:?}", g),
+        None => println!("no satisfying global state"),
+    }
 }

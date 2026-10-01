@@ -1,25 +1,26 @@
-// LLP housing market: forbidden when agent j is not in the
-// submatching but wishes for a house that is in the submatching;
-// advance increments the proposal index.
+// LLP housing market: forbidden when agent j is not in S(G) (the
+// largest submatching) but wishes for a house held by an agent who is;
+// advance moves j to its next preference. S(G) is the set of agents
+// lying on a cycle of the wish functional graph (i -> wish(i)).
 
 #include <iostream>
 #include <vector>
 
+int wish(int i, const std::vector<int>& G,
+        const std::vector<std::vector<int>>& pref) {
+    return pref[i][G[i]];
+}
+
 bool inSubmatching(int j, const std::vector<int>& G,
                    const std::vector<std::vector<int>>& pref) {
     int n = (int)G.size();
-    int target = pref[j][G[j]];
-    for (int i = 0; i < n; ++i)
-        if (i != j && pref[i][G[i]] == target) return false;
-    return true;
-}
-
-bool wishInSubmatching(int j, const std::vector<int>& G,
-                       const std::vector<std::vector<int>>& pref) {
-    int n = (int)G.size();
-    int wish = pref[j][G[j]];
-    for (int i = 0; i < n; ++i)
-        if (pref[i][G[i]] == wish && inSubmatching(i, G, pref)) return true;
+    int cur = wish(j, G, pref);
+    int steps = 1;
+    while (steps <= n) {
+        if (cur == j) return true;
+        cur = wish(cur, G, pref);
+        ++steps;
+    }
     return false;
 }
 
@@ -30,7 +31,7 @@ std::vector<int> llpHousingMarket(const std::vector<std::vector<int>>& pref) {
     while (changed) {
         changed = false;
         for (int j = 0; j < n; ++j) {
-            if (!inSubmatching(j, G, pref) && wishInSubmatching(j, G, pref)) {
+            if (!inSubmatching(j, G, pref) && inSubmatching(wish(j, G, pref), G, pref)) {
                 ++G[j];
                 changed = true;
             }
@@ -41,10 +42,10 @@ std::vector<int> llpHousingMarket(const std::vector<std::vector<int>>& pref) {
 
 int main() {
     std::vector<std::vector<int>> pref = {
-        {1, 0, 2, 3},
-        {0, 1, 2, 3},
-        {0, 1, 2, 3},
-        {3, 1, 0, 2}
+        {1, 2, 0, 3},
+        {0, 3, 1, 2},
+        {0, 1, 3, 2},
+        {1, 0, 2, 3}
     };
     auto G = llpHousingMarket(pref);
     std::cout << "G:";

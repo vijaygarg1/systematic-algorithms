@@ -1,4 +1,5 @@
 // Divide-and-conquer closest-pair-of-points (squared distance).
+// Sequential recursion, matching the book's presentation.
 
 class ClosestPair {
   double[] find(int lo, int hi, double[] Px, double[] Py) {
@@ -22,7 +23,8 @@ class ClosestPair {
             }
       } else {
         int mid = (lo + hi) / 2;
-        [ ClosestPair(lo, mid, Px, Py, G) [] ClosestPair(mid+1, hi, Px, Py, G) ];
+        ClosestPair(lo, mid, Px, Py, G);
+        ClosestPair(mid+1, hi, Px, Py, G);
         // Combine: scan the strip.
         forall i in [lo..hi-1] :
           forall j in [i+1..hi] :

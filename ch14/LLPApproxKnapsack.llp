@@ -5,7 +5,10 @@
 // scaled profit >= p; the answer is max { p : D[nf][p] <= W }, profit mu * p.
 
 class LLPApproxKnapsack {
-  int[][] LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
+  // Returns p* = max{p : D[nf][p] <= W}, the scaled optimum (KwOut of
+  // bxx-approximate.tex Algorithm LLP-ApproxKnapsack). The original-scale
+  // profit is scale * p*, where scale = epsNum*M/(epsDen*nf).
+  int LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
     int n = w.length;
     // Discard items with w[i] > W (they can never be in a feasible solution).
     int nf = 0;
@@ -87,6 +90,13 @@ class LLPApproxKnapsack {
         i = i + 1;
       }
     };
-    return D;
+    // p* = max { p : D[nf][p] <= W }.
+    int pStar = 0;
+    int p = 0;
+    while (p <= Vp) {
+      if (D[nf][p] <= W) { pStar = p; };
+      p = p + 1;
+    };
+    return pStar;
   }
 }

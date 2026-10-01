@@ -1,7 +1,10 @@
-// LLP assignment: minimum clearing price vector via step-jump price increments.
-// Each iteration: identify overdemanded items, raise each by step[j] = min slack
-// to the next critical price (the smallest amount that lets some bidder become
-// indifferent and break a tight edge). Strongly polynomial.
+// LLP assignment: minimum clearing price vector. When no perfect
+// matching exists in the current tight-edge graph, find an
+// inclusion-minimal overdemanded set J via alternating-path
+// reachability from an unmatched bidder, then raise every item in J by
+// ONE SHARED amount delta = min over bidders demanding into J of
+// [bidder's best surplus - bidder's best surplus using an item
+// outside J].
 
 fn try_match(b: usize, v: &[Vec<i32>], c: &[i32], partner: &mut [i32], seen: &mut [bool]) -> bool {
     let n = c.len();
@@ -20,58 +23,60 @@ fn try_match(b: usize, v: &[Vec<i32>], c: &[i32], partner: &mut [i32], seen: &mu
     false
 }
 
-fn check_perfect_matching(v: &[Vec<i32>], c: &[i32]) -> bool {
-    let n = c.len();
-    let m = v.len();
-    let mut partner = vec![-1i32; n];
-    let mut matched = 0;
-    for b in 0..m {
-        let mut seen = vec![false; n];
-        if try_match(b, v, c, &mut partner, &mut seen) { matched += 1; }
-    }
-    matched == m
+fn best_surplus(b: usize, v: &[Vec<i32>], c: &[i32]) -> i32 {
+    (0..c.len()).map(|i| v[b][i] - c[i]).max().unwrap()
 }
 
-fn raise_overdemanded_prices(v: &[Vec<i32>], c: &mut [i32]) {
-    let n = c.len();
-    let m = v.len();
-    // Snapshot bestSurplus[b] before any prices change this round.
-    let mut best_surplus = vec![i32::MIN; m];
-    for b in 0..m {
-        for i in 0..n {
-            if v[b][i] - c[i] > best_surplus[b] { best_surplus[b] = v[b][i] - c[i]; }
-        }
-    }
-    // step[j] = min slack across bidders whose top choice includes j.
-    let mut step = vec![i32::MAX; n];
-    let mut demand = vec![0i32; n];
-    for j in 0..n {
-        for b in 0..m {
-            if v[b][j] - c[j] != best_surplus[b] { continue; }
-            demand[j] += 1;
-            let mut second_best = i32::MIN;
-            for i in 0..n {
-                if i == j { continue; }
-                if v[b][i] - c[i] > second_best { second_best = v[b][i] - c[i]; }
+fn best_surplus_outside(b: usize, v: &[Vec<i32>], c: &[i32], item_in_j: &[bool]) -> i32 {
+    (0..c.len()).filter(|&i| !item_in_j[i]).map(|i| v[b][i] - c[i]).max().unwrap()
+}
+
+fn reach(b: usize, v: &[Vec<i32>], c: &[i32], partner: &[i32], item_in_j: &mut [bool], bidder_in_b: &mut [bool]) {
+    if bidder_in_b[b] { return; }
+    bidder_in_b[b] = true;
+    let best = best_surplus(b, v, c);
+    for i in 0..c.len() {
+        if v[b][i] - c[i] == best && !item_in_j[i] {
+            item_in_j[i] = true;
+            if partner[i] != -1 {
+                reach(partner[i] as usize, v, c, partner, item_in_j, bidder_in_b);
             }
-            let slack = (v[b][j] - c[j]) - second_best;
-            if slack < step[j] { step[j] = slack; }
         }
-        // Integer arithmetic: a tied bidder gives slack 0; raise by at least 1.
-        if step[j] < 1 { step[j] = 1; }
-    }
-    for j in 0..n {
-        if demand[j] > 1 { c[j] += step[j]; }
     }
 }
 
 fn llp_assignment(v: &[Vec<i32>]) -> Vec<i32> {
     let n = v[0].len();
+    let m = v.len();
     let mut c = vec![0i32; n];
-    while !check_perfect_matching(v, &c) {
-        raise_overdemanded_prices(v, &mut c);
+    loop {
+        let mut partner = vec![-1i32; n];
+        for b in 0..m {
+            let mut seen = vec![false; n];
+            try_match(b, v, &c, &mut partner, &mut seen);
+        }
+        let mut bidder_matched = vec![false; m];
+        for i in 0..n {
+            if partner[i] != -1 { bidder_matched[partner[i] as usize] = true; }
+        }
+        let unmatched = (0..m).find(|&b| !bidder_matched[b]);
+        let unmatched = match unmatched {
+            None => return c,
+            Some(b) => b,
+        };
+
+        let mut item_in_j = vec![false; n];
+        let mut bidder_in_b = vec![false; m];
+        reach(unmatched, v, &c, &partner, &mut item_in_j, &mut bidder_in_b);
+        let delta = (0..m)
+            .filter(|&b| bidder_in_b[b])
+            .map(|b| best_surplus(b, v, &c) - best_surplus_outside(b, v, &c, &item_in_j))
+            .min()
+            .unwrap();
+        for j in 0..n {
+            if item_in_j[j] { c[j] += delta; }
+        }
     }
-    c
 }
 
 fn main() {
@@ -82,4 +87,12 @@ fn main() {
     ];
     let c = llp_assignment(&v);
     println!("prices: {:?}", c);
+
+    // Tie case: 3 bidders tied on items {0,1}, item 2 undesired.
+    let v2 = vec![
+        vec![20, 20, 0],
+        vec![20, 20, 0],
+        vec![20, 20, 0],
+    ];
+    println!("tie case: {:?}", llp_assignment(&v2));
 }

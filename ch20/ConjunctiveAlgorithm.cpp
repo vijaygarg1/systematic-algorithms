@@ -13,6 +13,8 @@ bool happenedBefore(int j, const std::vector<int>& G,
     return false;
 }
 
+// Returns the satisfying global state, or an empty vector if none exists
+// (some process would need to advance past its last retained state).
 std::vector<int> conjunctiveAlgorithm(const std::vector<std::vector<int>>& vc,
                                       const std::vector<int>& T) {
     int n = (int)T.size();
@@ -21,8 +23,11 @@ std::vector<int> conjunctiveAlgorithm(const std::vector<std::vector<int>>& vc,
     while (changed) {
         changed = false;
         for (int j = 0; j < n; ++j) {
-            if (G[j] >= T[j]) continue;
-            if (happenedBefore(j, G, vc)) { ++G[j]; changed = true; }
+            if (happenedBefore(j, G, vc)) {
+                if (G[j] >= T[j]) return std::vector<int>();
+                ++G[j];
+                changed = true;
+            }
         }
     }
     return G;
@@ -36,8 +41,12 @@ int main() {
     };
     std::vector<int> T = {2, 2};
     auto G = conjunctiveAlgorithm(vc, T);
-    std::cout << "G:";
-    for (int x : G) std::cout << ' ' << x;
-    std::cout << '\n';
+    if (G.empty()) {
+        std::cout << "no satisfying global state\n";
+    } else {
+        std::cout << "G:";
+        for (int x : G) std::cout << ' ' << x;
+        std::cout << '\n';
+    }
     return 0;
 }

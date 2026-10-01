@@ -23,14 +23,14 @@ public class LLPJobSchedulingFixed {
     fixed[j] = true;
   }
 
-  public void LLPJobSchedulingFixed(int[] t, int[][] pre) {
+  public int[] LLPJobSchedulingFixed(int[] t, int[][] pre) {
     this.t = t;
     this.pre = pre;
     this.n = t.length;
     this.G = t.clone();
     this.fixed = new boolean[n];
     for (int k = 0; k < n; k++) {
-      fixed[k] = false;
+      fixed[k] = (pre[k].length == 0);
     }
     {
       boolean changed = true;
@@ -44,6 +44,7 @@ public class LLPJobSchedulingFixed {
         }
       }
     }
+    return G;
   }
 
   public static void main(String[] args) {

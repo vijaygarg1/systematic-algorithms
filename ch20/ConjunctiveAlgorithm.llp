@@ -9,7 +9,7 @@ class ConjunctiveAlgorithm {
     forbidden (j) : happenedBefore(j, G, vc) =>
       advance : {
         if (G[j] >= T[j]) {
-          return G;
+          return null;
         } else {
           G[j] = G[j] + 1;
         }

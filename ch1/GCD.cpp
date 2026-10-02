@@ -1,16 +1,11 @@
-// GCD using the mod operation.
+// GCD by repeated subtraction.
 
 #include <iostream>
 
 int gcd(int a, int b) {
     while (a != b) {
-        if (a > b) {
-            if (a % b == 0) a = b;
-            else            a = a % b;
-        } else {
-            if (b % a == 0) b = a;
-            else            b = b % a;
-        }
+        if (a > b) a -= b;
+        else       b -= a;
     }
     return a;
 }

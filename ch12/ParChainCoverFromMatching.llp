@@ -1,0 +1,46 @@
+// Fulkerson reduction: glue chains via matched edges, contract by pointer-jumping.
+
+class ParChainCoverFromMatching {
+  int[] ParChainCoverFromMatching(int[] matchPartner) {
+    int n = matchPartner.length;
+    int[] C = new int[n];
+    int i = 0;
+    while (i < n) {
+      C[i] = i;
+      i = i + 1;
+    };
+    // Each matched (u, v) sets C[u] := v -- u is the top of its chain
+    // (by uniqueness of u^-) and v is the bottom of its chain (by
+    // uniqueness of v^+).  The two chains glue into one.
+    int u = 0;
+    while (u < n) {
+      int v = matchPartner[u];
+      if (v != 0 - 1) {
+        C[u] = v;
+      };
+      u = u + 1;
+    };
+    parentPointerJumping(C);
+    return C;
+  }
+
+  // Iteratively replace C[i] by C[C[i]] until every entry points to
+  // its chain root (a fixed point).  Linear time per round; O(log n)
+  // rounds suffice for chains of length n.
+  void parentPointerJumping(int[] C) {
+    int n = C.length;
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+      int i = 0;
+      while (i < n) {
+        int p = C[i];
+        if (C[p] != p) {
+          C[i] = C[p];
+          changed = true;
+        };
+        i = i + 1;
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+// LLP form of Gale-Shapley on the proposal-vector lattice.
+
+class LLP_StableMarriage {
+  int[] LLP_StableMarriage(int[1..n][1..n] mpref, int[1..n][1..n] rank, int[1..n] I) {
+    int[1..n] G = 0;
+    setBase(1);
+    forall k in [1..n] : G[k] = I[k];
+    always : int z = mpref[j][G[j]]
+    forbidden (j) :
+      exists i in [1..n] :
+        exists k in [1..G[i]] :
+          z == mpref[i][k]
+          && rank[z][i] < rank[z][j]
+    =>
+      advance : G[j] = G[j] + 1;
+    return G;
+  }
+}

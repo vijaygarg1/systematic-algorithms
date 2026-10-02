@@ -1,0 +1,13 @@
+// LLP-LIS: G[j] >= G[i] + 1 for every i in pre(j) (i < j with A[i] < A[j]).
+
+class LLPLongestIncreasingSubseq {
+  int[] LLPLongestIncreasingSubseq(int[] A, set<int>[] pre) {
+    int[] G = 1;
+    forbidden (j) :
+      exists i in pre[j] : G[j] < G[i] + 1
+    =>
+      advance :
+        G[j] = max i in pre[j] : G[i] + 1;
+    return G;
+  }
+}

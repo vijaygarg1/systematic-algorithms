@@ -1,0 +1,30 @@
+// LLP-ShortestPath: Dijkstra-style LLP with priority-queue scheduling.
+// always: parent[j][i] = (i in pre[j]) && (G[j] >= G[i] + w[i][j])
+// always: fixed[j] = (j == s) || (exists i : parent[j][i] && fixed[i])
+
+class LLPShortestPath {
+  void LLPShortestPath(int s, int[][] pre, int[][] w) {
+    int[] G = 0;
+    boolean[] fixed = false;
+    fixed[s] = true;
+    forbidden (j) : !fixed[j] =>
+      advance : {
+        G[j] = minCrossCut(j, pre, w, G, fixed);
+        fixed[j] = true;
+      };
+  }
+
+  int minCrossCut(int j, int[][] pre, int[][] w, int[] G, boolean[] fixed) {
+    int best = infinity;
+    int k = 0;
+    while (k < pre[j].length) {
+      int i = pre[j][k];
+      if (fixed[i]) {
+        int d = G[i] + w[i][j];
+        if (d < best) { best = d; }
+      };
+      k = k + 1;
+    };
+    return best;
+  }
+}

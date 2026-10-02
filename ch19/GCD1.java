@@ -7,7 +7,6 @@ public class GCD1 {
   int n;
   int[] A;
   int[] G;
-  int j;
   int picked_i;
 
   private boolean forbidden(int j) {
@@ -17,7 +16,7 @@ public class GCD1 {
     return false;
   }
 
-  private void advance() {
+  private void advance(int j) {
     int i = picked_i;
     if (((G[j] % G[i]) == 0)) {
       G[j] = G[i];
@@ -36,7 +35,7 @@ public class GCD1 {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            this.j = j; advance();
+            advance(j);
             changed = true;
           }
         }

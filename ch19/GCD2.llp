@@ -1,0 +1,16 @@
+// GCD2: ascending GCD via ceiling-ratio operations.
+// Equivalent forbidden / advance form of the ensure-clause version
+// G[j] >= max_i (A[j] * G[i] + A[i] - 1) / A[i].
+//
+// Forbidden picks any i for which the bound is currently violated;
+// advance lifts G[j] to that single ratio.  Iterating over forbidden i's
+// converges to the maximum because the ensure constraint is monotone.
+
+int[] GCD2(int[] A) {
+  int[] G = 0;
+  forall k in [0..n-1] : G[k] = 1;
+  forbidden (j) : exists i in [0..n-1] pick i :
+      G[j] * A[i] < A[j] * G[i] =>
+    advance : G[j] = (A[j] * G[i] + A[i] - 1) / A[i];
+  return G;
+}

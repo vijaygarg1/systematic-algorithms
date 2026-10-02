@@ -1,8 +1,4 @@
-// Precedences: composition program enforcing precedence constraints
-// pre(j) on job starts.  Each job j cannot start until every i in
-// pre(j) has finished (start G[i] plus processing time t[i]).
-// Composed onto LLP-MinMaxLateness via predicate conjunction:
-// [ LLP-MinMaxLateness(t, d, G) && Precedences(pre, t, G) ].
+// Precedence constraint: job j cannot start before all predecessors finish.
 
 import java.util.*;
 
@@ -11,7 +7,6 @@ public class Precedences {
   int[][] pre;
   int[] t;
   int[] G;
-  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -21,13 +16,13 @@ public class Precedences {
     return t1;
   }
 
-  private void advance() {
+  private void advance(int j) {
     int m = Integer.MIN_VALUE;
     for (int i : pre[j]) m = Math.max(m, (G[i] + t[i]));
     G[j] = m;
   }
 
-  public int[] Precedences(int[][] pre, int[] t, int[] G) {
+  public void Precedences(int[][] pre, int[] t, int[] G) {
     this.pre = pre;
     this.t = t;
     this.G = G;
@@ -38,13 +33,12 @@ public class Precedences {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            this.j = j; advance();
+            advance(j);
             changed = true;
           }
         }
       }
     }
-    return G;
   }
 
   public static void main(String[] args) {

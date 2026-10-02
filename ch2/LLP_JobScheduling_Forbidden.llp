@@ -1,0 +1,9 @@
+// LLP job scheduling: forbidden when G[j] < max_{i in pre[j]} G[i] + t[j].
+
+int[] LLP_JobScheduling_Forbidden(int[0..n-1] t, set<int>[0..n-1] pre) {
+  int[0..n-1] G = 0;
+  forall k in [0..n] : G[k] = t[k];
+  forbidden (j) : G[j] < max i in pre[j] : G[i] + t[j] =>
+    advance : G[j] = max i in pre[j] : G[i] + t[j];
+  return G;
+}

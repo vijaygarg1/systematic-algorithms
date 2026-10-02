@@ -9,14 +9,13 @@ public class FastComponents {
   int n;
   int[][] adj;
   int[] G;
-  int j;
 
   private boolean _forbidden0(int j) {
     if ((G[j] >= G[G[j]])) return false;
     return true;
   }
 
-  private void _advance0() {
+  private void _advance0(int j) {
     G[j] = G[G[j]];
   }
 
@@ -29,7 +28,7 @@ public class FastComponents {
     return (!(G[j] >= t1));
   }
 
-  private void _advance1() {
+  private void _advance1(int j) {
     int m = Integer.MIN_VALUE;
     for (int i : adj[j]) m = Math.max(m, G[i]);
     G[j] = m;
@@ -46,7 +45,7 @@ public class FastComponents {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            this.j = j; _advance0();
+            _advance0(j);
             changed = true;
           }
         }
@@ -58,7 +57,7 @@ public class FastComponents {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden1(j)) {
-            this.j = j; _advance1();
+            _advance1(j);
             changed = true;
           }
         }

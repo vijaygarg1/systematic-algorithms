@@ -1,0 +1,28 @@
+// Odd-Even Sort: alternating odd- and even-indexed compare-swap passes.
+
+class OddEvenSort {
+  void sort(int[] A) {
+    boolean found = true;
+    while (found) {
+      found = false;
+      // Odd-indexed pass: j = 1, 3, 5, ...
+      int j = 1;
+      while (j < A.length - 1) {
+        if (A[j] > A[j + 1]) {
+          found = true;
+          swap(A[j], A[j + 1]);
+        };
+        j = j + 2;
+      };
+      // Even-indexed pass: j = 0, 2, 4, ...
+      j = 0;
+      while (j < A.length - 1) {
+        if (A[j] > A[j + 1]) {
+          found = true;
+          swap(A[j], A[j + 1]);
+        };
+        j = j + 2;
+      }
+    }
+  }
+}

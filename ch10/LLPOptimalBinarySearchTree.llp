@@ -1,0 +1,28 @@
+// LLP-OptimalBinarySearchTree: ensure G[i][j] >= optimal cost over interval [i..j].
+
+class LLPOptimalBinarySearchTree {
+  void LLPOptimalBinarySearchTree(double[] p, double[][] G) {
+    forbidden (i, j) : G[i][j] < optCost(p, G, i, j) =>
+      advance : G[i][j] = optCost(p, G, i, j);
+    // priority: (j - i)
+  }
+
+  double optCost(double[] p, double[][] G, int i, int j) {
+    double best = infinity;
+    int k = i;
+    while (k <= j) {
+      double s = 0.0;
+      int l = i;
+      while (l <= j) {
+        s = s + p[l];
+        l = l + 1;
+      }
+      double cost = G[i][k-1] + s + G[k+1][j];
+      if (cost < best) {
+        best = cost;
+      }
+      k = k + 1;
+    }
+    return best;
+  }
+}

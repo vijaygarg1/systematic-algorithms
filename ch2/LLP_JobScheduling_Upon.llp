@@ -1,0 +1,13 @@
+// LLP job scheduling, upon-form of the same recurrence.  The index is
+// implicit and defaults to j, giving the process-local reading used by
+// distributed programs: "at j, when G[j] is too small, raise it".
+// Compiles to the same Java as the forbidden and ensure forms.
+
+int[] LLP_JobScheduling_Upon(int[0..n-1] t, set<int>[0..n-1] pre) {
+  int[0..n-1] G = 0;
+  forall k in [0..n] : G[k] = t[k];
+  upon G[j] < max i in pre[j] : G[i] + t[j] {
+    G[j] = max i in pre[j] : G[i] + t[j];
+  }
+  return G;
+}

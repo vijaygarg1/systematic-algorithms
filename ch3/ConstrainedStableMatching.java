@@ -8,7 +8,6 @@ public class ConstrainedStableMatching {
   int[][] mpref;
   int[][] rank;
   int[] G;
-  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -22,7 +21,7 @@ public class ConstrainedStableMatching {
     return ((G[j] == 0) || t1);
   }
 
-  private void advance() {
+  private void advance(int j) {
     G[j] = (G[j] + 1);
   }
 
@@ -36,7 +35,7 @@ public class ConstrainedStableMatching {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            this.j = j; advance();
+            advance(j);
             changed = true;
           }
         }

@@ -1,0 +1,25 @@
+// Price_b: find the minimum price vector using LLP.
+// forbidden(j): exists predecessor i with p[j] < p[i] - w[i,j].
+// advance: p[j] := max { p[i] - w[i,j] | i in pre(j) }.
+
+class LLPPriceB {
+  void LLPPriceB(int[][] pre, int[][] w) {
+    int[] G = 0;
+    forbidden (j) :
+      exists i in pre[j] : G[j] < G[i] - w[i][j]
+    =>
+      advance : G[j] = maxPricePred(j, pre, w, G);
+  }
+
+  int maxPricePred(int j, int[][] pre, int[][] w, int[] G) {
+    int best = G[j];
+    int k = 0;
+    while (k < pre[j].length) {
+      int i = pre[j][k];
+      int val = G[i] - w[i][j];
+      if (val > best) { best = val; };
+      k = k + 1;
+    };
+    return best;
+  }
+}

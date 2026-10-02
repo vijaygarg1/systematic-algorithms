@@ -1,0 +1,57 @@
+// LLP driver for the least mincut satisfying a lattice-linear side predicate.
+
+class LLPMincut {
+  boolean[] LLPMincut(boolean[] G) {
+    int n = G.length;
+    boolean done = false;
+    while (!done) {
+      // Inner: drive every j-forbidden under B to true.
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        int j = 0;
+        while (j < n) {
+          if (forbiddenForB(j, G)) {
+            if (G[j]) {
+              return null;
+            };
+            G[j] = true;
+            changed = true;
+          };
+          j = j + 1;
+        }
+      };
+      // Now G is closed under B; jump to the least mincut >= G.
+      if (Bcheck(G)) {
+        done = true;
+      } else {
+        boolean[] next = nextMincut(G);
+        if (next == null) {
+          return null;
+        };
+        G = next;
+      }
+    };
+    return G;
+  }
+
+  // True iff G currently satisfies the side predicate B.  The caller
+  // overrides this for a concrete B; the placeholder accepts every G.
+  boolean Bcheck(boolean[] G) {
+    return true;
+  }
+
+  // True iff index j must be added to G to make B (or the mincut
+  // closure) become true.  The placeholder declares no index forbidden.
+  boolean forbiddenForB(int j, boolean[] G) {
+    return false;
+  }
+
+  // Returns the least mincut S' that contains G, or null if no such
+  // mincut exists.  Concrete implementations call a max-flow
+  // subroutine on the residual graph.  The placeholder returns G
+  // unchanged.
+  boolean[] nextMincut(boolean[] G) {
+    return G;
+  }
+}

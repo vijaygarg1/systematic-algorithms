@@ -4,12 +4,12 @@
 #include <vector>
 
 int pairSum(const std::vector<int>& A, int target) {
-    int count = 0;
+    int c = 0;
     int n = (int)A.size();
     for (int i = 0; i < n; ++i)
         for (int j = i + 1; j < n; ++j)
-            if (A[i] + A[j] == target) ++count;
-    return count;
+            if (A[i] + A[j] == target) ++c;
+    return c;
 }
 
 int main() {

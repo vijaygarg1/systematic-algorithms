@@ -1,0 +1,26 @@
+// LLP single-item knapsack step: lift previous-row values to admit one new item.
+
+class LLPIncrKnapsack {
+  int[] LLPIncrKnapsack(int w, int v, int[] C) {
+    int[] G = 0;
+    forbidden (j) :
+      G[j] < C[j] || (j >= w && G[j] < C[j - w] + v)
+    =>
+      advance :
+        G[j] = newValue(j);
+    return G;
+  }
+
+  // The pointwise maximum of "skip the new item" (C[j]) and
+  // "take the new item" (C[j - w] + v, only if j >= w).
+  int newValue(int j) {
+    int skip = C[j];
+    if (j >= w) {
+      int take = C[j - w] + v;
+      if (take > skip) {
+        return take;
+      }
+    };
+    return skip;
+  }
+}

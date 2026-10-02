@@ -1,0 +1,25 @@
+// LLP weighted interval scheduling: G[j] >= max(G[j-1], w[j] + G[p[j]]).
+
+class LLPWeightedIntervalScheduling {
+  int[] LLPWeightedIntervalScheduling(int[] w, int[] p) {
+    int[] G = 0;
+    forbidden (j) :
+      j >= 1 && G[j] < maxRhs(j)
+    =>
+      advance :
+        G[j] = maxRhs(j);
+    return G;
+  }
+
+  // Right-hand side of the recurrence at index j: the larger of
+  // skipping j (G[j-1]) and taking j (w[j] + G[p[j]]).
+  int maxRhs(int j) {
+    int skip = G[j - 1];
+    int take = w[j] + G[p[j]];
+    if (take > skip) {
+      return take;
+    } else {
+      return skip;
+    }
+  }
+}

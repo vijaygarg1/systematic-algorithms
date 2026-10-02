@@ -1,29 +1,26 @@
-"""LLP FPTAS for Knapsack: profit-indexed min-weight DP D[i][p] on a
-lattice of size (nf+1) x (V'+1), independent of the capacity W -- this
-is what keeps the scheme fully polynomial (a capacity-indexed lattice
-would instead grow with W and remain merely pseudo-polynomial).
-D[i][p] = minimum total weight of a subset of the first i feasible
-items with scaled profit >= p. Returns p* = max{p : D[nf][p] <= W}."""
+"""LLP FPTAS for Knapsack: discard items that cannot fit, then run a profit-indexed
+min-weight DP D[i][p] on a lattice of size (nf+1) x (V'+1), V' = O(nf^2/eps), where
+nf is the number of feasible items, driven by a forbidden / advance pair on (i, p)
+pairs.  Fully polynomial."""
 
 
 def llp_approx_knapsack(w, v, W, eps_num, eps_den):
     n = len(w)
+    # Discard items with w[i] > W (they can never be in a feasible solution).
     feasible = [i for i in range(n) if w[i] <= W]
-    if not feasible:
-        return 0
     fw = [w[i] for i in feasible]
     fv = [v[i] for i in feasible]
-    nf = len(fw)
-    M = max(fv)
-
-    v_prime = [(fv[i] * nf * eps_den) // (eps_num * M) for i in range(nf)]
+    nf = len(feasible)
+    # M = max profit among feasible items (this item fits, so M <= OPT).
+    M = max(fv) if nf > 0 else 1
+    v_prime = [(fv[k] * nf * eps_den) // (eps_num * M) for k in range(nf)]
     Vp = sum(v_prime)
-
-    INF = 1 + sum(fw)
+    INF = 1 + sum(fw)  # a weight above any achievable total weight
+    # D[i][p] = min weight of a subset of the first i feasible items with scaled profit >= p.
     D = [[INF] * (Vp + 1) for _ in range(nf + 1)]
     for i in range(nf + 1):
         D[i][0] = 0
-
+    # Forbidden/advance fixpoint: lower D[i][p] to min(skip, take).
     changed = True
     while changed:
         changed = False
@@ -37,19 +34,16 @@ def llp_approx_knapsack(w, v, W, eps_num, eps_den):
                 if target < D[i][p]:
                     D[i][p] = target
                     changed = True
-
-    p_star = 0
-    for p in range(Vp + 1):
-        if D[nf][p] <= W:
-            p_star = p
-    return p_star
+    return D
 
 
 if __name__ == "__main__":
     w = [2, 3, 4]
     v = [30, 40, 50]
     W = 6
-    p_star = llp_approx_knapsack(w, v, W, eps_num=1, eps_den=5)
-    print("p* =", p_star, "(expect 24)")
-    scale = (1 * 50) / (5 * 3)
-    print("approx profit =", scale * p_star, "(expect ~80, OPT=80)")
+    D = llp_approx_knapsack(w, v, W, eps_num=1, eps_den=5)
+    nf = len(D) - 1
+    Vp = len(D[nf]) - 1
+    p_star = max((p for p in range(Vp + 1) if D[nf][p] <= W), default=0)
+    mu = (1 / 5) * max(v) / len(w)
+    print('best scaled profit p* =', p_star, ' estimated profit =', mu * p_star)

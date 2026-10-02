@@ -1,0 +1,13 @@
+// VertexImplications: if v is in the cover and (v,w) is an implication,
+// then w must also be in the cover.
+// forbidden(w): exists v with (v,w) in I and G[v]=1 and G[w]=0.
+// advance: G[w] := 1.
+
+class VertexImplications {
+  void VertexImplications(int[][] I, boolean[] G) {
+    forbidden (w) :
+      exists v in [0..n-1] : I[v][w] == 1 && G[v] && !G[w]
+    =>
+      advance : G[w] = true;
+  }
+}

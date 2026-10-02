@@ -1,0 +1,29 @@
+// LLP-NearestNeighbor: find nearest neighbor distance for each point.
+// px[j], py[j] are x,y coordinates of point j.
+
+class LLPNearestNeighbor {
+  void LLPNearestNeighbor(double[] px, double[] py) {
+    double[] G = infinity;
+    forbidden (j) : G[j] > nearestDist(px, py, j) =>
+      advance : G[j] = nearestDist(px, py, j);
+  }
+
+  double nearestDist(double[] px, double[] py, int j) {
+    double best = infinity;
+    int k = 0;
+    while (k < px.length) {
+      if (k != j) {
+        double d = dist(px, py, j, k);
+        if (d < best) { best = d; }
+      };
+      k = k + 1;
+    };
+    return best;
+  }
+
+  double dist(double[] px, double[] py, int j, int k) {
+    double dx = px[j] - px[k];
+    double dy = py[j] - py[k];
+    return dx * dx + dy * dy;
+  }
+}

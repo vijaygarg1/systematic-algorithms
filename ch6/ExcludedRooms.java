@@ -1,7 +1,4 @@
-// ExcludedRooms: composition program enforcing that course j is not
-// assigned a room from its excluded set R[j].  Composed onto
-// LLP-IntervalPartition via predicate conjunction:
-// [ LLP-IntervalPartition(s, f, G) && ExcludedRooms(R, G) ].
+// Excluded-rooms constraint: room G[j] must not be in the excluded set R[j].
 
 import java.util.*;
 
@@ -10,7 +7,6 @@ public class ExcludedRooms {
   int[][] R;
   int[] G;
   int[][] pre;
-  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -20,11 +16,11 @@ public class ExcludedRooms {
     return t1;
   }
 
-  private void advance() {
+  private void advance(int j) {
     G[j] = leastValidRoom(j);
   }
 
-  public int[] ExcludedRooms(int[][] R, int[] G, int[][] pre) {
+  public void ExcludedRooms(int[][] R, int[] G, int[][] pre) {
     this.R = R;
     this.G = G;
     this.pre = pre;
@@ -35,13 +31,12 @@ public class ExcludedRooms {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            this.j = j; advance();
+            advance(j);
             changed = true;
           }
         }
       }
     }
-    return G;
   }
 
   public int leastValidRoom(int j) {

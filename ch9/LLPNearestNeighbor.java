@@ -8,13 +8,14 @@ public class LLPNearestNeighbor {
   double[] px;
   double[] py;
   double[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((G[j] > nearestDist(px, py, j)))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = nearestDist(px, py, j);
   }
 
@@ -30,7 +31,7 @@ public class LLPNearestNeighbor {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -60,8 +61,8 @@ public class LLPNearestNeighbor {
   }
 
   public static void main(String[] args) {
-    double[] px = new double[] {1.0, 2.0, 3.0, 4.0};
-    double[] py = new double[] {1.0, 2.0, 3.0, 4.0};
+    double[] px = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    double[] py = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     LLPNearestNeighbor prog = new LLPNearestNeighbor();
     prog.LLPNearestNeighbor(px, py);
     System.out.println(Arrays.toString(px));

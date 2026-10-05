@@ -5,17 +5,26 @@ class WeightedInterval {
     int n = s.length;
     int[] opt = new int[n];
     int[] G   = new int[n];
+    // Phase 1: compute optimal values.
     opt[0] = 0;
     int cur = 1;
     while (cur < n) {
-      opt[cur] = opt[cur - 1];
       if (w[cur] + opt[p[cur]] >= opt[cur - 1]) {
         opt[cur] = w[cur] + opt[p[cur]];
-        G[cur]   = 1;
       } else {
-        G[cur] = 0;
+        opt[cur] = opt[cur - 1];
       };
       cur = cur + 1;
+    };
+    // Phase 2: backtrack to find selected intervals.
+    cur = n - 1;
+    while (cur > 0) {
+      if (w[cur] + opt[p[cur]] >= opt[cur - 1]) {
+        G[cur] = 1;
+        cur = p[cur];
+      } else {
+        cur = cur - 1;
+      }
     };
     return G;
   }

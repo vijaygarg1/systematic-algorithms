@@ -45,7 +45,7 @@ public class OptimalBinarySearchTree {
   }
 
   public static void main(String[] args) {
-    double[] prob = new double[] {1.0, 2.0, 3.0, 4.0};
+    double[] prob = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     OptimalBinarySearchTree prog = new OptimalBinarySearchTree();
     double[][] result = prog.solve(prob);
     System.out.println(Arrays.deepToString(result));

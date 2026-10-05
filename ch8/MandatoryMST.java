@@ -10,6 +10,7 @@ public class MandatoryMST {
   int[] v;
   int[] parent;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!(M[j])) return false;
@@ -17,13 +18,14 @@ public class MandatoryMST {
     return true;
   }
 
-  private void advance(int j) {
+  private boolean advance() {
     if ((find(u[j], parent) == find(v[j], parent))) {
-      return null;
+      return true;
     } else {
       G[j] = true;
       union(u[j], v[j], parent);
     }
+    return false;
   }
 
   public void MandatoryMST(boolean[] M, int[] u, int[] v, int[] parent, boolean[] G) {
@@ -39,7 +41,7 @@ public class MandatoryMST {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; if (advance()) return;
             changed = true;
           }
         }
@@ -65,9 +67,9 @@ public class MandatoryMST {
 
   public static void main(String[] args) {
     boolean[] M = new boolean[] {false, false, false, false};
-    int[] u = new int[] {1, 4, 7};
-    int[] v = new int[] {2, 3, 5, 8};
-    int[] parent = new int[] {6, 9};
+    int[] u = new int[] {0, 0, 1, 2};
+    int[] v = new int[] {0, 0, 1, 1};
+    int[] parent = new int[] {0, 0, 0, 2};
     boolean[] G = new boolean[] {false, false, false, false};
     MandatoryMST prog = new MandatoryMST();
     prog.MandatoryMST(M, u, v, parent, G);

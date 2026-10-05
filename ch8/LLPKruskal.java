@@ -59,9 +59,9 @@ public class LLPKruskal {
   }
 
   public static void main(String[] args) {
-    int[] u = new int[] {1, 4, 7};
-    int[] v = new int[] {2, 3, 5, 8};
-    int[] parent = new int[] {6, 9};
+    int[] u = new int[] {0, 0, 1, 2};
+    int[] v = new int[] {0, 0, 1, 1};
+    int[] parent = new int[] {0, 0, 0, 2};
     LLPKruskal prog = new LLPKruskal();
     boolean[] result = prog.LLPKruskal(u, v, parent);
     System.out.println(Arrays.toString(result));

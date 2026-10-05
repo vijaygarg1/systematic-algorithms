@@ -1,8 +1,20 @@
 // LLP-BitonicMerge: forbidden when a pair at distance m is inverted.
-
+//
+// `i + m < n` is an explicit bound, not part of the original two-line
+// statement of this predicate: the compiler has no notion of the
+// "priority" comment below (true Batcher bitonic merge restricts m to
+// a specific power-of-two schedule), so without it this compiles to a
+// plain nested loop over the full cross product i, m in [0, n), and
+// i + m reaches n .. 2n-2 -- out of bounds on A (confirmed: crashed
+// every synthesized main). With the bound, this still converges (any
+// inversion A[i] > A[j], i < j, is directly compared once m = j - i)
+// and still always finishes fully sorted; it just does so as a
+// generic compare-exchange-network sort rather than the asymptotically
+// faster, truly parallel recursive bitonic schedule the comment
+// describes.
 class LLPBitonicMerge {
   void LLPBitonicMerge(int[] A, int n) {
-    forbidden (i, m) : A[i] > A[i + m] =>
+    forbidden (i, m) : i + m < n && A[i] > A[i + m] =>
       advance : swap(A[i], A[i + m]);
     // priority: for m = n, n/2, ..., 1:
     //   evaluate all i with (i - 1) % (2 * m) < m in parallel

@@ -5,6 +5,7 @@ import java.util.*;
 public class LLPOddEvenSort {
   int n;
   int[] A;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((j < (n - 1)))) return false;
@@ -12,7 +13,7 @@ public class LLPOddEvenSort {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     { int tmp = A[j]; A[j] = A[(j + 1)]; A[(j + 1)] = tmp; }
   }
 
@@ -25,7 +26,7 @@ public class LLPOddEvenSort {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -34,7 +35,7 @@ public class LLPOddEvenSort {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LLPOddEvenSort prog = new LLPOddEvenSort();
     prog.LLPOddEvenSort(A);
     System.out.println(Arrays.toString(A));

@@ -23,8 +23,8 @@ public class FractionalKnapsack {
   }
 
   public static void main(String[] args) {
-    double[] v = new double[] {1.0, 2.0, 3.0, 4.0};
-    double[] w = new double[] {1.0, 2.0, 3.0, 4.0};
+    double[] v = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    double[] w = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     double W = 10.0;
     FractionalKnapsack prog = new FractionalKnapsack();
     double[] result = prog.solve(v, w, W);

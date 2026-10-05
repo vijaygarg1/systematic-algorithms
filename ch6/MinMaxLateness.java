@@ -17,8 +17,8 @@ public class MinMaxLateness {
   }
 
   public static void main(String[] args) {
-    int[] t = new int[] {1, 4, 7};
-    int[] d = new int[] {2, 3, 5, 8};
+    int[] t = new int[] {0, 0, 1, 2};
+    int[] d = new int[] {0, 0, 1, 1};
     MinMaxLateness prog = new MinMaxLateness();
     int[] result = prog.schedule(t, d);
     System.out.println(Arrays.toString(result));

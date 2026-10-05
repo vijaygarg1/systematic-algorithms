@@ -34,8 +34,8 @@ public class MergeTwo {
   }
 
   public static void main(String[] args) {
-    int[] B = new int[] {1, 4, 7};
-    int[] C = new int[] {2, 3, 5, 8};
+    int[] B = new int[] {0, 0, 1, 2};
+    int[] C = new int[] {0, 0, 1, 1};
     MergeTwo prog = new MergeTwo();
     int[] result = prog.merge(B, C);
     System.out.println(Arrays.toString(result));

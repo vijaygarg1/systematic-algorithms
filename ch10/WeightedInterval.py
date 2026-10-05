@@ -4,11 +4,20 @@ def schedule(s, f, w, p):
     n = len(s)
     opt = [0] * n
     G   = [0] * n
+    # Phase 1: compute optimal values.
     for cur in range(1, n):
-        opt[cur] = opt[cur - 1]
         if w[cur] + opt[p[cur]] >= opt[cur - 1]:
             opt[cur] = w[cur] + opt[p[cur]]
+        else:
+            opt[cur] = opt[cur - 1]
+    # Phase 2: backtrack to find selected intervals.
+    cur = n - 1
+    while cur > 0:
+        if w[cur] + opt[p[cur]] >= opt[cur - 1]:
             G[cur] = 1
+            cur = p[cur]
+        else:
+            cur = cur - 1
     return G
 
 

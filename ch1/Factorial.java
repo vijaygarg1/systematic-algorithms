@@ -11,7 +11,7 @@ public class Factorial {
   }
 
   public static void main(String[] args) {
-    int n = 0;
+    int n = 3;
     Factorial prog = new Factorial();
     int result = prog.Factorial(n);
     System.out.println(result);

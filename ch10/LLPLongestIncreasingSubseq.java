@@ -7,6 +7,7 @@ public class LLPLongestIncreasingSubseq {
   int[] A;
   int[][] pre;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -16,7 +17,7 @@ public class LLPLongestIncreasingSubseq {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int m = Integer.MIN_VALUE;
     for (int i : pre[j]) m = Math.max(m, (G[i] + 1));
     G[j] = m;
@@ -34,7 +35,7 @@ public class LLPLongestIncreasingSubseq {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -44,7 +45,10 @@ public class LLPLongestIncreasingSubseq {
   }
 
   public static void main(String[] args) {
-    // Demo harness for LLPLongestIncreasingSubseq.
-    // Construct with hard-coded inputs and call the entry method.
+    // No runnable example: LLPLongestIncreasingSubseq's parameters include a type
+    // this synthesizer cannot safely construct on its own (e.g. set<int>[],
+    // a 3D+ array, or another unsupported shape) -- not a compile error, just
+    // nothing to call here. See the .llp source for the real signature, and
+    // construct valid inputs by hand to exercise this method.
   }
 }

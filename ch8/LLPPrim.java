@@ -1,4 +1,14 @@
 // LLP-Prim: each non-root vertex advances when the global cross-cut is its lightest edge.
+//
+// setBase(1): every aux method here (minCrossCut, argMinCrossCut,
+// globalMinCrossCut, propagateFixed) loops `i = 1; while (i <= n)`,
+// a 1-indexed convention (index 0 reserved/unused) that was never
+// declared -- without it, this.n = parent.length (0-indexed), so the
+// very same loops read/write parent[n], one past the end of a
+// length-n array. Declaring the 1-indexed base makes this.n =
+// parent.length - 1, matching the loops as written (confirmed: this
+// is the same setBase(1) convention LLP_StableMarriage uses for its
+// own 1-indexed aux methods).
 
 import java.util.*;
 
@@ -32,12 +42,12 @@ public class LLPPrim {
     this.W = W;
     this.C = C;
     this.root = root;
-    this.n = parent.length;
+    this.n = parent.length - 1;
     {
       boolean changed = true;
       while (changed) {
         changed = false;
-        for (int j = 0; j < n; j++) {
+        for (int j = 1; j <= n; j++) {
           if (forbidden(j)) {
             this.j = j; advance();
             changed = true;
@@ -105,10 +115,10 @@ public class LLPPrim {
   }
 
   public static void main(String[] args) {
-    int[] parent = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
-    boolean[] fixed = new boolean[] {false, false, false, false};
-    double[][] W = new double[][] {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
-    double[] C = new double[] {1.0, 2.0, 3.0, 4.0};
+    int[] parent = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
+    boolean[] fixed = new boolean[] {false, false, false, false, false, false, false, false};
+    double[][] W = new double[][] {{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}, {9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0}, {17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0}, {25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0}, {33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0}, {41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0}, {49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0}, {57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0}};
+    double[] C = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     LLPPrim prog = new LLPPrim();
     double[] result = prog.LLPPrim(parent, fixed, W, C, 0);
     System.out.println(Arrays.toString(result));

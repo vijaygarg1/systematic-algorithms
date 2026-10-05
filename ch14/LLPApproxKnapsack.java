@@ -104,11 +104,11 @@ public class LLPApproxKnapsack {
   }
 
   public static void main(String[] args) {
-    int[] w = new int[] {1, 4, 7};
-    int[] v = new int[] {2, 3, 5, 8};
+    int[] w = new int[] {0, 0, 1, 2};
+    int[] v = new int[] {0, 0, 1, 1};
     int W = 10;
-    int epsNum = 0;
-    int epsDen = 0;
+    int epsNum = 1;
+    int epsDen = 2;
     LLPApproxKnapsack prog = new LLPApproxKnapsack();
     int result = prog.LLPApproxKnapsack(w, v, W, epsNum, epsDen);
     System.out.println(result);

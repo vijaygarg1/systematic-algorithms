@@ -69,7 +69,7 @@ public class FordFulkerson {
   }
 
   public static void main(String[] args) {
-    int[][] c = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] c = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     FordFulkerson prog = new FordFulkerson();
     int[][] result = prog.maxflow(c, 0, 1);
     System.out.println(Arrays.deepToString(result));

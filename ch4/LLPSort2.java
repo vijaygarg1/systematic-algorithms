@@ -38,7 +38,7 @@ public class LLPSort2 {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LLPSort2 prog = new LLPSort2();
     prog.LLPSort2(A);
     System.out.println(Arrays.toString(A));

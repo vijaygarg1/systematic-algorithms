@@ -1,41 +1,75 @@
-// Classical Dijkstra: extract-min frontier vertex, relax outgoing edges.
+// Classical Dijkstra (bxx-shortestPath.tex, fig:dijk): binary min-heap
+// H of (vertex, cost) pairs keyed by cost, with lazy deletion -- a
+// vertex may be pushed more than once as its distance improves; stale
+// entries are simply skipped on removal via the fixed[] check -- all
+// exactly matching the book's H.add()/H.removeMin() algorithm, not a
+// linear O(n) scan for the minimum each round.
 
 class Dijkstra {
   int[] shortestPath(int[][] w, int s) {
     int n = w.length;
+    int INF = 2147483647;
     int[] dist = new int[n];
     boolean[] fixed = new boolean[n];
-    forall i in [0..n-1] : dist[i] = 2147483647;
+    forall i in [0..n-1] : dist[i] = INF;
     dist[s] = 0;
-    int count = 0;
-    while (count < n) {
-      // Linear scan for the unfixed vertex with the smallest dist.
-      int j = -1;
-      int best = 2147483647;
-      int k = 0;
-      while (k < n) {
-        if (!fixed[k] && dist[k] < best) {
-          j = k;
-          best = dist[k];
-        };
-        k = k + 1;
-      };
-      if (j == -1) {
-        return dist;
-      };
-      fixed[j] = true;
-      count = count + 1;
-      // Relax outgoing edges of j.
-      k = 0;
-      while (k < n) {
-        if (!fixed[k] && w[j][k] < 2147483647) {
-          if (dist[j] + w[j][k] < dist[k]) {
+    int cap = n * n + 1;
+    int[] heapVertex = new int[cap];
+    int[] heapCost = new int[cap];
+    int heapSize = 0;
+    heapSize = heapPush(heapVertex, heapCost, heapSize, s, dist[s]);
+    while (heapSize > 0) {
+      int j = heapVertex[0];
+      heapSize = heapPop(heapVertex, heapCost, heapSize);
+      if (!fixed[j]) {
+        fixed[j] = true;
+        int k = 0;
+        while (k < n) {
+          if (!fixed[k] && w[j][k] < INF && dist[j] + w[j][k] < dist[k]) {
             dist[k] = dist[j] + w[j][k];
-          }
-        };
-        k = k + 1;
+            heapSize = heapPush(heapVertex, heapCost, heapSize, k, dist[k]);
+          };
+          k = k + 1;
+        }
       }
     };
     return dist;
+  }
+
+  // H.add(vertex, cost): insert into the min-heap keyed by cost; returns new size.
+  int heapPush(int[] hv, int[] hc, int size, int vertex, int cost) {
+    int i = size;
+    hv[i] = vertex;
+    hc[i] = cost;
+    size = size + 1;
+    while (i > 0 && hc[(i - 1) / 2] > hc[i]) {
+      int p = (i - 1) / 2;
+      swap(hv[i], hv[p]);
+      swap(hc[i], hc[p]);
+      i = p;
+    };
+    return size;
+  }
+
+  // H.removeMin(): remove the minimum-cost element (the root); returns new size.
+  int heapPop(int[] hv, int[] hc, int size) {
+    size = size - 1;
+    hv[0] = hv[size];
+    hc[0] = hc[size];
+    heapify(hv, hc, 0, size);
+    return size;
+  }
+
+  void heapify(int[] hv, int[] hc, int i, int size) {
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+    if (left < size && hc[left] < hc[smallest]) { smallest = left; };
+    if (right < size && hc[right] < hc[smallest]) { smallest = right; };
+    if (smallest != i) {
+      swap(hv[i], hv[smallest]);
+      swap(hc[i], hc[smallest]);
+      heapify(hv, hc, smallest, size);
+    }
   }
 }

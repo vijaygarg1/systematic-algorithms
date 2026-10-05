@@ -6,6 +6,7 @@ public class LLPLexicallyFirstVertexCover {
   int n;
   int[][] adj;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -15,7 +16,7 @@ public class LLPLexicallyFirstVertexCover {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -28,7 +29,7 @@ public class LLPLexicallyFirstVertexCover {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -83,7 +84,7 @@ public class LLPLexicallyFirstVertexCover {
   }
 
   public static void main(String[] args) {
-    int[][] adj = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     LLPLexicallyFirstVertexCover prog = new LLPLexicallyFirstVertexCover();
     boolean[] result = prog.LLPLexicallyFirstVertexCover(adj);
     System.out.println(Arrays.toString(result));

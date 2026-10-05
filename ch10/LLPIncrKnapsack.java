@@ -8,13 +8,14 @@ public class LLPIncrKnapsack {
   int v;
   int[] C;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!(((G[j] < C[j]) || ((j >= w) && (G[j] < (C[(j - w)] + v)))))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = newValue(j);
   }
 
@@ -30,7 +31,7 @@ public class LLPIncrKnapsack {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -53,7 +54,7 @@ public class LLPIncrKnapsack {
   public static void main(String[] args) {
     int w = 3;
     int v = 5;
-    int[] C = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] C = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LLPIncrKnapsack prog = new LLPIncrKnapsack();
     int[] result = prog.LLPIncrKnapsack(w, v, C);
     System.out.println(Arrays.toString(result));

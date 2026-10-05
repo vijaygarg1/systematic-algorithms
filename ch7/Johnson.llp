@@ -1,6 +1,24 @@
 // Classical Johnson all-pairs shortest paths: BellmanFord computes a
 // non-negative price vector that reweights edges, then Dijkstra runs from
 // every source on the reweighted graph. Returns null on negative cycle.
+//
+// Keeps its own copy of the single-source relaxation loop (`dijkstra`
+// below) rather than calling the sibling Dijkstra program, even though
+// llc.py/llcjs.py can now express that call (added for exactly this,
+// chat-companion review item 2: `int[] distPrime = Dijkstra(wPrime, u);`
+// compiles correctly as `new Dijkstra().shortestPath(wPrime, u)`).
+// Tried it directly -- confirmed correct output against the standard
+// CLRS Johnson's-algorithm worked example -- but it breaks a site-wide
+// guarantee this companion otherwise holds for every single program:
+// every published Java/Python/C++/Rust file runs completely standalone
+// when downloaded alone (the "Plain text" links on each demo page link
+// to exactly one file, never a bundle). A Johnson.java that references
+// `new Dijkstra()` needs Dijkstra.java alongside it to even compile --
+// confirmed validate-site.py's per-file isolated compile check catches
+// this immediately, the same class of problem the Kruskal.py fix
+// (progs-mst/py/Kruskal.py) addressed by inlining rather than
+// importing. Kept duplicated for the same reason until/unless this site
+// starts publishing multi-file downloads.
 
 class Johnson {
   int[][] allPairs(int[][] w) {

@@ -7,6 +7,7 @@ public class LCM1 {
   int n;
   int[] A;
   int[] G;
+  int j;
   int picked_i;
 
   private boolean forbidden(int j) {
@@ -16,7 +17,7 @@ public class LCM1 {
     return false;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int i = picked_i;
     G[j] = (G[j] + (((((G[i] - G[j]) + A[j]) - 1) / A[j]) * A[j]));
   }
@@ -31,7 +32,7 @@ public class LCM1 {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -41,7 +42,7 @@ public class LCM1 {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LCM1 prog = new LCM1();
     int[] result = prog.LCM1(A);
     System.out.println(Arrays.toString(result));

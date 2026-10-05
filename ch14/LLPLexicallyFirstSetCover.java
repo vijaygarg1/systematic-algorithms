@@ -6,13 +6,14 @@ public class LLPLexicallyFirstSetCover {
   int n;
   int[][] S;
   boolean[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!(isLexMaxCov(j, S, G))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = true;
   }
 
@@ -25,7 +26,7 @@ public class LLPLexicallyFirstSetCover {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -97,7 +98,7 @@ public class LLPLexicallyFirstSetCover {
   }
 
   public static void main(String[] args) {
-    int[][] S = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] S = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     LLPLexicallyFirstSetCover prog = new LLPLexicallyFirstSetCover();
     boolean[] result = prog.LLPLexicallyFirstSetCover(S);
     System.out.println(Arrays.toString(result));

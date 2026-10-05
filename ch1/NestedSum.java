@@ -18,7 +18,7 @@ public class NestedSum {
   }
 
   public static void main(String[] args) {
-    int n = 0;
+    int n = 3;
     NestedSum prog = new NestedSum();
     int result = prog.NestedSum(n);
     System.out.println(result);

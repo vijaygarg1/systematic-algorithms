@@ -1,13 +1,21 @@
-"""LLP-IntervalPartition: assign each course j to the least free room not used by any overlapping earlier course in pre[j]; advance fixes j once all of its pre-set is fixed."""
+"""LLP-IntervalPartition: assign each course j to the least free room not
+used by any overlapping earlier course in pre[j]; advance fixes j once
+all of its pre-set is fixed. The least-free-room computation uses a
+min-heap of the occupied room numbers in pre[j] (extract-min repeatedly
+to find the smallest room number not present), matching the book's
+heap-based advance step."""
+
+import heapq
 
 
 def least_free_room(j, G, pre):
+    heap = [G[i] for i in pre[j]]
+    heapq.heapify(heap)
     r = 1
-    while True:
-        conflict = any(G[i] == r for i in pre[j])
-        if not conflict:
-            return r
+    while heap and heap[0] == r:
+        heapq.heappop(heap)
         r += 1
+    return r
 
 
 def llp_interval_partition(pre):

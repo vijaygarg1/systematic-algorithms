@@ -49,8 +49,8 @@ public class Ord {
 
   public static void main(String[] args) {
     int a = 0;
-    int[] p = new int[] {1, 4, 7};
-    int[] e = new int[] {2, 3, 5, 8};
+    int[] p = new int[] {2, 3, 5, 7};
+    int[] e = new int[] {0, 0, 1, 2};
     Ord prog = new Ord();
     int result = prog.Ord(a, p.length, p, e);
     System.out.println(result);

@@ -1,6 +1,30 @@
-"""Classical Kruskal MST: sort edges, union-find with rank and path-compression."""
+"""Classical Kruskal MST: sort edges, union-find with rank and path-compression.
 
-from UnionFind import find, union
+find/union are inlined from UnionFind.py (not imported) so this file runs
+standalone -- the website only ever publishes the .py.txt plain-text view
+of each file individually, never a multi-file download, so an import of a
+sibling module fails for anyone who saves this one file and runs it."""
+
+
+def find(parent, x):
+    if parent[x] != x:
+        parent[x] = find(parent, parent[x])
+    return parent[x]
+
+
+def union(parent, rank, x, y):
+    rx = find(parent, x)
+    ry = find(parent, y)
+    if rx == ry:
+        return False
+    if rank[rx] < rank[ry]:
+        parent[rx] = ry
+    elif rank[rx] > rank[ry]:
+        parent[ry] = rx
+    else:
+        parent[ry] = rx
+        rank[rx] += 1
+    return True
 
 
 def mst(n, U, V, W):

@@ -45,7 +45,7 @@ public class Prim {
   }
 
   public static void main(String[] args) {
-    int[][] w = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] w = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     Prim prog = new Prim();
     int[] result = prog.mst(w);
     System.out.println(Arrays.toString(result));

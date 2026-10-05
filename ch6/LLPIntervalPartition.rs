@@ -1,4 +1,11 @@
-// LLP-IntervalPartition: assign each course to least free room not used by overlapping earlier courses.
+// LLP-IntervalPartition: assign each course to least free room not used
+// by overlapping earlier courses. The least-free-room computation uses
+// a min-heap of the occupied room numbers in pre[j] (extract-min
+// repeatedly to find the smallest room number not present), matching
+// the book's heap-based advance step.
+
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 
 fn llp_interval_partition(pre: &[Vec<usize>]) -> Vec<i32> {
     let n = pre.len();
@@ -6,11 +13,14 @@ fn llp_interval_partition(pre: &[Vec<usize>]) -> Vec<i32> {
     let mut fixed = vec![false; n];
 
     let least_free_room = |g: &Vec<i32>, j: usize| -> i32 {
+        let mut heap: BinaryHeap<Reverse<i32>> = pre[j].iter().map(|&i| Reverse(g[i])).collect();
         let mut r = 1;
-        loop {
-            if !pre[j].iter().any(|&i| g[i] == r) { return r; }
+        while let Some(&Reverse(top)) = heap.peek() {
+            if top != r { break; }
+            heap.pop();
             r += 1;
         }
+        r
     };
 
     let mut changed = true;

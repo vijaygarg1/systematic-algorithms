@@ -12,6 +12,7 @@ public class GCD2 {
   int n;
   int[] A;
   int[] G;
+  int j;
   int picked_i;
 
   private boolean _forbidden0(int j) {
@@ -21,7 +22,7 @@ public class GCD2 {
     return false;
   }
 
-  private void _advance0(int j) {
+  private void _advance0() {
     int i = picked_i;
     G[j] = ((((A[j] * G[i]) + A[i]) - 1) / A[i]);
   }
@@ -39,7 +40,7 @@ public class GCD2 {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }
@@ -49,7 +50,7 @@ public class GCD2 {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     GCD2 prog = new GCD2();
     int[] result = prog.GCD2(A);
     System.out.println(Arrays.toString(result));

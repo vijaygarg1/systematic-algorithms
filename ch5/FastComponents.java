@@ -9,13 +9,14 @@ public class FastComponents {
   int n;
   int[][] adj;
   int[] G;
+  int j;
 
   private boolean _forbidden0(int j) {
     if ((G[j] >= G[G[j]])) return false;
     return true;
   }
 
-  private void _advance0(int j) {
+  private void _advance0() {
     G[j] = G[G[j]];
   }
 
@@ -28,7 +29,7 @@ public class FastComponents {
     return (!(G[j] >= t1));
   }
 
-  private void _advance1(int j) {
+  private void _advance1() {
     int m = Integer.MIN_VALUE;
     for (int i : adj[j]) m = Math.max(m, G[i]);
     G[j] = m;
@@ -45,7 +46,7 @@ public class FastComponents {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }
@@ -57,7 +58,7 @@ public class FastComponents {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden1(j)) {
-            _advance1(j);
+            this.j = j; _advance1();
             changed = true;
           }
         }
@@ -67,7 +68,10 @@ public class FastComponents {
   }
 
   public static void main(String[] args) {
-    // Demo harness for FastComponents.
-    // Construct with hard-coded inputs and call the entry method.
+    // No runnable example: FastComponents's parameters include a type
+    // this synthesizer cannot safely construct on its own (e.g. set<int>[],
+    // a 3D+ array, or another unsupported shape) -- not a compile error, just
+    // nothing to call here. See the .llp source for the real signature, and
+    // construct valid inputs by hand to exercise this method.
   }
 }

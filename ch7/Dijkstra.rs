@@ -1,4 +1,10 @@
-// Classical Dijkstra: extract-min frontier vertex, relax outgoing edges.
+// Classical Dijkstra: binary min-heap H of (cost, vertex) pairs, with
+// lazy deletion -- a vertex may be pushed more than once as its
+// distance improves; stale entries are skipped on removal via the
+// fixed[] check.
+
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 
 const INF: i32 = i32::MAX / 2;
 
@@ -7,17 +13,17 @@ fn shortest_path(w: &[Vec<i32>], s: usize) -> Vec<i32> {
     let mut dist = vec![INF; n];
     let mut fixed = vec![false; n];
     dist[s] = 0;
-    for _ in 0..n {
-        let mut j: Option<usize> = None;
-        let mut best = INF;
-        for k in 0..n {
-            if !fixed[k] && dist[k] < best { j = Some(k); best = dist[k]; }
-        }
-        let j = match j { Some(x) => x, None => break };
+    let mut heap = BinaryHeap::new();
+    heap.push(Reverse((0, s)));
+    while let Some(Reverse((_c, j))) = heap.pop() {
+        if fixed[j] { continue; }
         fixed[j] = true;
         for k in 0..n {
             if fixed[k] || w[j][k] >= INF { continue; }
-            if dist[j] + w[j][k] < dist[k] { dist[k] = dist[j] + w[j][k]; }
+            if dist[j] + w[j][k] < dist[k] {
+                dist[k] = dist[j] + w[j][k];
+                heap.push(Reverse((dist[k], k)));
+            }
         }
     }
     dist

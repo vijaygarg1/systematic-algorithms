@@ -1,22 +1,32 @@
-// LLP market clearing price: forbidden when item j is in a minimal
-// overdemanded set; advance raises its price by 1.
+// LLP-Assignment-Spec (bxx-assignment.tex, fig:alg-price-hl): forbidden
+// when item j belongs to an inclusion-minimal overdemanded set J (found
+// via alternating-path reachability from an unmatched bidder, the
+// standard witness for a violated Hall's condition); advance then
+// recomputes that same set J and the shared slack-jump
+// delta := min over bidders b demanding into J of [b's best surplus -
+// b's best surplus using an item outside J], and raises EVERY item in
+// J by that one shared delta -- exactly the book's rule
+// "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
+// See LLPAssignment.llp in this same directory for the equivalent
+// procedural \While{true} form (bxx-assignment.tex Algorithm
+// LLP-Assignment) that reaches the identical clearing price.
 
 import java.util.*;
 
 public class ConstrainedMarketClearingPrice {
   int n;
   int[][] v;
-  int n;
   int m;
   int[] G;
+  int j;
 
   private boolean _forbidden0(int j) {
-    if (!(isOverDemanded(j, v, G))) return false;
+    if (!(inOverdemandedSet(j, v, G))) return false;
     return true;
   }
 
-  private void _advance0(int j) {
-    G[j] = (G[j] + 1);
+  private void _advance0() {
+    raiseOverdemandedSet(j, v, G);
   }
 
   public int[] ConstrainedMarketClearingPrice(int[][] v) {
@@ -24,7 +34,6 @@ public class ConstrainedMarketClearingPrice {
     this.n = v[0].length;
     this.m = v.length;
     this.G = new int[n];
-    for (int i = 0; i < n; i++) this.G[i] = new int[n];
     for (int k = 0; k < n; k++) {
       G[k] = 0;
     }
@@ -34,7 +43,7 @@ public class ConstrainedMarketClearingPrice {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
-            _advance0(j);
+            this.j = j; _advance0();
             changed = true;
           }
         }
@@ -43,31 +52,173 @@ public class ConstrainedMarketClearingPrice {
     return G;
   }
 
-  public boolean isOverDemanded(int j, int[][] v, int[] G) {
+  public boolean inOverdemandedSet(int j, int[][] v, int[] G) {
     int n = G.length;
     int m = v.length;
-    int demandCount = 0;
+    int[] partner = new int[n];
+    for (int k = 0; k < n; k++) {
+      partner[k] = (0 - 1);
+    }
     int b = 0;
     while ((b < m)) {
-      int best = (v[b][j] - G[j]);
-      boolean isBest = true;
-      int i = 0;
-      while ((i < n)) {
-        if (((v[b][i] - G[i]) > best)) {
-          isBest = false;
-        }
-        i = (i + 1);
+      boolean[] seen = new boolean[n];
+      tryMatch(b, v, G, partner, seen);
+      b = (b + 1);
+    }
+    boolean[] bidderMatched = new boolean[m];
+    int i = 0;
+    while ((i < n)) {
+      if ((partner[i] != (0 - 1))) {
+        bidderMatched[partner[i]] = true;
       }
-      if (isBest) {
-        demandCount = (demandCount + 1);
+      i = (i + 1);
+    }
+    int unmatched = (0 - 1);
+    b = 0;
+    while (((b < m) && (unmatched == (0 - 1)))) {
+      if ((!bidderMatched[b])) {
+        unmatched = b;
       }
       b = (b + 1);
     }
-    return (demandCount > 1);
+    if ((unmatched == (0 - 1))) {
+      return false;
+    }
+    boolean[] itemInJ = new boolean[n];
+    boolean[] bidderInB = new boolean[m];
+    reach(unmatched, v, G, partner, itemInJ, bidderInB);
+    return itemInJ[j];
+  }
+
+  public void raiseOverdemandedSet(int j, int[][] v, int[] G) {
+    int n = G.length;
+    int m = v.length;
+    int[] partner = new int[n];
+    for (int k = 0; k < n; k++) {
+      partner[k] = (0 - 1);
+    }
+    int b = 0;
+    while ((b < m)) {
+      boolean[] seen = new boolean[n];
+      tryMatch(b, v, G, partner, seen);
+      b = (b + 1);
+    }
+    boolean[] bidderMatched = new boolean[m];
+    int i = 0;
+    while ((i < n)) {
+      if ((partner[i] != (0 - 1))) {
+        bidderMatched[partner[i]] = true;
+      }
+      i = (i + 1);
+    }
+    int unmatched = (0 - 1);
+    b = 0;
+    while (((b < m) && (unmatched == (0 - 1)))) {
+      if ((!bidderMatched[b])) {
+        unmatched = b;
+      }
+      b = (b + 1);
+    }
+    boolean[] itemInJ = new boolean[n];
+    boolean[] bidderInB = new boolean[m];
+    reach(unmatched, v, G, partner, itemInJ, bidderInB);
+    int delta = 2147483647;
+    b = 0;
+    while ((b < m)) {
+      if (bidderInB[b]) {
+        int best = bestSurplus(b, v, G);
+        int bestOutside = bestSurplusOutside(b, v, G, itemInJ);
+        int gap = (best - bestOutside);
+        if ((gap < delta)) {
+          delta = gap;
+        }
+      }
+      b = (b + 1);
+    }
+    i = 0;
+    while ((i < n)) {
+      if (itemInJ[i]) {
+        G[i] = (G[i] + delta);
+      }
+      i = (i + 1);
+    }
+  }
+
+  public int bestSurplus(int b, int[][] v, int[] G) {
+    int n = G.length;
+    int best = (0 - 2147483647);
+    int i = 0;
+    while ((i < n)) {
+      int s = (v[b][i] - G[i]);
+      if ((s > best)) {
+        best = s;
+      }
+      i = (i + 1);
+    }
+    return best;
+  }
+
+  public int bestSurplusOutside(int b, int[][] v, int[] G, boolean[] itemInJ) {
+    int n = G.length;
+    int best = (0 - 2147483647);
+    int i = 0;
+    while ((i < n)) {
+      if ((!itemInJ[i])) {
+        int s = (v[b][i] - G[i]);
+        if ((s > best)) {
+          best = s;
+        }
+      }
+      i = (i + 1);
+    }
+    return best;
+  }
+
+  public void reach(int b, int[][] v, int[] G, int[] partner, boolean[] itemInJ, boolean[] bidderInB) {
+    if ((!bidderInB[b])) {
+      bidderInB[b] = true;
+      int n = G.length;
+      int best = bestSurplus(b, v, G);
+      int i = 0;
+      while ((i < n)) {
+        if ((((v[b][i] - G[i]) == best) && (!itemInJ[i]))) {
+          itemInJ[i] = true;
+          if ((partner[i] != (0 - 1))) {
+            reach(partner[i], v, G, partner, itemInJ, bidderInB);
+          }
+        }
+        i = (i + 1);
+      }
+    }
+  }
+
+  public boolean tryMatch(int b, int[][] v, int[] G, int[] partner, boolean[] seen) {
+    int n = G.length;
+    int bestSurplus = (0 - 2147483647);
+    int i = 0;
+    while ((i < n)) {
+      int s = (v[b][i] - G[i]);
+      if ((s > bestSurplus)) {
+        bestSurplus = s;
+      }
+      i = (i + 1);
+    }
+    i = 0;
+    while ((i < n)) {
+      if ((((v[b][i] - G[i]) == bestSurplus) && (!seen[i]))) {
+        seen[i] = true;
+        if (((partner[i] == (0 - 1)) || tryMatch(partner[i], v, G, partner, seen))) {
+          partner[i] = b;
+          return true;
+        }
+      }
+      i = (i + 1);
+    }
+    return false;
   }
 
   public static void main(String[] args) {
-    int[][] v = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] v = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     ConstrainedMarketClearingPrice prog = new ConstrainedMarketClearingPrice();
     int[] result = prog.ConstrainedMarketClearingPrice(v);
     System.out.println(Arrays.toString(result));

@@ -1,30 +1,24 @@
-// Kahn's-style topological sweep: finalise each job once its predecessors are fixed.
+// LLP-JobScheduling-Fixed (bxx-llp-alg.tex, fig:llpJobSchedulingFixed):
+// forbidden when job j is not yet fixed but every predecessor is;
+// advance sets G[j] to the max completion time over predecessors plus
+// t[j], then marks j fixed -- matching the book's forbidden/advance
+// box exactly (not a plain Kahn's-style topological sweep, which
+// drops the fixed/forbidden formulation entirely). See
+// LLPJobSchedulingFixed.llp in this same directory for an identical
+// algorithm under its own (no-underscore) class name.
 
-int[] LLP_JobScheduling_WithFixed(int[] t, set<int>[] pre, set<int>[] succ) {
-  int n = t.length;
-  int[] G = new int[n];
-  int[] count = new int[n];
-  int[] candidate = new int[n];
-  int head = 0;
-  int tail = 0;
-  forall k in [0..n-1] : G[k] = t[k];
-  forall k in [0..n-1] : count[k] = pre[k].length;
-  forall k in [0..n-1] :
-    if (count[k] == 0) {
-      candidate[tail] = k;
-      tail = tail + 1;
-    };
-  while (head < tail) {
-    int j = candidate[head];
-    head = head + 1;
-    G[j] = max(G[j], max i in pre[j] : G[i] + t[j]);
-    forall k in succ[j] : {
-      count[k] = count[k] - 1;
-      if (count[k] == 0) {
-        candidate[tail] = k;
-        tail = tail + 1;
-      }
-    }
-  };
-  return G;
+class LLP_JobScheduling_WithFixed {
+  int[] LLP_JobScheduling_WithFixed(int[] t, set<int>[] pre) {
+    int n = t.length;
+    int[] G = new int[n];
+    boolean[] fixed = new boolean[n];
+    forall k in [0..n-1] : G[k] = t[k];
+    forall k in [0..n-1] : fixed[k] = (pre[k].length == 0);
+    forbidden (j) : !fixed[j] && forall i in pre[j] : fixed[i] =>
+      advance : {
+        G[j] = max i in pre[j] : G[i] + t[j];
+        fixed[j] = true;
+      };
+    return G;
+  }
 }

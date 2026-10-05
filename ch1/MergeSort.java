@@ -43,9 +43,9 @@ public class MergeSort {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     MergeSort prog = new MergeSort();
-    prog.MergeSort(A, 0, A.length);
+    prog.MergeSort(A, 0, A.length - 1);
     System.out.println(Arrays.toString(A));
   }
 }

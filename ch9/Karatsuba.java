@@ -33,7 +33,7 @@ public class Karatsuba {
   public static void main(String[] args) {
     int X = 0;
     int Y = 0;
-    int n = 0;
+    int n = 3;
     Karatsuba prog = new Karatsuba();
     int result = prog.multiply(X, Y, n);
     System.out.println(result);

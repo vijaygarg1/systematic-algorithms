@@ -1,7 +1,12 @@
-// Gale's Top Trading Cycle (TTC) algorithm for the housing market.
-// At each stage, build the top-choice graph on unassigned agents,
-// find a cycle in it, assign each agent in the cycle their current top
-// remaining house, and mark them fixed.  Iterate until everyone is fixed.
+// Gale's Top Trading Cycle (TTC) algorithm for the housing market,
+// matching bxx-housing.tex Algorithm TTC exactly: each stage (1) every
+// unfixed agent advances its wish pointer past houses already owned by
+// fixed agents, building the top-choice graph; (2) ALL node-disjoint
+// cycles in that graph are found at once (every unfixed node has
+// out-degree 1, so each agent either lies on a cycle or on a tail
+// leading into one); (3) every agent on ANY cycle this stage trades
+// and is fixed -- not a single pointer-chasing walk that resolves one
+// cycle at a time and rebuilds the whole graph for each one.
 
 class TTC {
   int[] assign(int[][] pref) {
@@ -9,13 +14,13 @@ class TTC {
     int[] house = new int[n];
     boolean[] fixed = new boolean[n];
     int[] G = new int[n];
-    boolean[] onPath = new boolean[n];
     forall i in [0..n-1] : fixed[i] = false;
     forall i in [0..n-1] : G[i] = 0;
 
     int numFixed = 0;
     while (numFixed < n) {
-      // Step 1: advance G[i] past houses owned by fixed agents.
+      // Step 1: advance wish[i] past houses owned by fixed agents, for
+      // every unfixed agent i.
       int i = 0;
       while (i < n) {
         if (!fixed[i]) {
@@ -24,37 +29,53 @@ class TTC {
         i = i + 1;
       };
 
-      // Step 2: walk from the first unfixed agent until we revisit a node.
-      int k = 0;
-      while (k < n) { onPath[k] = false; k = k + 1; };
-
-      int start = 0;
-      while (fixed[start]) { start = start + 1; };
-
-      int cur = start;
-      onPath[cur] = true;
-      int nxt = pref[cur][G[cur]];
-      while (!onPath[nxt]) {
-        cur = nxt;
-        onPath[cur] = true;
-        nxt = pref[cur][G[cur]];
+      // Step 2: find ALL cycles of the functional graph i -> pref[i][G[i]]
+      // restricted to unfixed agents (out-degree exactly 1 within that
+      // subgraph, by step 1). state: 0 = unvisited, 1 = on current walk,
+      // 2 = fully resolved (cycle membership already decided).
+      int[] state = new int[n];
+      boolean[] inCycle = new boolean[n];
+      int[] path = new int[n];
+      i = 0;
+      while (i < n) {
+        if (!fixed[i] && state[i] == 0) {
+          int pathLen = 0;
+          int cur = i;
+          while (state[cur] == 0) {
+            state[cur] = 1;
+            path[pathLen] = cur;
+            pathLen = pathLen + 1;
+            cur = pref[cur][G[cur]];
+          };
+          if (state[cur] == 1) {
+            // cur is on the current walk: the path from cur onward is a cycle.
+            int p = 0;
+            boolean onCyc = false;
+            while (p < pathLen) {
+              if (path[p] == cur) { onCyc = true; };
+              if (onCyc) { inCycle[path[p]] = true; };
+              p = p + 1;
+            }
+          };
+          int p2 = 0;
+          while (p2 < pathLen) {
+            state[path[p2]] = 2;
+            p2 = p2 + 1;
+          }
+        };
+        i = i + 1;
       };
 
-      // Step 3: assign houses around the cycle that starts at nxt.
-      int cycleStart = nxt;
-      cur = cycleStart;
-      boolean cycled = false;
-      while (!cycled) {
-        int wish = pref[cur][G[cur]];
-        house[cur] = wish;
-        fixed[cur] = true;
-        numFixed = numFixed + 1;
-        if (wish == cycleStart) {
-          cycled = true;
-        } else {
-          cur = wish;
-        }
-      };
+      // Step 3: implement the trades for every agent on a cycle this stage.
+      i = 0;
+      while (i < n) {
+        if (inCycle[i]) {
+          house[i] = pref[i][G[i]];
+          fixed[i] = true;
+          numFixed = numFixed + 1;
+        };
+        i = i + 1;
+      }
     };
     return house;
   }

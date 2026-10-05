@@ -117,7 +117,7 @@ public class ParallelCut {
   }
 
   public static void main(String[] args) {
-    int[][] vc = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] vc = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     int n = 0;
     int m = 0;
     ParallelCut prog = new ParallelCut();

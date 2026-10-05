@@ -3,7 +3,7 @@
 INF = 2 ** 31 - 1
 
 
-def run(G):
+def floyd_warshall(G):
     n = len(G)
     for k in range(n):
         for i in range(n):
@@ -20,6 +20,6 @@ if __name__ == "__main__":
         [5,   INF, 0,   1],
         [2,   INF, INF, 0],
     ]
-    run(G)
+    floyd_warshall(G)
     for row in G:
         print(row)

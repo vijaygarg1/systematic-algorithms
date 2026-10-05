@@ -44,7 +44,10 @@ public class SlowComponents {
   }
 
   public static void main(String[] args) {
-    // Demo harness for SlowComponents.
-    // Construct with hard-coded inputs and call the entry method.
+    // No runnable example: SlowComponents's parameters include a type
+    // this synthesizer cannot safely construct on its own (e.g. set<int>[],
+    // a 3D+ array, or another unsupported shape) -- not a compile error, just
+    // nothing to call here. See the .llp source for the real signature, and
+    // construct valid inputs by hand to exercise this method.
   }
 }

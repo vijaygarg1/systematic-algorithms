@@ -1,4 +1,7 @@
-// Release-times constraint: job j cannot start before time r[j].
+// ReleaseTimes: composition program enforcing that job j cannot start
+// before its release time r[j].  Composed onto LLP-MinMaxLateness via
+// predicate conjunction:
+// [ LLP-MinMaxLateness(t, d, G) && ReleaseTimes(r, G) ].
 
 import java.util.*;
 
@@ -6,17 +9,18 @@ public class ReleaseTimes {
   int n;
   int[] r;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((G[j] < r[j]))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = r[j];
   }
 
-  public void ReleaseTimes(int[] r, int[] G) {
+  public int[] ReleaseTimes(int[] r, int[] G) {
     this.r = r;
     this.G = G;
     this.n = r.length;
@@ -26,20 +30,20 @@ public class ReleaseTimes {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
       }
     }
+    return G;
   }
 
   public static void main(String[] args) {
-    int[] r = new int[] {1, 4, 7};
-    int[] G = new int[] {2, 3, 5, 8};
+    int[] r = new int[] {0, 0, 1, 2};
+    int[] G = new int[] {0, 0, 1, 1};
     ReleaseTimes prog = new ReleaseTimes();
-    prog.ReleaseTimes(r, G);
-    System.out.println(Arrays.toString(r));
-    System.out.println(Arrays.toString(G));
+    int[] result = prog.ReleaseTimes(r, G);
+    System.out.println(Arrays.toString(result));
   }
 }

@@ -18,7 +18,7 @@ public class BinarySearch {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     int key = 0;
     BinarySearch prog = new BinarySearch();
     int result = prog.BinarySearch(A, key, 0, A.length);

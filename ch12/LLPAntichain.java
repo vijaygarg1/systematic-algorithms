@@ -44,9 +44,9 @@ public class LLPAntichain {
   }
 
   public static void main(String[] args) {
-    int[][] chains = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    int[] len = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
-    boolean[][] leq = new boolean[][] {{true, false, false}, {false, true, false}, {false, false, true}};
+    int[][] chains = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[] len = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
+    boolean[][] leq = new boolean[][] {{true, false, false, false, false, false, false, false}, {false, true, false, false, false, false, false, false}, {false, false, true, false, false, false, false, false}, {false, false, false, true, false, false, false, false}, {false, false, false, false, true, false, false, false}, {false, false, false, false, false, true, false, false}, {false, false, false, false, false, false, true, false}, {false, false, false, false, false, false, false, true}};
     LLPAntichain prog = new LLPAntichain();
     int[] result = prog.LLPAntichain(chains, len, leq);
     System.out.println(Arrays.toString(result));

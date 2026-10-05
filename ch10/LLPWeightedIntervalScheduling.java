@@ -7,6 +7,7 @@ public class LLPWeightedIntervalScheduling {
   int[] w;
   int[] p;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((j >= 1))) return false;
@@ -14,7 +15,7 @@ public class LLPWeightedIntervalScheduling {
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = maxRhs(j);
   }
 
@@ -29,7 +30,7 @@ public class LLPWeightedIntervalScheduling {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -49,8 +50,8 @@ public class LLPWeightedIntervalScheduling {
   }
 
   public static void main(String[] args) {
-    int[] w = new int[] {1, 4, 7};
-    int[] p = new int[] {2, 3, 5, 8};
+    int[] w = new int[] {0, 0, 1, 2};
+    int[] p = new int[] {0, 0, 1, 1};
     LLPWeightedIntervalScheduling prog = new LLPWeightedIntervalScheduling();
     int[] result = prog.LLPWeightedIntervalScheduling(w, p);
     System.out.println(Arrays.toString(result));

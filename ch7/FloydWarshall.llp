@@ -1,7 +1,7 @@
 // Floyd-Warshall APSP: triple loop on intermediate vertex.
 
 class FloydWarshall {
-  void run(int[][] G) {
+  void FloydWarshall(int[][] G) {
     int n = G.length;
     int k = 0;
     while (k < n) {

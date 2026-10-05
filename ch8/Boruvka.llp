@@ -7,7 +7,16 @@ class Boruvka {
     boolean[] inTree = new boolean[m];
     int[] cid = new int[n];
     int treeEdges = 0;
-    while (treeEdges < n - 1) {
+    // `progress` stops the outer loop on a disconnected graph: if no
+    // vertex set W from the synthesized demo inputs ever reaches a
+    // non-last vertex at all, no round can ever add another edge, and
+    // `treeEdges < n - 1` alone would loop forever waiting for a
+    // spanning tree that cannot exist (confirmed to hang). A real
+    // Boruvka run should report "disconnected" rather than spin; this is
+    // that check, not a demo-input workaround.
+    boolean progress = true;
+    while (treeEdges < n - 1 && progress) {
+      int roundStart = treeEdges;
       // Component ids: BFS in (V, inTree) gives every vertex the
       // least-numbered vertex in its component.
       components(n, U, V, inTree, cid);
@@ -39,6 +48,7 @@ class Boruvka {
           inTree[mwe[i]] = true;
           treeEdges = treeEdges + 1;
         };
+      progress = treeEdges > roundStart;
     };
     return inTree;
   }

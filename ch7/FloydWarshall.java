@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class FloydWarshall {
-  public void run(int[][] G) {
+  public void FloydWarshall(int[][] G) {
     int n = G.length;
     int k = 0;
     while ((k < n)) {
@@ -25,9 +25,9 @@ public class FloydWarshall {
   }
 
   public static void main(String[] args) {
-    int[][] G = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] G = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     FloydWarshall prog = new FloydWarshall();
-    prog.run(G);
+    prog.FloydWarshall(G);
     System.out.println(Arrays.deepToString(G));
   }
 }

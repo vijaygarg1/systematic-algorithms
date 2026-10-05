@@ -28,7 +28,7 @@ public class ThreeWayPartition {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     int pivot = 5;
     ThreeWayPartition prog = new ThreeWayPartition();
     int[] result = prog.partition(A, pivot, 0, A.length);

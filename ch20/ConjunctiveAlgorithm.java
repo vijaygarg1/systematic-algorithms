@@ -6,7 +6,7 @@ import java.util.*;
 public class ConjunctiveAlgorithm {
   int n;
   private static final int[] _NO_EARLY_EXIT = new int[0];
-  int[][] vc;
+  int[][][] vc;
   int[] T;
   int[] G;
   int j;
@@ -25,7 +25,7 @@ public class ConjunctiveAlgorithm {
     return _NO_EARLY_EXIT;
   }
 
-  public int[] ConjunctiveAlgorithm(int[][] vc, int[] T) {
+  public int[] ConjunctiveAlgorithm(int[][][] vc, int[] T) {
     this.vc = vc;
     this.T = T;
     this.n = T.length;
@@ -49,11 +49,11 @@ public class ConjunctiveAlgorithm {
     return G;
   }
 
-  public boolean happenedBefore(int j, int[] G, int[][] vc) {
+  public boolean happenedBefore(int j, int[] G, int[][][] vc) {
     int n = G.length;
     int i = 0;
     while ((i < n)) {
-      if (((i != j) && (vc[((j * n) + G[j])][i] >= G[i]))) {
+      if (((i != j) && (vc[j][G[j]][i] >= G[i]))) {
         return true;
       }
       i = (i + 1);
@@ -62,10 +62,10 @@ public class ConjunctiveAlgorithm {
   }
 
   public static void main(String[] args) {
-    int[][] vc = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    int[] T = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
-    ConjunctiveAlgorithm prog = new ConjunctiveAlgorithm();
-    int[] result = prog.ConjunctiveAlgorithm(vc, T);
-    System.out.println(Arrays.toString(result));
+    // No runnable example: ConjunctiveAlgorithm's parameters include a type
+    // this synthesizer cannot safely construct on its own (e.g. set<int>[],
+    // a 3D+ array, or another unsupported shape) -- not a compile error, just
+    // nothing to call here. See the .llp source for the real signature, and
+    // construct valid inputs by hand to exercise this method.
   }
 }

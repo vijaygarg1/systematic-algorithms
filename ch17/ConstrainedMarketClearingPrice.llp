@@ -1,37 +1,182 @@
-// LLP market clearing price: forbidden when item j is in a minimal
-// overdemanded set; advance raises its price by 1.
-
+// LLP-Assignment-Spec (bxx-assignment.tex, fig:alg-price-hl): forbidden
+// when item j belongs to an inclusion-minimal overdemanded set J (found
+// via alternating-path reachability from an unmatched bidder, the
+// standard witness for a violated Hall's condition); advance then
+// recomputes that same set J and the shared slack-jump
+// delta := min over bidders b demanding into J of [b's best surplus -
+// b's best surplus using an item outside J], and raises EVERY item in
+// J by that one shared delta -- exactly the book's rule
+// "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
+// See LLPAssignment.llp in this same directory for the equivalent
+// procedural \While{true} form (bxx-assignment.tex Algorithm
+// LLP-Assignment) that reaches the identical clearing price.
 class ConstrainedMarketClearingPrice {
   int[] ConstrainedMarketClearingPrice(int[][] v) {
     int n = v[0].length;
     int m = v.length;
     int[] G = new int[n];
     forall k in [0..n-1] : G[k] = 0;
-    forbidden (j) : isOverDemanded(j, v, G) =>
-      advance : G[j] = G[j] + 1;
+    forbidden (j) : inOverdemandedSet(j, v, G) =>
+      advance : raiseOverdemandedSet(j, v, G);
     return G;
   }
 
-  boolean isOverDemanded(int j, int[][] v, int[] G) {
+  // True iff item j belongs to the overdemanded set reachable, by
+  // alternating paths in the current tight-edge (max-surplus) graph,
+  // from some bidder left unmatched by a maximum matching of that
+  // graph -- the standard witness set for a violated Hall's condition,
+  // hence a (not necessarily unique, but always inclusion-valid)
+  // overdemanded set containing j whenever no perfect matching exists.
+  boolean inOverdemandedSet(int j, int[][] v, int[] G) {
     int n = G.length;
     int m = v.length;
-    int demandCount = 0;
+    int[] partner = new int[n];
+    forall k in [0..n-1] : partner[k] = 0 - 1;
     int b = 0;
     while (b < m) {
-      int best = v[b][j] - G[j];
-      boolean isBest = true;
-      int i = 0;
-      while (i < n) {
-        if (v[b][i] - G[i] > best) {
-          isBest = false;
-        };
-        i = i + 1;
-      };
-      if (isBest) {
-        demandCount = demandCount + 1;
+      boolean[] seen = new boolean[n];
+      tryMatch(b, v, G, partner, seen);
+      b = b + 1;
+    };
+    boolean[] bidderMatched = new boolean[m];
+    int i = 0;
+    while (i < n) {
+      if (partner[i] != 0 - 1) { bidderMatched[partner[i]] = true; };
+      i = i + 1;
+    };
+    int unmatched = 0 - 1;
+    b = 0;
+    while (b < m && unmatched == (0 - 1)) {
+      if (!bidderMatched[b]) { unmatched = b; };
+      b = b + 1;
+    };
+    if (unmatched == (0 - 1)) {
+      return false;
+    };
+    boolean[] itemInJ = new boolean[n];
+    boolean[] bidderInB = new boolean[m];
+    reach(unmatched, v, G, partner, itemInJ, bidderInB);
+    return itemInJ[j];
+  }
+
+  // Recomputes the minimal overdemanded set J containing j (same
+  // witness construction as inOverdemandedSet), the shared slack-jump
+  // delta over the bidders demanding into J, and raises every item in
+  // J by that one delta.
+  void raiseOverdemandedSet(int j, int[][] v, int[] G) {
+    int n = G.length;
+    int m = v.length;
+    int[] partner = new int[n];
+    forall k in [0..n-1] : partner[k] = 0 - 1;
+    int b = 0;
+    while (b < m) {
+      boolean[] seen = new boolean[n];
+      tryMatch(b, v, G, partner, seen);
+      b = b + 1;
+    };
+    boolean[] bidderMatched = new boolean[m];
+    int i = 0;
+    while (i < n) {
+      if (partner[i] != 0 - 1) { bidderMatched[partner[i]] = true; };
+      i = i + 1;
+    };
+    int unmatched = 0 - 1;
+    b = 0;
+    while (b < m && unmatched == (0 - 1)) {
+      if (!bidderMatched[b]) { unmatched = b; };
+      b = b + 1;
+    };
+    boolean[] itemInJ = new boolean[n];
+    boolean[] bidderInB = new boolean[m];
+    reach(unmatched, v, G, partner, itemInJ, bidderInB);
+    int delta = 2147483647;
+    b = 0;
+    while (b < m) {
+      if (bidderInB[b]) {
+        int best = bestSurplus(b, v, G);
+        int bestOutside = bestSurplusOutside(b, v, G, itemInJ);
+        int gap = best - bestOutside;
+        if (gap < delta) { delta = gap; }
       };
       b = b + 1;
     };
-    return demandCount > 1;
+    i = 0;
+    while (i < n) {
+      if (itemInJ[i]) { G[i] = G[i] + delta; };
+      i = i + 1;
+    }
+  }
+
+  int bestSurplus(int b, int[][] v, int[] G) {
+    int n = G.length;
+    int best = 0 - 2147483647;
+    int i = 0;
+    while (i < n) {
+      int s = v[b][i] - G[i];
+      if (s > best) { best = s; };
+      i = i + 1;
+    };
+    return best;
+  }
+
+  // Best surplus available to bidder b using an item NOT in J.
+  int bestSurplusOutside(int b, int[][] v, int[] G, boolean[] itemInJ) {
+    int n = G.length;
+    int best = 0 - 2147483647;
+    int i = 0;
+    while (i < n) {
+      if (!itemInJ[i]) {
+        int s = v[b][i] - G[i];
+        if (s > best) { best = s; };
+      };
+      i = i + 1;
+    };
+    return best;
+  }
+
+  // Marks, in itemInJ/bidderInB, every item and bidder reachable from
+  // bidder b by alternating paths in the tight-edge graph w.r.t. the
+  // current matching `partner`.
+  void reach(int b, int[][] v, int[] G, int[] partner, boolean[] itemInJ, boolean[] bidderInB) {
+    if (!bidderInB[b]) {
+      bidderInB[b] = true;
+      int n = G.length;
+      int best = bestSurplus(b, v, G);
+      int i = 0;
+      while (i < n) {
+        if (v[b][i] - G[i] == best && !itemInJ[i]) {
+          itemInJ[i] = true;
+          if (partner[i] != 0 - 1) {
+            reach(partner[i], v, G, partner, itemInJ, bidderInB);
+          }
+        };
+        i = i + 1;
+      };
+    }
+  }
+
+  boolean tryMatch(int b, int[][] v, int[] G, int[] partner, boolean[] seen) {
+    int n = G.length;
+    int bestSurplus = 0 - 2147483647;
+    int i = 0;
+    while (i < n) {
+      int s = v[b][i] - G[i];
+      if (s > bestSurplus) {
+        bestSurplus = s;
+      };
+      i = i + 1;
+    };
+    i = 0;
+    while (i < n) {
+      if (v[b][i] - G[i] == bestSurplus && !seen[i]) {
+        seen[i] = true;
+        if (partner[i] == 0 - 1 || tryMatch(partner[i], v, G, partner, seen)) {
+          partner[i] = b;
+          return true;
+        }
+      };
+      i = i + 1;
+    };
+    return false;
   }
 }

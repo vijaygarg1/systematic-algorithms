@@ -1,4 +1,7 @@
-// Excluded-rooms constraint: room G[j] must not be in the excluded set R[j].
+// ExcludedRooms: composition program enforcing that course j is not
+// assigned a room from its excluded set R[j].  Composed onto
+// LLP-IntervalPartition via predicate conjunction:
+// [ LLP-IntervalPartition(s, f, G) && ExcludedRooms(R, G) ].
 
 import java.util.*;
 
@@ -7,6 +10,7 @@ public class ExcludedRooms {
   int[][] R;
   int[] G;
   int[][] pre;
+  int j;
 
   private boolean forbidden(int j) {
     boolean t1 = false;
@@ -16,11 +20,11 @@ public class ExcludedRooms {
     return t1;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = leastValidRoom(j);
   }
 
-  public void ExcludedRooms(int[][] R, int[] G, int[][] pre) {
+  public int[] ExcludedRooms(int[][] R, int[] G, int[][] pre) {
     this.R = R;
     this.G = G;
     this.pre = pre;
@@ -31,12 +35,13 @@ public class ExcludedRooms {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
       }
     }
+    return G;
   }
 
   public int leastValidRoom(int j) {
@@ -64,7 +69,10 @@ public class ExcludedRooms {
   }
 
   public static void main(String[] args) {
-    // Demo harness for ExcludedRooms.
-    // Construct with hard-coded inputs and call the entry method.
+    // No runnable example: ExcludedRooms's parameters include a type
+    // this synthesizer cannot safely construct on its own (e.g. set<int>[],
+    // a 3D+ array, or another unsupported shape) -- not a compile error, just
+    // nothing to call here. See the .llp source for the real signature, and
+    // construct valid inputs by hand to exercise this method.
   }
 }

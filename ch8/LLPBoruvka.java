@@ -34,7 +34,7 @@ public class LLPBoruvka {
   }
 
   public static void main(String[] args) {
-    int[] G = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] G = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LLPBoruvka prog = new LLPBoruvka();
     prog.LLPBoruvka(G);
     System.out.println(Arrays.toString(G));

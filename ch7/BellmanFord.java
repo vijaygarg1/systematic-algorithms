@@ -26,9 +26,9 @@ public class BellmanFord {
   }
 
   public static void main(String[] args) {
-    int[] U = new int[] {1, 4, 7};
-    int[] V = new int[] {2, 3, 5, 8};
-    int[] W = new int[] {6, 9};
+    int[] U = new int[] {0, 0, 1, 2};
+    int[] V = new int[] {0, 0, 1, 1};
+    int[] W = new int[] {0, 0, 0, 2};
     BellmanFord prog = new BellmanFord();
     int[] result = prog.shortestPath(U.length, U, V, W, 0);
     System.out.println(Arrays.toString(result));

@@ -1,0 +1,25 @@
+// LLP-Dijkstra: a particular LLP schedule of LLP-BellmanFord that fixes
+// one vertex per round -- the non-fixed vertex of minimum G[j] -- using
+// a priority-queue scheduler instead of relaxing every forbidden index
+// concurrently.
+
+class LLPDijkstra {
+  double[] LLPDijkstra(set<int>[] adj, double[][] w) {
+    double[] G = infinity;
+    boolean[] fixed = false;
+    setMode(PriorityQueue);
+    setPriority(G[j], min);
+    G[0] = 0;
+    forbidden (j) : !fixed[j] && G[j] < infinity =>
+      advance : {
+        fixed[j] = true;
+        forall k in adj[j] : {
+          if (!fixed[k]) {
+            double cand = G[j] + w[j][k];
+            if (cand < G[k]) { G[k] = cand; }
+          }
+        };
+      };
+    return G;
+  }
+}

@@ -127,8 +127,8 @@ public class TwoSAT {
   }
 
   public static void main(String[] args) {
-    int[] clauseA = new int[] {1, 4, 7};
-    int[] clauseB = new int[] {2, 3, 5, 8};
+    int[] clauseA = new int[] {0, 0, 1, 2};
+    int[] clauseB = new int[] {0, 0, 1, 1};
     TwoSAT prog = new TwoSAT();
     boolean[] result = prog.TwoSAT(clauseA, clauseB);
     System.out.println(Arrays.toString(result));

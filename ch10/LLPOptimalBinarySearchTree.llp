@@ -7,6 +7,12 @@ class LLPOptimalBinarySearchTree {
     // priority: (j - i)
   }
 
+  // k ranges over every root choice in [i, j]; the subtree to its left
+  // is the empty range [i, k-1] when k == i (cost 0, not G[i][i-1] --
+  // k-1 == i-1 there, one before the start of this row, out of bounds
+  // on the real G[][] -- confirmed to crash the very first call,
+  // forbidden(0, j) with k == i == 0), and symmetrically the right
+  // subtree is empty when k == j.
   double optCost(double[] p, double[][] G, int i, int j) {
     double best = infinity;
     int k = i;
@@ -17,7 +23,11 @@ class LLPOptimalBinarySearchTree {
         s = s + p[l];
         l = l + 1;
       }
-      double cost = G[i][k-1] + s + G[k+1][j];
+      double leftCost = 0.0;
+      if (k > i) { leftCost = G[i][k-1]; }
+      double rightCost = 0.0;
+      if (k < j) { rightCost = G[k+1][j]; }
+      double cost = leftCost + s + rightCost;
       if (cost < best) {
         best = cost;
       }

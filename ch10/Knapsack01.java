@@ -39,8 +39,8 @@ public class Knapsack01 {
   }
 
   public static void main(String[] args) {
-    int[] w = new int[] {1, 4, 7};
-    int[] v = new int[] {2, 3, 5, 8};
+    int[] w = new int[] {0, 0, 1, 2};
+    int[] v = new int[] {0, 0, 1, 1};
     int W = 10;
     Knapsack01 prog = new Knapsack01();
     int[][] result = prog.solve(w, v, W);

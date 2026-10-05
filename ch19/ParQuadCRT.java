@@ -16,6 +16,7 @@ public class ParQuadCRT {
   int[] a;
   int[] roots;
   int[] G;
+  int j;
   int picked_i;
 
   private boolean forbidden(int j) {
@@ -25,7 +26,7 @@ public class ParQuadCRT {
     return false;
   }
 
-  private void advance(int j) {
+  private void advance() {
     int i = picked_i;
     G[j] = (G[j] + (((((G[i] - G[j]) + m[j]) - 1) / m[j]) * m[j]));
   }
@@ -42,7 +43,7 @@ public class ParQuadCRT {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -52,9 +53,9 @@ public class ParQuadCRT {
   }
 
   public static void main(String[] args) {
-    int[] m = new int[] {1, 4, 7};
-    int[] a = new int[] {2, 3, 5, 8};
-    int[] roots = new int[] {6, 9};
+    int[] m = new int[] {3, 5, 7, 11};
+    int[] a = new int[] {0, 0, 1, 2};
+    int[] roots = new int[] {0, 0, 1, 1};
     ParQuadCRT prog = new ParQuadCRT();
     int[] result = prog.ParQuadCRT(m, a, roots);
     System.out.println(Arrays.toString(result));

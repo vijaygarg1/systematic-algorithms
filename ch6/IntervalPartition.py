@@ -1,21 +1,24 @@
-"""Interval partition: greedy by earliest start time -- assign each interval to any room whose previous interval has finished, or open a new room. Rooms used = max overlap depth."""
+"""Interval partition: for each interval (sorted by start time), reuse the
+earliest-free room via a min-heap of (finishTime, roomNumber) pairs --
+extract-min when its finish time is <= the current start time, else open
+a new room. Rooms used = max overlap depth."""
+
+import heapq
 
 
 def partition(s, f):
     n = len(s)
     G = [0] * n
-    room_finish = []
+    heap = []  # (finishTime, roomNumber), min-heap
+    num_rooms = 0
     for j in range(n):
-        r = -1
-        for i, end in enumerate(room_finish):
-            if end <= s[j]:
-                r = i
-                break
-        if r == -1:
-            r = len(room_finish)
-            room_finish.append(0)
+        if heap and heap[0][0] <= s[j]:
+            _, r = heapq.heappop(heap)
+        else:
+            r = num_rooms
+            num_rooms += 1
         G[j] = r + 1
-        room_finish[r] = f[j]
+        heapq.heappush(heap, (f[j], r))
     return G
 
 

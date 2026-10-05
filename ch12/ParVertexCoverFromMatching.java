@@ -75,8 +75,8 @@ public class ParVertexCoverFromMatching {
   }
 
   public static void main(String[] args) {
-    int[][] adj = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    int[] matchL = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[] matchL = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     ParVertexCoverFromMatching prog = new ParVertexCoverFromMatching();
     boolean[] result = prog.ParVertexCoverFromMatching(adj, matchL);
     System.out.println(Arrays.toString(result));

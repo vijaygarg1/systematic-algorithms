@@ -279,7 +279,7 @@ public class LLPAssignment {
   }
 
   public static void main(String[] args) {
-    int[][] v = new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    int[][] v = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     LLPAssignment prog = new LLPAssignment();
     int[] result = prog.LLPAssignment(v);
     System.out.println(Arrays.toString(result));

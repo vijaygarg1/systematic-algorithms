@@ -48,7 +48,7 @@ public class LLPMincut {
   }
 
   public static void main(String[] args) {
-    boolean[] G = new boolean[] {false, false, false, false};
+    boolean[] G = new boolean[] {false, false, false, false, false, false, false, false};
     LLPMincut prog = new LLPMincut();
     boolean[] result = prog.LLPMincut(G);
     System.out.println(Arrays.toString(result));

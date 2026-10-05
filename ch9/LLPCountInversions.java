@@ -6,13 +6,14 @@ public class LLPCountInversions {
   int n;
   int[] A;
   int[] G;
+  int j;
 
   private boolean forbidden(int j) {
     if (!((G[j] < countLeft(A, j)))) return false;
     return true;
   }
 
-  private void advance(int j) {
+  private void advance() {
     G[j] = countLeft(A, j);
   }
 
@@ -26,7 +27,7 @@ public class LLPCountInversions {
         changed = false;
         for (int j = 0; j < n; j++) {
           if (forbidden(j)) {
-            advance(j);
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -47,7 +48,7 @@ public class LLPCountInversions {
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {5, 2, 4, 6, 1, 3, 8, 7};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LLPCountInversions prog = new LLPCountInversions();
     prog.LLPCountInversions(A);
     System.out.println(Arrays.toString(A));

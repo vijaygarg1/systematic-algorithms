@@ -12,7 +12,7 @@ public class Hanoi {
   }
 
   public static void main(String[] args) {
-    int n = 0;
+    int n = 3;
     int aux = 0;
     int target = 0;
     Hanoi prog = new Hanoi();

@@ -42,8 +42,8 @@ public class ParCRT2 {
   }
 
   public static void main(String[] args) {
-    int[] m = new int[] {1, 4, 7};
-    int[] b = new int[] {2, 3, 5, 8};
+    int[] m = new int[] {3, 5, 7, 11};
+    int[] b = new int[] {0, 0, 1, 2};
     int M = 0;
     ParCRT2 prog = new ParCRT2();
     int[] result = prog.ParCRT2(m, b, M);

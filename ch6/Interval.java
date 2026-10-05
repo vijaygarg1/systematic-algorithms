@@ -22,8 +22,8 @@ public class Interval {
   }
 
   public static void main(String[] args) {
-    int[] s = new int[] {1, 4, 7};
-    int[] f = new int[] {2, 3, 5, 8};
+    int[] s = new int[] {0, 0, 1, 2};
+    int[] f = new int[] {0, 0, 1, 1};
     Interval prog = new Interval();
     int[] result = prog.schedule(s, f);
     System.out.println(Arrays.toString(result));

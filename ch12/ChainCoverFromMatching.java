@@ -2,8 +2,8 @@
 
 import java.util.*;
 
-public class ParChainCoverFromMatching {
-  public int[] ParChainCoverFromMatching(int[] matchPartner) {
+public class ChainCoverFromMatching {
+  public int[] ChainCoverFromMatching(int[] matchPartner) {
     int n = matchPartner.length;
     int[] C = new int[n];
     int i = 0;
@@ -42,8 +42,8 @@ public class ParChainCoverFromMatching {
 
   public static void main(String[] args) {
     int[] matchPartner = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
-    ParChainCoverFromMatching prog = new ParChainCoverFromMatching();
-    int[] result = prog.ParChainCoverFromMatching(matchPartner);
+    ChainCoverFromMatching prog = new ChainCoverFromMatching();
+    int[] result = prog.ChainCoverFromMatching(matchPartner);
     System.out.println(Arrays.toString(result));
   }
 }

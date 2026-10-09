@@ -11,7 +11,7 @@ public class FloydWarshall {
       while ((i < n)) {
         int j = 0;
         while ((j < n)) {
-          if (((G[i][k] != 2147483647) && (G[k][j] != 2147483647))) {
+          if (((G[i][k] != Integer.MAX_VALUE) && (G[k][j] != Integer.MAX_VALUE))) {
             if (((G[i][k] + G[k][j]) < G[i][j])) {
               G[i][j] = (G[i][k] + G[k][j]);
             }

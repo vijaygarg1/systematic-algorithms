@@ -53,7 +53,7 @@ public class ConjunctiveAlgorithm {
     int n = G.length;
     int i = 0;
     while ((i < n)) {
-      if (((i != j) && (vc[j][G[j]][i] >= G[i]))) {
+      if (((i != j) && (vc[i][G[i]][j] >= G[j]))) {
         return true;
       }
       i = (i + 1);

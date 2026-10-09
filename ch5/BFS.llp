@@ -4,7 +4,7 @@ class BFS {
   int[] traverse(set<int>[] dep, int s) {
     int n = dep.length;
     int[] G = new int[n];
-    forall i in [0..n-1] : G[i] = 2147483647;
+    forall i in [0..n-1] : G[i] = infinity;
     G[s] = 0;
     // FIFO queue simulated via an int[] with head/tail indices.
     int[] Q = new int[n];

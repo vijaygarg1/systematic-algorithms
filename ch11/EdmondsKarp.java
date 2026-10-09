@@ -13,7 +13,7 @@ public class EdmondsKarp {
       if ((found == 0)) {
         done = true;
       } else {
-        int bottleneck = 2147483647;
+        int bottleneck = Integer.MAX_VALUE;
         int v = t;
         while ((v != s)) {
           int u = parent[v];

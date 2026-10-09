@@ -4,6 +4,12 @@
 // edges; equivalently, when M itself is not acyclic.  Composed onto
 // LLP-Kruskal via predicate conjunction:
 // [ LLP-Kruskal(E, w, G) && MandatoryEdges(M, G) ].
+// Calls the sibling UnionFind program (`UnionFind.find(parent, x)`,
+// `UnionFind.union(parent, rank, x, y)`) instead of keeping its own
+// copy of find/union -- same multi-file treatment as Kruskal.llp. This
+// makes MandatoryEdges.java a multi-file program: it requires
+// UnionFind.java alongside it to compile (see JAVA_MULTI_FILE in
+// validate-site.py and the `javaRequires` demo-spec field in llp.js).
 
 import java.util.*;
 
@@ -15,6 +21,7 @@ public class MandatoryEdges {
   boolean[] M;
   int[] parent;
   boolean[] G;
+  int[] rank;
   int j;
 
   private boolean forbidden(int j) {
@@ -24,11 +31,11 @@ public class MandatoryEdges {
   }
 
   private boolean[] advance() {
-    if ((find(u[j], parent) == find(v[j], parent))) {
+    if ((new UnionFind().find(parent, u[j]) == new UnionFind().find(parent, v[j]))) {
       return null;
     }
     G[j] = true;
-    union(u[j], v[j], parent);
+    new UnionFind().union(parent, rank, u[j], v[j]);
     return _NO_EARLY_EXIT;
   }
 
@@ -39,6 +46,7 @@ public class MandatoryEdges {
     this.parent = parent;
     this.n = u.length;
     this.G = new boolean[n];
+    this.rank = new int[parent.length];
     {
       boolean changed = true;
       while (changed) {
@@ -52,22 +60,6 @@ public class MandatoryEdges {
       }
     }
     return G;
-  }
-
-  public int find(int x, int[] parent) {
-    while ((parent[x] != x)) {
-      parent[x] = parent[parent[x]];
-      x = parent[x];
-    }
-    return x;
-  }
-
-  public void union(int a, int b, int[] parent) {
-    int ra = find(a, parent);
-    int rb = find(b, parent);
-    if ((ra != rb)) {
-      parent[ra] = rb;
-    }
   }
 
   public static void main(String[] args) {

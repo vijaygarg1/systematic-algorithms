@@ -3,75 +3,31 @@
 // min-priority-queue Q of (finishTime, roomNumber) pairs -- extract-min
 // when Q is non-empty and its minimum finish time is <= s[i], else open
 // a new room -- matching the book's binary-heap algorithm exactly, not
-// a linear scan over existing rooms each iteration.
+// a linear scan over existing rooms each iteration. Uses the heap<int>
+// builtin (-> java.util.PriorityQueue<int[]>, lexicographically ordered
+// by (finish, room) so ties reuse the lowest-numbered free room) instead
+// of hand-rolled heapPush/heapPop/heapify/greater.
 
 class IntervalPartition {
   int[] partition(int[] s, int[] f) {
     int n = s.length;
     int[] G = new int[n];
-    int cap = n + 1;
-    int[] heapFinish = new int[cap];
-    int[] heapRoom = new int[cap];
-    int heapSize = 0;
+    heap<int> Q = new heap<int>();
     int numRooms = 0;
     int j = 0;
     while (j < n) {
       int r = 0 - 1;
-      if (heapSize > 0 && heapFinish[0] <= s[j]) {
-        r = heapRoom[0];
-        heapSize = heapPop(heapFinish, heapRoom, heapSize);
+      if (!Q.isEmpty() && Q.peekKey() <= s[j]) {
+        r = Q.peekValue();
+        Q.removeMin();
       } else {
         r = numRooms;
         numRooms = numRooms + 1;
       };
       G[j] = r + 1;
-      heapSize = heapPush(heapFinish, heapRoom, heapSize, f[j], r);
+      Q.push(f[j], r);
       j = j + 1;
     };
     return G;
-  }
-
-  // True iff the key (fa, ra) is lexicographically greater than (fb, rb).
-  boolean greater(int fa, int ra, int fb, int rb) {
-    if (fa != fb) { return fa > fb; };
-    return ra > rb;
-  }
-
-  // Q.insert(finish, room): insert into the min-heap keyed by
-  // (finishTime, roomNumber); returns new size.
-  int heapPush(int[] hf, int[] hr, int size, int finish, int room) {
-    int i = size;
-    hf[i] = finish;
-    hr[i] = room;
-    size = size + 1;
-    while (i > 0 && greater(hf[(i - 1) / 2], hr[(i - 1) / 2], hf[i], hr[i])) {
-      int p = (i - 1) / 2;
-      swap(hf[i], hf[p]);
-      swap(hr[i], hr[p]);
-      i = p;
-    };
-    return size;
-  }
-
-  // Q.extract-min(): remove the minimum-key element (the root); returns new size.
-  int heapPop(int[] hf, int[] hr, int size) {
-    size = size - 1;
-    hf[0] = hf[size];
-    hr[0] = hr[size];
-    heapify(hf, hr, 0, size);
-    return size;
-  }
-
-  void heapify(int[] hf, int[] hr, int i, int size) {
-    int smallest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
-    if (left < size && greater(hf[smallest], hr[smallest], hf[left], hr[left])) { smallest = left; };
-    if (right < size && greater(hf[smallest], hr[smallest], hf[right], hr[right])) { smallest = right; };
-    if (smallest != i) {
-      swap(hf[i], hf[smallest]);
-      swap(hr[i], hr[smallest]);
-      heapify(hf, hr, smallest, size);
-    }
   }
 }

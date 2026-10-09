@@ -5,7 +5,7 @@
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
 // intersect Z).
 
-fn par_vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
+fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
     let l = adj.len();
     let r = adj[0].len();
     let mut in_z = vec![false; l + r];
@@ -68,7 +68,7 @@ fn main() {
         vec![0, 1, 1],
     ];
     let match_l = [0i32, 2, 1];
-    let c = par_vertex_cover_from_matching(&adj, &match_l);
+    let c = vertex_cover_from_matching(&adj, &match_l);
     print!("cover bits:");
     for b in &c { print!(" {}", if *b { 1 } else { 0 }); }
     println!();

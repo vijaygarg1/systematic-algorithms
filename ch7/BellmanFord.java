@@ -6,7 +6,7 @@ public class BellmanFord {
   public int[] shortestPath(int n, int[] U, int[] V, int[] W, int s) {
     int[] dist = new int[n];
     for (int i = 0; i < n; i++) {
-      dist[i] = 2147483647;
+      dist[i] = Integer.MAX_VALUE;
     }
     dist[s] = 0;
     int k = 1;
@@ -15,7 +15,7 @@ public class BellmanFord {
       while ((e < U.length)) {
         int u = U[e];
         int v = V[e];
-        if (((dist[u] != 2147483647) && ((dist[u] + W[e]) < dist[v]))) {
+        if (((dist[u] != Integer.MAX_VALUE) && ((dist[u] + W[e]) < dist[v]))) {
           dist[v] = (dist[u] + W[e]);
         }
         e = (e + 1);

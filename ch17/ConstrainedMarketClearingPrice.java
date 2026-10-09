@@ -122,7 +122,7 @@ public class ConstrainedMarketClearingPrice {
     boolean[] itemInJ = new boolean[n];
     boolean[] bidderInB = new boolean[m];
     reach(unmatched, v, G, partner, itemInJ, bidderInB);
-    int delta = 2147483647;
+    int delta = Integer.MAX_VALUE;
     b = 0;
     while ((b < m)) {
       if (bidderInB[b]) {
@@ -146,7 +146,7 @@ public class ConstrainedMarketClearingPrice {
 
   public int bestSurplus(int b, int[][] v, int[] G) {
     int n = G.length;
-    int best = (0 - 2147483647);
+    int best = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - G[i]);
@@ -160,7 +160,7 @@ public class ConstrainedMarketClearingPrice {
 
   public int bestSurplusOutside(int b, int[][] v, int[] G, boolean[] itemInJ) {
     int n = G.length;
-    int best = (0 - 2147483647);
+    int best = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       if ((!itemInJ[i])) {
@@ -194,7 +194,7 @@ public class ConstrainedMarketClearingPrice {
 
   public boolean tryMatch(int b, int[][] v, int[] G, int[] partner, boolean[] seen) {
     int n = G.length;
-    int bestSurplus = (0 - 2147483647);
+    int bestSurplus = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - G[i]);

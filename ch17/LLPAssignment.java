@@ -53,7 +53,7 @@
 //
 // boolean tryMatch(int b, int[][] v, int[] C, int[] partner, boolean[] seen) {
 // int n = C.length;
-// int bestSurplus = 0 - 2147483647;
+// int bestSurplus = 0 - infinity;
 // int i = 0;
 // while (i < n) {
 // int s = v[b][i] - C[i];
@@ -82,7 +82,7 @@
 // int[] bestSurplus = new int[m];
 // int b = 0;
 // while (b < m) {
-// bestSurplus[b] = 0 - 2147483647;
+// bestSurplus[b] = 0 - infinity;
 // int i = 0;
 // while (i < n) {
 // int s = v[b][i] - C[i];
@@ -97,13 +97,13 @@
 // int[] demand = new int[n];
 // int j = 0;
 // while (j < n) {
-// step[j] = 2147483647;
+// step[j] = infinity;
 // demand[j] = 0;
 // b = 0;
 // while (b < m) {
 // if (v[b][j] - C[j] == bestSurplus[b]) {
 // demand[j] = demand[j] + 1;
-// int secondBest = 0 - 2147483647;
+// int secondBest = 0 - infinity;
 // int i = 0;
 // while (i < n) {
 // if (i != j) {
@@ -180,7 +180,7 @@ public class LLPAssignment {
         boolean[] itemInJ = new boolean[n];
         boolean[] bidderInB = new boolean[m];
         reach(unmatched, v, C, partner, itemInJ, bidderInB);
-        int delta = 2147483647;
+        int delta = Integer.MAX_VALUE;
         b = 0;
         while ((b < m)) {
           if (bidderInB[b]) {
@@ -207,7 +207,7 @@ public class LLPAssignment {
 
   public int bestSurplus(int b, int[][] v, int[] C) {
     int n = C.length;
-    int best = (0 - 2147483647);
+    int best = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - C[i]);
@@ -221,7 +221,7 @@ public class LLPAssignment {
 
   public int bestSurplusOutside(int b, int[][] v, int[] C, boolean[] itemInJ) {
     int n = C.length;
-    int best = (0 - 2147483647);
+    int best = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       if ((!itemInJ[i])) {
@@ -255,7 +255,7 @@ public class LLPAssignment {
 
   public boolean tryMatch(int b, int[][] v, int[] C, int[] partner, boolean[] seen) {
     int n = C.length;
-    int bestSurplus = (0 - 2147483647);
+    int bestSurplus = (0 - Integer.MAX_VALUE);
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - C[i]);

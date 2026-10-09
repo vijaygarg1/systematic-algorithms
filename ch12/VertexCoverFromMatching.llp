@@ -5,8 +5,8 @@
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
 // intersect Z).
 
-class ParVertexCoverFromMatching {
-  boolean[] ParVertexCoverFromMatching(int[][] adj, int[] matchL) {
+class VertexCoverFromMatching {
+  boolean[] VertexCoverFromMatching(int[][] adj, int[] matchL) {
     int L = adj.length;
     int R = adj[0].length;
     boolean[] inZ    = new boolean[L + R];

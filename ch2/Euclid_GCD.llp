@@ -1,9 +1,0 @@
-// LLP form of Euclid: forbidden when some G[i] < G[j]; advance subtracts.
-
-int[] Euclid_GCD(int[] A) {
-  int[] G = 0;
-  forall k in [0..n-1] : G[k] = A[k];
-  forbidden (j) : exists i in [0..n-1] pick i : G[j] > G[i]  =>
-    advance : G[j] = G[j] - G[i];
-  return G;
-}

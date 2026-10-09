@@ -10,7 +10,7 @@ public class Prim {
     boolean[] fixed = new boolean[n];
     for (int i = 0; i < n; i++) {
       {
-        d[i] = 2147483647;
+        d[i] = Integer.MAX_VALUE;
         parent[i] = (-1);
       }
     }
@@ -18,7 +18,7 @@ public class Prim {
     int count = 0;
     while ((count < n)) {
       int v = (-1);
-      int best = 2147483647;
+      int best = Integer.MAX_VALUE;
       int k = 0;
       while ((k < n)) {
         if (((!fixed[k]) && (d[k] < best))) {
@@ -34,7 +34,7 @@ public class Prim {
       count = (count + 1);
       k = 0;
       while ((k < n)) {
-        if ((((!fixed[k]) && (w[v][k] != 2147483647)) && (w[v][k] < d[k]))) {
+        if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
           d[k] = w[v][k];
           parent[k] = v;
         }

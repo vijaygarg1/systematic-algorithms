@@ -7,7 +7,7 @@ public class BFS {
     int n = dep.length;
     int[] G = new int[n];
     for (int i = 0; i < n; i++) {
-      G[i] = 2147483647;
+      G[i] = Integer.MAX_VALUE;
     }
     G[s] = 0;
     int[] Q = new int[n];

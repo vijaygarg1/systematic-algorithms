@@ -12,7 +12,7 @@ class EdmondsKarp {
         done = true;
       } else {
         // Bottleneck residual capacity along the path.
-        int bottleneck = 2147483647;
+        int bottleneck = infinity;
         int v = t;
         while (v != s) {
           int u = parent[v];

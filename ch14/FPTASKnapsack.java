@@ -37,9 +37,7 @@ public class FPTASKnapsack {
     int M = fv[0];
     i = 1;
     while ((i < nf)) {
-      if ((fv[i] > M)) {
-        M = fv[i];
-      }
+      M = Math.max(M, fv[i]);
       i = (i + 1);
     }
     int[] vPrime = new int[nf];
@@ -74,14 +72,9 @@ public class FPTASKnapsack {
       int p = 1;
       while ((p <= Vp)) {
         D[i][p] = D[(i - 1)][p];
-        int prev = (p - vPrime[(i - 1)]);
-        if ((prev < 0)) {
-          prev = 0;
-        }
+        int prev = Math.max(0, (p - vPrime[(i - 1)]));
         int take = (fw[(i - 1)] + D[(i - 1)][prev]);
-        if ((take < D[i][p])) {
-          D[i][p] = take;
-        }
+        D[i][p] = Math.min(D[i][p], take);
         p = (p + 1);
       }
       i = (i + 1);
@@ -99,11 +92,7 @@ public class FPTASKnapsack {
     while ((i > 0)) {
       if ((D[i][bp] < D[(i - 1)][bp])) {
         S[orig[(i - 1)]] = true;
-        int prev = (bp - vPrime[(i - 1)]);
-        if ((prev < 0)) {
-          prev = 0;
-        }
-        bp = prev;
+        bp = Math.max(0, (bp - vPrime[(i - 1)]));
       }
       i = (i - 1);
     }

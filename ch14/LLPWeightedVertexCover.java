@@ -1,122 +1,60 @@
-// LLP-WeightedVertexCover: primal-dual 2-approximation for weighted vertex
-// cover, matching bxx-approximate.tex Algorithm LLP-WeightedVertexCover.
-// G[{u,v}] is the price on edge {u,v}; a vertex v is tight when its
-// incident prices saturate w[v]; an edge is slack when neither endpoint
-// is tight. To keep this a well-formed LLP computation, only a
-// lex-minimal slack edge (one no larger, in edge order, than any slack
-// edge sharing a vertex with it) may advance -- distinct lex-minimal
-// slack edges are pairwise non-adjacent, so advancing one never disturbs
-// another. Each advance raises its edge's price by the smaller of its
-// two endpoints' remaining budgets, tightening at least one endpoint.
-// Sequentially, repeatedly advancing the single globally lex-least
-// slack edge is a valid schedule (it is trivially lex-minimal among its
-// neighbors), so that is what this program does. Output: C[v] := tight(v).
-//
-// Earlier version of this file (kept for reference, not used): raised
-// every currently-slack edge by one common uniform step per round
-// (Vazirani-style), rather than the book's per-edge, lex-minimal-only
-// step. Left in a comment below rather than deleted.
-//
-// class LLPWeightedVertexCover {
-// void LLPWeightedVertexCover(int[][] adj, double[] w) {
-// int nv = w.length;
-// double[][] G = new double[nv][nv];
-// boolean changed = true;
-// while (changed) {
-// changed = false;
-// double r = computeStep(adj, w, G, nv);
-// if (r <= 0.0) { changed = false; };
-// int u = 0;
-// while (u < nv) {
-// int v = u + 1;
-// while (v < nv) {
-// if (adj[u][v] == 1 && !tight(u, adj, w, G, nv) && !tight(v, adj, w, G, nv)) {
-// G[u][v] = G[u][v] + r;
-// G[v][u] = G[v][u] + r;
-// changed = true;
-// };
-// v = v + 1;
-// };
-// u = u + 1;
-// }
-// };
-// }
-//
-// boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {
-// double sum = 0.0;
-// int u = 0;
-// while (u < nv) {
-// if (adj[u][v] == 1) { sum = sum + G[u][v]; };
-// u = u + 1;
-// };
-// return sum >= w[v];
-// }
-//
-// double computeStep(int[][] adj, double[] w, double[][] G, int nv) {
-// double r = infinity;
-// int v = 0;
-// while (v < nv) {
-// int slackDeg = 0;
-// int u = 0;
-// while (u < nv) {
-// if (adj[u][v] == 1 && !tight(u, adj, w, G, nv) && !tight(v, adj, w, G, nv)) {
-// slackDeg = slackDeg + 1;
-// };
-// u = u + 1;
-// };
-// if (slackDeg > 0) {
-// double sum = 0.0;
-// u = 0;
-// while (u < nv) {
-// if (adj[u][v] == 1) { sum = sum + G[u][v]; };
-// u = u + 1;
-// };
-// double ratio = (w[v] - sum) / slackDeg;
-// if (ratio < r) { r = ratio; };
-// };
-// v = v + 1;
-// };
-// return r;
-// }
-// }
+// LLP-WeightedVertexCover: primal-dual 2-approximation for weighted
+// vertex cover, matching bxx-approximate.tex Algorithm
+// LLP-WeightedVertexCover (fig:llp-wvc). G[u][v] is the price on edge
+// {u,v}; a vertex v is tight when its incident prices saturate w[v]; an
+// edge is slack when neither endpoint is tight; slackMin(u,v) further
+// requires {u,v} to be lex-minimal among every slack edge sharing an
+// endpoint with it -- the same lex-minimality check as
+// LLPLexicallyFirstVertexCover, just over slack edges instead of
+// uncovered ones. Advancing raises the edge's price by the smaller of
+// its two endpoints' remaining budgets, tightening at least one.
 
 import java.util.*;
 
 public class LLPWeightedVertexCover {
+  int n;
+  int[][] adj;
+  double[] w;
+  int nv;
+  double[][] G;
+  int u;
+  int v;
+
+  private boolean _forbidden0(int u, int v) {
+    if (!((u < v))) return false;
+    if (!(slackMin(u, v, adj, w, G))) return false;
+    return true;
+  }
+
+  private void _advance0() {
+    double step = Math.min((w[u] - price(u, adj, G, nv)), (w[v] - price(v, adj, G, nv)));
+    G[u][v] = (G[u][v] + step);
+    G[v][u] = G[u][v];
+  }
+
   public boolean[] LLPWeightedVertexCover(int[][] adj, double[] w) {
-    int nv = w.length;
-    double[][] G = new double[nv][nv];
-    boolean done = false;
-    while ((!done)) {
-      int su = (0 - 1);
-      int sv = (0 - 1);
-      int u = 0;
-      while (((u < nv) && (su == (0 - 1)))) {
-        if ((!tight(u, adj, w, G, nv))) {
-          int v = (u + 1);
-          while (((v < nv) && (su == (0 - 1)))) {
-            if (((adj[u][v] == 1) && (!tight(v, adj, w, G, nv)))) {
-              su = u;
-              sv = v;
+    this.adj = adj;
+    this.w = w;
+    this.n = w.length;
+    this.nv = w.length;
+    this.G = new double[nv][nv];
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int u = 0; u < n; u++) {
+          for (int v = 0; v < n; v++) {
+            if (_forbidden0(u, v)) {
+              this.u = u; this.v = v; _advance0();
+              changed = true;
             }
-            v = (v + 1);
           }
         }
-        u = (u + 1);
-      }
-      if ((su == (0 - 1))) {
-        done = true;
-      } else {
-        double step = Math.min((w[su] - price(su, adj, G, nv)), (w[sv] - price(sv, adj, G, nv)));
-        G[su][sv] = (G[su][sv] + step);
-        G[sv][su] = G[su][sv];
       }
     }
     boolean[] C = new boolean[nv];
-    int i = 0;
-    while ((i < nv)) {
+    for (int i = 0; i < nv; i++) {
       C[i] = tight(i, adj, w, G, nv);
-      i = (i + 1);
     }
     return C;
   }
@@ -135,6 +73,43 @@ public class LLPWeightedVertexCover {
 
   public boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {
     return (price(v, adj, G, nv) >= w[v]);
+  }
+
+  public boolean slack(int u, int v, int[][] adj, double[] w, double[][] G, int nv) {
+    return ((!tight(u, adj, w, G, nv)) && (!tight(v, adj, w, G, nv)));
+  }
+
+  public boolean slackMin(int u, int v, int[][] adj, double[] w, double[][] G) {
+    int nv = w.length;
+    if (((adj[u][v] != 1) || (!slack(u, v, adj, w, G, nv)))) {
+      return false;
+    }
+    int x = 0;
+    while ((x < nv)) {
+      int y = (x + 1);
+      while ((y < nv)) {
+        if (((adj[x][y] == 1) && slack(x, y, adj, w, G, nv))) {
+          if (((((x == u) || (x == v)) || (y == u)) || (y == v))) {
+            if ((lexLess(x, y, u, v) && (!((x == u) && (y == v))))) {
+              return false;
+            }
+          }
+        }
+        y = (y + 1);
+      }
+      x = (x + 1);
+    }
+    return true;
+  }
+
+  public boolean lexLess(int a, int b, int c, int d) {
+    if ((a < c)) {
+      return true;
+    }
+    if ((a > c)) {
+      return false;
+    }
+    return (b < d);
   }
 
   public static void main(String[] args) {

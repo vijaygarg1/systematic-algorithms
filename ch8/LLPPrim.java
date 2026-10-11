@@ -58,18 +58,6 @@ public class LLPPrim {
     return C;
   }
 
-  public double minCrossCut(int j) {
-    double best = Integer.MAX_VALUE;
-    int i = 1;
-    while ((i <= n)) {
-      if ((fixed[i] && (W[i][j] < best))) {
-        best = W[i][j];
-      }
-      i = (i + 1);
-    }
-    return best;
-  }
-
   public int argMinCrossCut(int j) {
     int besti = (0 - 1);
     double best = Integer.MAX_VALUE;
@@ -82,6 +70,14 @@ public class LLPPrim {
       i = (i + 1);
     }
     return besti;
+  }
+
+  public double minCrossCut(int j) {
+    int i = argMinCrossCut(j);
+    if ((i == (0 - 1))) {
+      return Integer.MAX_VALUE;
+    }
+    return W[i][j];
   }
 
   public double globalMinCrossCut() {

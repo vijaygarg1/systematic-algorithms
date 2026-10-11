@@ -13,7 +13,7 @@ import java.util.*;
 public class Kruskal {
   public boolean[] mst(int n, int[] U, int[] V, int[] W) {
     int m = U.length;
-    boolean[] inTree = new boolean[m];
+    boolean[] T = new boolean[m];
     int[] parent = new int[n];
     int[] rank = new int[n];
     for (int i = 0; i < n; i++) {
@@ -23,12 +23,12 @@ public class Kruskal {
     int e = 0;
     while (((e < m) && (chosen < (n - 1)))) {
       if (new UnionFind().union(parent, rank, U[e], V[e])) {
-        inTree[e] = true;
+        T[e] = true;
         chosen = (chosen + 1);
       }
       e = (e + 1);
     }
-    return inTree;
+    return T;
   }
 
   public static void main(String[] args) {

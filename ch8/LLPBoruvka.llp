@@ -1,8 +1,127 @@
-// LLP pointer-jumping kernel of Borůvka's algorithm.
+// LLP-Boruvka (bxx-mst-llp-boruvka.tex, algo:Boruvka-llp): the book's
+// recursive Boruvka(V,E) -- each level selects every active vertex's
+// minimum-weight edge (breaking a mutual-mwe tie toward the
+// smaller-numbered vertex), pointer-jumps to rooted stars via the LLP
+// kernel, records every active vertex's own mwe edge in T, keeps only
+// the roots active, and recurses until one component remains. The
+// book's tail recursion is written here as a `while` loop (the two are
+// semantically identical -- the recursive call is the last action at
+// each level, with T already accumulated) so the LLP kernel can stay a
+// genuine `forbidden`/`advance` guard, re-run to a fresh fixpoint once
+// per level by the surrounding loop. G and active[] persist across
+// levels rather than being relabeled into a smaller V'/E' each time (no
+// dynamic graph type in this language); find(v) walks G to a fixpoint
+// instead, resolving any edge -- even one between two long-since-
+// absorbed vertices -- to its current top-level components, the same
+// effect as the book's contraction without rebuilding the graph. The
+// book's own precondition is a connected graph with no self-loops
+// (bxx-mst-llp-boruvka.tex: "we assume that the input ... is a connected
+// graph without any self-loops"), so it never needs to handle a vertex
+// with no outgoing edge at all; `progress` guards against exactly that
+// case (a disconnected input, or a self-loop/isolated vertex in a
+// synthesized test instance) the same way classical Boruvka.llp's own
+// `progress` guard does, so the loop below cannot spin forever waiting
+// for a spanning tree that cannot exist.
 
 class LLPBoruvka {
-  void LLPBoruvka(int[]  G) {
-    forbidden (j) : G[j] != G[G[j]]  =>
-      advance : G[j] = G[G[j]];
+  boolean[] mst(int n, int[] U, int[] V, int[] W) {
+    boolean[] T = new boolean[U.length];
+    int[] G = new int[n];
+    boolean[] active = new boolean[n];
+    forall i in [0..n-1] : { G[i] = i; active[i] = true; };
+
+    boolean progress = true;
+    while (countActive(n, active) > 1 && progress) {
+      int before = countActive(n, active);
+      int m = U.length;
+      int[] mweEdge = new int[n];
+      double[] mweW = new double[n];
+      forall i in [0..n-1] : mweEdge[i] = -1;
+      forall i in [0..n-1] : mweW[i] = infinity;
+
+      int e = 0;
+      while (e < m) {
+        int ru = find(U[e], G);
+        int rv = find(V[e], G);
+        if (active[ru] && active[rv] && ru != rv) {
+          if (W[e] < mweW[ru]) {
+            mweW[ru] = W[e];
+            mweEdge[ru] = e;
+          };
+          if (W[e] < mweW[rv]) {
+            mweW[rv] = W[e];
+            mweEdge[rv] = e;
+          };
+        };
+        e = e + 1;
+      };
+
+      // Initialize G per the book's tie-breaking rule: G[i] := i's mwe
+      // neighbor w, except when i and w are a mutual pair (each other's
+      // mwe) and i < w, in which case G[i] := i. A vertex with no
+      // cross-component edge at all (mweEdge[i] == -1, impossible under
+      // the book's connected-input assumption) just stays self-rooted.
+      forall i in [0..n-1] :
+        if (active[i]) {
+          if (mweEdge[i] == 0 - 1) {
+            G[i] = i;
+          } else {
+            int w = otherEndpoint(mweEdge[i], U, V, i);
+            int wEdge = mweEdge[w];
+            if (wEdge != 0 - 1 && otherEndpoint(wEdge, U, V, w) == i && i < w) {
+              G[i] = i;
+            } else {
+              G[i] = w;
+            };
+          };
+        };
+
+      forbidden (j) : active[j] && G[j] != G[G[j]]  =>
+        advance : G[j] = G[G[j]];
+
+      // T := every active vertex's own mwe edge, when it has one.
+      forall i in [0..n-1] :
+        if (active[i] && mweEdge[i] != 0 - 1) {
+          T[mweEdge[i]] = true;
+        };
+
+      // V' := the roots; everyone else is absorbed and stays frozen.
+      forall i in [0..n-1] :
+        if (active[i] && G[i] != i) {
+          active[i] = false;
+        };
+      progress = countActive(n, active) < before;
+    };
+    return T;
+  }
+
+  // Global find: follows G to a fixpoint. Safe for an already-absorbed
+  // vertex too, since its frozen pointer still leads toward that
+  // round's root, which may itself since have been absorbed further.
+  int find(int v, int[] G) {
+    while (G[v] != v) {
+      v = G[v];
+    };
+    return v;
+  }
+
+  int countActive(int n, boolean[] active) {
+    int c = 0;
+    int i = 0;
+    while (i < n) {
+      if (active[i]) {
+        c = c + 1;
+      };
+      i = i + 1;
+    };
+    return c;
+  }
+
+  // The endpoint of edge e other than v.
+  int otherEndpoint(int e, int[] U, int[] V, int v) {
+    if (U[e] == v) {
+      return V[e];
+    };
+    return U[e];
   }
 }

@@ -3,29 +3,29 @@
 // bxx-matchingReduced.tex Algorithm VertexCoverFromMatching: Z is the set
 // of vertices reachable from an unmatched L-vertex by an alternating path
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
-// intersect Z).
+// intersect Z). The book treats the matching M as given directly as a
+// partner lookup; here it is given as match_l[j] = R-partner of L-vertex
+// j (or -1 if unmatched), with match_r (the same matching read from the
+// R side -- the only direction the book's "partner[w]" needs, since w is
+// always an R-vertex at that point in the algorithm) derived from it.
 
 fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
     let l = adj.len();
     let r = adj[0].len();
-    let mut in_z = vec![false; l + r];
-    let mut partner = vec![-1i32; l + r];
-
-    for u in 0..l {
-        let v = match_l[u];
-        if v != -1 {
-            partner[u] = (l as i32) + v;
-            partner[l + v as usize] = u as i32;
+    let mut match_r = vec![-1i32; r];
+    for j in 0..l {
+        if match_l[j] != -1 {
+            match_r[match_l[j] as usize] = j as i32;
         }
     }
 
-    // BFS queue of vertices whose incident edges are still unexplored,
-    // seeded with every unmatched L-vertex.
+    // Z := set of unmatched vertices in L; Q := Z.
+    let mut in_z = vec![false; l + r];
     let mut q: Vec<usize> = Vec::new();
-    for u in 0..l {
-        if match_l[u] == -1 {
-            in_z[u] = true;
-            q.push(u);
+    for j in 0..l {
+        if match_l[j] == -1 {
+            in_z[j] = true;
+            q.push(j);
         }
     }
 
@@ -34,16 +34,17 @@ fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
         let w = q[head];
         head += 1;
         if w < l {
-            // From an L-vertex, follow every non-matching edge.
+            // w in L: follow every (w, v) in E \ M with v not in Z.
             for v in 0..r {
-                if adj[w][v] == 1 && partner[w] != (l + v) as i32 && !in_z[l + v] {
+                if adj[w][v] == 1 && match_l[w] != v as i32 && !in_z[l + v] {
                     in_z[l + v] = true;
                     q.push(l + v);
                 }
             }
         } else {
-            // From an R-vertex, follow its matching edge (if any).
-            let p = partner[w];
+            // w in R: if w is matched and partner[w] not in Z, add it.
+            let rr = w - l;
+            let p = match_r[rr];
             if p != -1 && !in_z[p as usize] {
                 in_z[p as usize] = true;
                 q.push(p as usize);

@@ -6,34 +6,20 @@ public class Knapsack01 {
   public int[][] solve(int[] w, int[] v, int W) {
     int n = (w.length - 1);
     int[][] G = new int[(n + 1)][(W + 1)];
-    int c = 0;
-    while ((c <= W)) {
+    for (int c = 0; c <= W; c++) {
       G[0][c] = 0;
-      c = (c + 1);
     }
-    int i = 0;
-    while ((i <= n)) {
+    for (int i = 0; i <= n; i++) {
       G[i][0] = 0;
-      i = (i + 1);
     }
-    i = 1;
-    while ((i <= n)) {
-      c = 1;
-      while ((c <= W)) {
+    for (int i = 1; i <= n; i++) {
+      for (int c = 1; c <= W; c++) {
         if ((w[i] > c)) {
           G[i][c] = G[(i - 1)][c];
         } else {
-          int skip = G[(i - 1)][c];
-          int take = (G[(i - 1)][(c - w[i])] + v[i]);
-          if ((take > skip)) {
-            G[i][c] = take;
-          } else {
-            G[i][c] = skip;
-          }
+          G[i][c] = Math.max(G[(i - 1)][c], (G[(i - 1)][(c - w[i])] + v[i]));
         }
-        c = (c + 1);
       }
-      i = (i + 1);
     }
     return G;
   }

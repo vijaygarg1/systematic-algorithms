@@ -1,18 +1,23 @@
-// Classical Boruvka MST: repeatedly attach every component to its
-// cheapest outgoing edge until one component remains.
+// Classical Boruvka MST (bxx-mst.tex, algo:Boruvka-seq): repeatedly
+// attach every component to its cheapest outgoing edge until one
+// component remains. The book's own precondition is a connected graph
+// (\KwIn{undirected connected weighted graph}), which this is not relied
+// on alone: `progress` guards against a disconnected input (some
+// component never finding an outgoing edge) so the loop below cannot
+// spin forever waiting for a spanning tree that cannot exist.
 
 import java.util.*;
 
 public class Boruvka {
   public boolean[] mst(int n, int[] U, int[] V, int[] W) {
     int m = U.length;
-    boolean[] inTree = new boolean[m];
+    boolean[] T = new boolean[m];
     int[] cid = new int[n];
     int treeEdges = 0;
     boolean progress = true;
     while (((treeEdges < (n - 1)) && progress)) {
       int roundStart = treeEdges;
-      components(n, U, V, inTree, cid);
+      components(n, U, V, T, cid);
       int[] mwe = new int[n];
       double[] dist = new double[n];
       for (int i = 0; i < n; i++) {
@@ -38,17 +43,17 @@ public class Boruvka {
         e = (e + 1);
       }
       for (int i = 0; i < n; i++) {
-        if ((((cid[i] == i) && (mwe[i] != (-1))) && (!inTree[mwe[i]]))) {
-          inTree[mwe[i]] = true;
+        if ((((cid[i] == i) && (mwe[i] != (-1))) && (!T[mwe[i]]))) {
+          T[mwe[i]] = true;
           treeEdges = (treeEdges + 1);
         }
       }
       progress = (treeEdges > roundStart);
     }
-    return inTree;
+    return T;
   }
 
-  public void components(int n, int[] U, int[] V, boolean[] inTree, int[] cid) {
+  public void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {
     boolean[] visited = new boolean[n];
     for (int i = 0; i < n; i++) {
       visited[i] = false;
@@ -56,36 +61,24 @@ public class Boruvka {
     int i = 0;
     while ((i < n)) {
       if ((!visited[i])) {
-        bfs(i, i, n, U, V, inTree, visited, cid);
+        bfs(i, i, n, U, V, T, visited, cid);
       }
       i = (i + 1);
     }
   }
 
-  public void bfs(int start, int root, int n, int[] U, int[] V, boolean[] inTree, boolean[] visited, int[] cid) {
-    int[] queue = new int[n];
-    int head = 0;
-    int tail = 0;
-    queue[tail] = start;
-    tail = (tail + 1);
-    visited[start] = true;
-    cid[start] = root;
-    while ((head < tail)) {
-      int v = queue[head];
-      head = (head + 1);
-      int e = 0;
-      while ((e < U.length)) {
-        if (inTree[e]) {
-          int u = neighborIf(U[e], V[e], v);
-          if (((u != (-1)) && (!visited[u]))) {
-            visited[u] = true;
-            cid[u] = root;
-            queue[tail] = u;
-            tail = (tail + 1);
-          }
+  public void bfs(int v, int root, int n, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
+    visited[v] = true;
+    cid[v] = root;
+    int e = 0;
+    while ((e < U.length)) {
+      if (T[e]) {
+        int u = neighborIf(U[e], V[e], v);
+        if (((u != (-1)) && (!visited[u]))) {
+          bfs(u, root, n, U, V, T, visited, cid);
         }
-        e = (e + 1);
       }
+      e = (e + 1);
     }
   }
 

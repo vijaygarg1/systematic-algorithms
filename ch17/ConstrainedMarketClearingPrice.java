@@ -129,9 +129,7 @@ public class ConstrainedMarketClearingPrice {
         int best = bestSurplus(b, v, G);
         int bestOutside = bestSurplusOutside(b, v, G, itemInJ);
         int gap = (best - bestOutside);
-        if ((gap < delta)) {
-          delta = gap;
-        }
+        delta = Math.min(delta, gap);
       }
       b = (b + 1);
     }
@@ -150,9 +148,7 @@ public class ConstrainedMarketClearingPrice {
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - G[i]);
-      if ((s > best)) {
-        best = s;
-      }
+      best = Math.max(best, s);
       i = (i + 1);
     }
     return best;
@@ -165,9 +161,7 @@ public class ConstrainedMarketClearingPrice {
     while ((i < n)) {
       if ((!itemInJ[i])) {
         int s = (v[b][i] - G[i]);
-        if ((s > best)) {
-          best = s;
-        }
+        best = Math.max(best, s);
       }
       i = (i + 1);
     }
@@ -198,9 +192,7 @@ public class ConstrainedMarketClearingPrice {
     int i = 0;
     while ((i < n)) {
       int s = (v[b][i] - G[i]);
-      if ((s > bestSurplus)) {
-        bestSurplus = s;
-      }
+      bestSurplus = Math.max(bestSurplus, s);
       i = (i + 1);
     }
     i = 0;

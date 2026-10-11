@@ -8,6 +8,7 @@ public class LLPOptimalBinarySearchTree {
   double[][] G;
   int i;
   int j;
+  PriorityQueue<int[]> forbiddenHeap;
 
   private boolean forbidden(int i, int j) {
     if (!((G[i][j] < optCost(p, G, i, j)))) return false;
@@ -18,49 +19,44 @@ public class LLPOptimalBinarySearchTree {
     G[i][j] = optCost(p, G, i, j);
   }
 
+  private double priority(int i, int j) {
+    return (j - i);
+  }
+
   public void LLPOptimalBinarySearchTree(double[] p, double[][] G) {
     this.p = p;
     this.G = G;
     this.n = p.length;
-    {
-      boolean changed = true;
-      while (changed) {
-        changed = false;
-        for (int i = 0; i < n; i++) {
-          for (int j = 0; j < n; j++) {
-            if (forbidden(i, j)) {
-              this.i = i; this.j = j; advance();
-              changed = true;
-            }
-          }
-        }
-      }
+    forbiddenHeap = new PriorityQueue<>(
+      (a, b) -> Double.compare(priority(a[0], a[1]), priority(b[0], b[1])));
+    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) forbiddenHeap.add(new int[]{i, j});
+    while (!forbiddenHeap.isEmpty()) {
+      int[] _idx = forbiddenHeap.poll();
+      int i = _idx[0];
+      int j = _idx[1];
+      if (forbidden(i, j)) { this.i = i; this.j = j; advance(); }
     }
   }
 
   public double optCost(double[] p, double[][] G, int i, int j) {
     double best = Integer.MAX_VALUE;
-    int k = i;
-    while ((k <= j)) {
-      double s = 0.0;
-      int l = i;
-      while ((l <= j)) {
-        s = (s + p[l]);
-        l = (l + 1);
+    for (int k = i; k <= j; k++) {
+      {
+        double s = 0.0;
+        for (int l = i; l <= j; l++) {
+          s = (s + p[l]);
+        }
+        double leftCost = 0.0;
+        if ((k > i)) {
+          leftCost = G[i][(k - 1)];
+        }
+        double rightCost = 0.0;
+        if ((k < j)) {
+          rightCost = G[(k + 1)][j];
+        }
+        double cost = ((leftCost + s) + rightCost);
+        best = Math.min(best, cost);
       }
-      double leftCost = 0.0;
-      if ((k > i)) {
-        leftCost = G[i][(k - 1)];
-      }
-      double rightCost = 0.0;
-      if ((k < j)) {
-        rightCost = G[(k + 1)][j];
-      }
-      double cost = ((leftCost + s) + rightCost);
-      if ((cost < best)) {
-        best = cost;
-      }
-      k = (k + 1);
     }
     return best;
   }

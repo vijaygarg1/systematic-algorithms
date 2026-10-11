@@ -1,12 +1,14 @@
-"""Classical augmenting-path bipartite matching."""
+"""Classical augmenting-path bipartite matching, matching
+bxx-matchingReduced.tex Algorithm BipartiteMatching (algo:seq-bipartite)."""
 
-def try_match(u, adj, partner, seen):
+
+def alternating_path(j, adj, S, seen):
     m = len(adj[0])
-    for v in range(m):
-        if adj[u][v] == 1 and not seen[v]:
-            seen[v] = True
-            if partner[v] == -1 or try_match(partner[v], adj, partner, seen):
-                partner[v] = u
+    for k in range(m):
+        if adj[j][k] == 1 and not seen[k]:
+            seen[k] = True
+            if S[k] == -1 or alternating_path(S[k], adj, S, seen):
+                S[k] = j
                 return True
     return False
 
@@ -15,12 +17,12 @@ def bipartite_matching(adj):
     n = len(adj)
     m = len(adj[0])
     G = [0] * n
-    partner = [-1] * m
-    for u in range(n):
+    S = [-1] * m
+    for j in range(n):
         seen = [False] * m
-        if try_match(u, adj, partner, seen):
-            G[u] = 1
-    return G, partner
+        if alternating_path(j, adj, S, seen):
+            G[j] = 1
+    return G, S
 
 
 if __name__ == "__main__":
@@ -30,7 +32,7 @@ if __name__ == "__main__":
         [1, 0, 0],
         [0, 1, 0],
     ]
-    G, partner = bipartite_matching(adj)
+    G, S = bipartite_matching(adj)
     print("G =", G)
-    print("partner (per right vertex):", partner)
+    print("S (partner, per right vertex):", S)
     print("matching size:", sum(G))

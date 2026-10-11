@@ -1,4 +1,10 @@
-// Classical augmenting-path bipartite matching.
+// Classical augmenting-path bipartite matching, matching
+// bxx-matchingReduced.tex Algorithm BipartiteMatching (algo:seq-bipartite):
+// for each L-vertex j in turn, look for an alternating path to some free
+// R-vertex k (S[k] unmatched). The book's abstract "there exists an
+// alternating path..." step, plus its "assign S[] along the path"
+// follow-up, are both realized here by the alternatingPath(...) DFS --
+// the standard way of implementing that check.
 
 import java.util.*;
 
@@ -7,35 +13,36 @@ public class BipartiteMatching {
     int n = adj.length;
     int m = adj[0].length;
     int[] G = new int[n];
-    int[] partner = new int[m];
-    int j = 0;
-    while ((j < m)) {
-      partner[j] = (0 - 1);
-      j = (j + 1);
+    int[] S = new int[m];
+    for (int j = 0; j < n; j++) {
+      G[j] = 0;
     }
-    int u = 0;
-    while ((u < n)) {
-      boolean[] seen = new boolean[m];
-      if (tryMatch(u, adj, partner, seen)) {
-        G[u] = 1;
+    for (int k = 0; k < m; k++) {
+      S[k] = (0 - 1);
+    }
+    for (int j = 0; j < n; j++) {
+      {
+        boolean[] seen = new boolean[m];
+        if (alternatingPath(j, adj, S, seen)) {
+          G[j] = 1;
+        }
       }
-      u = (u + 1);
     }
     return G;
   }
 
-  public boolean tryMatch(int u, int[][] adj, int[] partner, boolean[] seen) {
+  public boolean alternatingPath(int j, int[][] adj, int[] S, boolean[] seen) {
     int m = adj[0].length;
-    int v = 0;
-    while ((v < m)) {
-      if (((adj[u][v] == 1) && (!seen[v]))) {
-        seen[v] = true;
-        if (((partner[v] == (0 - 1)) || tryMatch(partner[v], adj, partner, seen))) {
-          partner[v] = u;
+    int k = 0;
+    while ((k < m)) {
+      if (((adj[j][k] == 1) && (!seen[k]))) {
+        seen[k] = true;
+        if (((S[k] == (0 - 1)) || alternatingPath(S[k], adj, S, seen))) {
+          S[k] = j;
           return true;
         }
       }
-      v = (v + 1);
+      k = (k + 1);
     }
     return false;
   }

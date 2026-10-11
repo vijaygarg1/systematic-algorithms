@@ -1,4 +1,7 @@
-// Ford-Fulkerson max-flow via DFS-found augmenting paths.
+// Ford-Fulkerson max-flow: repeatedly find an augmenting path in the
+// residual graph via DFS, push its bottleneck capacity, until none
+// remains. Shares its outer loop verbatim with EdmondsKarp.llp, which
+// differs only in finding augmenting paths via BFS instead of DFS.
 
 import java.util.*;
 
@@ -9,7 +12,7 @@ public class FordFulkerson {
     int[] parent = new int[n];
     boolean done = false;
     while ((!done)) {
-      int found = augmentingPath(c, f, s, t, parent);
+      int found = findAugmentingPath(c, f, s, t, parent);
       if ((found == 0)) {
         done = true;
       } else {
@@ -35,31 +38,29 @@ public class FordFulkerson {
     return f;
   }
 
-  public int augmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
+  public int findAugmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
     int n = c.length;
     boolean[] seen = new boolean[n];
-    int[] stack = new int[n];
-    int top = 0;
-    stack[top] = s;
-    top = (top + 1);
     seen[s] = true;
     parent[s] = s;
-    while ((top > 0)) {
-      top = (top - 1);
-      int u = stack[top];
-      if ((u == t)) {
-        return 1;
-      }
-      int v = 0;
-      while ((v < n)) {
-        if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
-          seen[v] = true;
-          parent[v] = u;
-          stack[top] = v;
-          top = (top + 1);
+    return dfs(c, f, s, t, parent, seen);
+  }
+
+  public int dfs(int[][] c, int[][] f, int u, int t, int[] parent, boolean[] seen) {
+    if ((u == t)) {
+      return 1;
+    }
+    int n = c.length;
+    int v = 0;
+    while ((v < n)) {
+      if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
+        seen[v] = true;
+        parent[v] = u;
+        if ((dfs(c, f, v, t, parent, seen) == 1)) {
+          return 1;
         }
-        v = (v + 1);
       }
+      v = (v + 1);
     }
     return 0;
   }

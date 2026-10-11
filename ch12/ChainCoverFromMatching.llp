@@ -25,7 +25,7 @@ class ChainCoverFromMatching {
   }
 
   // Iteratively replace C[i] by C[C[i]] until every entry points to
-  // its chain root (a fixed point).  Linear time per round; O(log n)
+  // its chain root and stops changing.  Linear time per round; O(log n)
   // rounds suffice for chains of length n.
   void parentPointerJumping(int[] C) {
     int n = C.length;

@@ -1,25 +1,23 @@
-// Classical Boruvka MST: repeatedly attach every component to its
-// cheapest outgoing edge until one component remains.
+// Classical Boruvka MST (bxx-mst.tex, algo:Boruvka-seq): repeatedly
+// attach every component to its cheapest outgoing edge until one
+// component remains. The book's own precondition is a connected graph
+// (\KwIn{undirected connected weighted graph}), which this is not relied
+// on alone: `progress` guards against a disconnected input (some
+// component never finding an outgoing edge) so the loop below cannot
+// spin forever waiting for a spanning tree that cannot exist.
 
 class Boruvka {
   boolean[] mst(int n, int[] U, int[] V, int[] W) {
     int m = U.length;
-    boolean[] inTree = new boolean[m];
+    boolean[] T = new boolean[m];
     int[] cid = new int[n];
     int treeEdges = 0;
-    // `progress` stops the outer loop on a disconnected graph: if no
-    // vertex set W from the synthesized demo inputs ever reaches a
-    // non-last vertex at all, no round can ever add another edge, and
-    // `treeEdges < n - 1` alone would loop forever waiting for a
-    // spanning tree that cannot exist (confirmed to hang). A real
-    // Boruvka run should report "disconnected" rather than spin; this is
-    // that check, not a demo-input workaround.
     boolean progress = true;
     while (treeEdges < n - 1 && progress) {
       int roundStart = treeEdges;
-      // Component ids: BFS in (V, inTree) gives every vertex the
+      // Component ids: BFS in (V, T) gives every vertex the
       // least-numbered vertex in its component.
-      components(n, U, V, inTree, cid);
+      components(n, U, V, T, cid);
 
       int[] mwe = new int[n];
       double[] dist = new double[n];
@@ -44,53 +42,42 @@ class Boruvka {
       };
 
       forall i in [0..n-1] :
-        if (cid[i] == i && mwe[i] != -1 && !inTree[mwe[i]]) {
-          inTree[mwe[i]] = true;
+        if (cid[i] == i && mwe[i] != -1 && !T[mwe[i]]) {
+          T[mwe[i]] = true;
           treeEdges = treeEdges + 1;
         };
       progress = treeEdges > roundStart;
     };
-    return inTree;
+    return T;
   }
 
-  // Aux: cid[v] := least-numbered vertex reachable from v in (V, inTree).
-  void components(int n, int[] U, int[] V, boolean[] inTree, int[] cid) {
+  // Aux: cid[v] := least-numbered vertex reachable from v in (V, T).
+  void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {
     boolean[] visited = new boolean[n];
     forall i in [0..n-1] : visited[i] = false;
     int i = 0;
     while (i < n) {
       if (!visited[i]) {
-        bfs(i, i, n, U, V, inTree, visited, cid);
+        bfs(i, i, n, U, V, T, visited, cid);
       };
       i = i + 1;
     };
   }
 
-  // Aux: BFS from `start`, labelling every reached vertex with `root`.
-  void bfs(int start, int root, int n, int[] U, int[] V, boolean[] inTree, boolean[] visited, int[] cid) {
-    int[] queue = new int[n];
-    int head = 0;
-    int tail = 0;
-    queue[tail] = start;
-    tail = tail + 1;
-    visited[start] = true;
-    cid[start] = root;
-    while (head < tail) {
-      int v = queue[head];
-      head = head + 1;
-      int e = 0;
-      while (e < U.length) {
-        if (inTree[e]) {
-          int u = neighborIf(U[e], V[e], v);
-          if (u != -1 && !visited[u]) {
-            visited[u] = true;
-            cid[u] = root;
-            queue[tail] = u;
-            tail = tail + 1;
-          };
+  // Aux: recursively visits v and every vertex reachable from it in
+  // (V, T), labelling each with the component's root.
+  void bfs(int v, int root, int n, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
+    visited[v] = true;
+    cid[v] = root;
+    int e = 0;
+    while (e < U.length) {
+      if (T[e]) {
+        int u = neighborIf(U[e], V[e], v);
+        if (u != -1 && !visited[u]) {
+          bfs(u, root, n, U, V, T, visited, cid);
         };
-        e = e + 1;
       };
+      e = e + 1;
     };
   }
 

@@ -5,21 +5,16 @@ class OptimalBinarySearchTree {
     int n = prob.length;
     double[][] dp = new double[n][n];
     double[][] s  = new double[n][n];
-    int i = 0;
-    while (i < n) {
+    forall i in [0..n-1] : {
       dp[i][i] = prob[i];
       s[i][i]  = prob[i];
-      i = i + 1;
     };
-    int len = 1;
-    while (len < n) {
-      int lo = 0;
-      while (lo < n - len) {
+    forall len in [1..n-1] :
+      forall lo in [0..n-1-len] : {
         int hi = lo + len;
         s[lo][hi] = s[lo][hi - 1] + prob[hi];
-        double best = infinity;
-        int r = lo;
-        while (r <= hi) {
+        dp[lo][hi] = infinity;
+        forall r in [lo..hi] : {
           double left  = 0.0;
           double right = 0.0;
           if (r > lo) {
@@ -29,16 +24,9 @@ class OptimalBinarySearchTree {
             right = dp[r + 1][hi];
           };
           double cost = s[lo][hi] + left + right;
-          if (cost < best) {
-            best = cost;
-          };
-          r = r + 1;
+          dp[lo][hi] = min(dp[lo][hi], cost);
         };
-        dp[lo][hi] = best;
-        lo = lo + 1;
       };
-      len = len + 1;
-    };
     return dp;
   }
 }

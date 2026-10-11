@@ -27,22 +27,8 @@ class LLPPrim {
     return C;
   }
 
-  // Min weight of an edge (i, j) with fixed[i] = true; infinity if no
-  // such edge exists yet.
-  double minCrossCut(int j) {
-    double best = infinity;
-    int i = 1;
-    while (i <= n) {
-      if (fixed[i] && W[i][j] < best) {
-        best = W[i][j];
-      };
-      i = i + 1;
-    };
-    return best;
-  }
-
-  // The vertex i that achieves the minimum in minCrossCut(j); -1 when
-  // no fixed neighbour is incident to j.
+  // The vertex i that achieves the minimum weight W[i][j] among fixed
+  // neighbours of j; -1 when no fixed neighbour is incident to j.
   int argMinCrossCut(int j) {
     int besti = 0 - 1;
     double best = infinity;
@@ -55,6 +41,14 @@ class LLPPrim {
       i = i + 1;
     };
     return besti;
+  }
+
+  // Min weight of an edge (i, j) with fixed[i] = true; infinity if no
+  // such edge exists yet.
+  double minCrossCut(int j) {
+    int i = argMinCrossCut(j);
+    if (i == 0 - 1) { return infinity; };
+    return W[i][j];
   }
 
   // Global minimum of minCrossCut(j) over every non-fixed j, equivalently

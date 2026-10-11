@@ -2,9 +2,10 @@
 
 class LLPOptimalBinarySearchTree {
   void LLPOptimalBinarySearchTree(double[] p, double[][] G) {
+    setMode(PriorityQueue);
+    setPriority(j - i, min);
     forbidden (i, j) : G[i][j] < optCost(p, G, i, j) =>
       advance : G[i][j] = optCost(p, G, i, j);
-    // priority: (j - i)
   }
 
   // k ranges over every root choice in [i, j]; the subtree to its left
@@ -15,24 +16,16 @@ class LLPOptimalBinarySearchTree {
   // subtree is empty when k == j.
   double optCost(double[] p, double[][] G, int i, int j) {
     double best = infinity;
-    int k = i;
-    while (k <= j) {
+    forall k in [i..j] : {
       double s = 0.0;
-      int l = i;
-      while (l <= j) {
-        s = s + p[l];
-        l = l + 1;
-      }
+      forall l in [i..j] : s = s + p[l];
       double leftCost = 0.0;
       if (k > i) { leftCost = G[i][k-1]; }
       double rightCost = 0.0;
       if (k < j) { rightCost = G[k+1][j]; }
       double cost = leftCost + s + rightCost;
-      if (cost < best) {
-        best = cost;
-      }
-      k = k + 1;
-    }
+      best = min(best, cost);
+    };
     return best;
   }
 }

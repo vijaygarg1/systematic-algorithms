@@ -1,4 +1,6 @@
-// Edmonds-Karp: Ford-Fulkerson with BFS to pick shortest augmenting paths.
+// Edmonds-Karp max-flow: Ford-Fulkerson with BFS (shortest augmenting
+// paths) in place of DFS. Shares its outer loop verbatim with
+// FordFulkerson.llp -- the two differ only in findAugmentingPath.
 
 class EdmondsKarp {
   int[][] maxflow(int[][] c, int s, int t) {
@@ -7,7 +9,7 @@ class EdmondsKarp {
     int[]   parent = new int[n];
     boolean done = false;
     while (!done) {
-      int found = bfsResidual(c, f, s, t, parent);
+      int found = findAugmentingPath(c, f, s, t, parent);
       if (found == 0) {
         done = true;
       } else {
@@ -16,12 +18,13 @@ class EdmondsKarp {
         int v = t;
         while (v != s) {
           int u = parent[v];
-          int r = c[u][v] - f[u][v];
+          int r = residual(c, f, u, v);
           if (r < bottleneck) {
             bottleneck = r;
           };
           v = u;
         };
+        // Push bottleneck units along the path; subtract on reverse.
         v = t;
         while (v != s) {
           int u = parent[v];
@@ -35,38 +38,45 @@ class EdmondsKarp {
   }
 
   // BFS in the residual graph; returns 1 iff t is reachable from s.
-  // parent[v] receives the BFS-tree predecessor of v on a shortest
-  // augmenting path from s.
-  int bfsResidual(int[][] c, int[][] f, int s, int t, int[] parent) {
+  // On success, parent[v] holds the BFS-tree predecessor of v on a
+  // shortest augmenting path from s.
+  int findAugmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
     int n = c.length;
     boolean[] seen = new boolean[n];
     int[] q = new int[n];
-    int head = 0;
-    int tail = 0;
-    q[tail] = s;
-    tail = tail + 1;
+    q[0] = s;
     seen[s] = true;
     parent[s] = s;
-    while (head < tail) {
-      int u = q[head];
-      head = head + 1;
-      if (u == t) {
-        return 1;
-      };
-      int v = 0;
-      while (v < n) {
-        if (!seen[v] && c[u][v] - f[u][v] > 0) {
-          seen[v] = true;
-          parent[v] = u;
-          q[tail] = v;
-          tail = tail + 1;
-        };
-        v = v + 1;
-      }
+    return bfs(c, f, t, parent, seen, q, 0, 1);
+  }
+
+  // Recursive BFS: processes the queue entry at index head, enqueuing
+  // every unseen residual-neighbor at the growing tail end, until t is
+  // dequeued or the queue is exhausted.
+  int bfs(int[][] c, int[][] f, int t, int[] parent, boolean[] seen, int[] q, int head, int tail) {
+    if (head >= tail) {
+      return 0;
     };
-    if (seen[t]) {
+    int u = q[head];
+    if (u == t) {
       return 1;
     };
-    return 0;
+    int n = c.length;
+    int v = 0;
+    while (v < n) {
+      if (!seen[v] && residual(c, f, u, v) > 0) {
+        seen[v] = true;
+        parent[v] = u;
+        q[tail] = v;
+        tail = tail + 1;
+      };
+      v = v + 1;
+    };
+    return bfs(c, f, t, parent, seen, q, head + 1, tail);
+  }
+
+  // Residual capacity of edge (u, v) under the current flow f.
+  int residual(int[][] c, int[][] f, int u, int v) {
+    return c[u][v] - f[u][v];
   }
 }

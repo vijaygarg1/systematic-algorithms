@@ -8,16 +8,10 @@ public class WeightedInterval {
     int[] opt = new int[n];
     int[] G = new int[n];
     opt[0] = 0;
-    int cur = 1;
-    while ((cur < n)) {
-      if (((w[cur] + opt[p[cur]]) >= opt[(cur - 1)])) {
-        opt[cur] = (w[cur] + opt[p[cur]]);
-      } else {
-        opt[cur] = opt[(cur - 1)];
-      }
-      cur = (cur + 1);
+    for (int cur = 1; cur < n; cur++) {
+      opt[cur] = Math.max((w[cur] + opt[p[cur]]), opt[(cur - 1)]);
     }
-    cur = (n - 1);
+    int cur = (n - 1);
     while ((cur > 0)) {
       if (((w[cur] + opt[p[cur]]) >= opt[(cur - 1)])) {
         G[cur] = 1;

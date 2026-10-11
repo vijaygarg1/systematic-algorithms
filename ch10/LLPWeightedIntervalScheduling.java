@@ -40,13 +40,7 @@ public class LLPWeightedIntervalScheduling {
   }
 
   public int maxRhs(int j) {
-    int skip = G[(j - 1)];
-    int take = (w[j] + G[p[j]]);
-    if ((take > skip)) {
-      return take;
-    } else {
-      return skip;
-    }
+    return Math.max(G[(j - 1)], (w[j] + G[p[j]]));
   }
 
   public static void main(String[] args) {

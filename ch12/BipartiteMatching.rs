@@ -1,12 +1,13 @@
-// Classical augmenting-path bipartite matching.
+// Classical augmenting-path bipartite matching, matching
+// bxx-matchingReduced.tex Algorithm BipartiteMatching (algo:seq-bipartite).
 
-fn try_match(u: usize, adj: &[Vec<i32>], partner: &mut [i32], seen: &mut [bool]) -> bool {
+fn alternating_path(j: usize, adj: &[Vec<i32>], s: &mut [i32], seen: &mut [bool]) -> bool {
     let m = adj[0].len();
-    for v in 0..m {
-        if adj[u][v] == 1 && !seen[v] {
-            seen[v] = true;
-            if partner[v] == -1 || try_match(partner[v] as usize, adj, partner, seen) {
-                partner[v] = u as i32;
+    for k in 0..m {
+        if adj[j][k] == 1 && !seen[k] {
+            seen[k] = true;
+            if s[k] == -1 || alternating_path(s[k] as usize, adj, s, seen) {
+                s[k] = j as i32;
                 return true;
             }
         }
@@ -18,10 +19,10 @@ fn bipartite_matching(adj: &[Vec<i32>]) -> Vec<i32> {
     let n = adj.len();
     let m = adj[0].len();
     let mut g = vec![0i32; n];
-    let mut partner = vec![-1i32; m];
-    for u in 0..n {
+    let mut s = vec![-1i32; m];
+    for j in 0..n {
         let mut seen = vec![false; m];
-        if try_match(u, adj, &mut partner, &mut seen) { g[u] = 1; }
+        if alternating_path(j, adj, &mut s, &mut seen) { g[j] = 1; }
     }
     g
 }

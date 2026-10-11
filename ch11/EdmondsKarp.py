@@ -1,36 +1,45 @@
-"""Edmonds-Karp: Ford-Fulkerson with BFS to pick shortest augmenting paths."""
+"""Edmonds-Karp max-flow: Ford-Fulkerson with BFS (shortest augmenting
+paths) in place of DFS. Shares its outer loop verbatim with
+FordFulkerson.py -- the two differ only in find_augmenting_path."""
 
-from collections import deque
+
+def residual(c, f, u, v):
+    return c[u][v] - f[u][v]
 
 
-def bfs_residual(c, f, s, t, parent):
+def bfs(c, f, t, parent, seen, q, head):
+    if head >= len(q):
+        return False
+    u = q[head]
+    if u == t:
+        return True
+    n = len(c)
+    for v in range(n):
+        if not seen[v] and residual(c, f, u, v) > 0:
+            seen[v] = True
+            parent[v] = u
+            q.append(v)
+    return bfs(c, f, t, parent, seen, q, head + 1)
+
+
+def find_augmenting_path(c, f, s, t, parent):
     n = len(c)
     seen = [False] * n
-    q = deque([s])
     seen[s] = True
     parent[s] = s
-    while q:
-        u = q.popleft()
-        if u == t:
-            return True
-        for v in range(n):
-            if not seen[v] and c[u][v] - f[u][v] > 0:
-                seen[v] = True
-                parent[v] = u
-                q.append(v)
-    return seen[t]
+    return bfs(c, f, t, parent, seen, [s], 0)
 
 
 def maxflow(c, s, t):
     n = len(c)
     f = [[0] * n for _ in range(n)]
     parent = [0] * n
-    while bfs_residual(c, f, s, t, parent):
+    while find_augmenting_path(c, f, s, t, parent):
         bottleneck = float("inf")
         v = t
         while v != s:
             u = parent[v]
-            bottleneck = min(bottleneck, c[u][v] - f[u][v])
+            bottleneck = min(bottleneck, residual(c, f, u, v))
             v = u
         v = t
         while v != s:

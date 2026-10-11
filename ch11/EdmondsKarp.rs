@@ -1,36 +1,44 @@
-// Edmonds-Karp: Ford-Fulkerson with BFS to pick shortest augmenting paths.
+// Edmonds-Karp max-flow: Ford-Fulkerson with BFS (shortest augmenting
+// paths) in place of DFS. Shares its outer loop verbatim with
+// FordFulkerson.rs -- the two differ only in find_augmenting_path.
 
-use std::collections::VecDeque;
+fn residual(c: &[Vec<i32>], f: &[Vec<i32>], u: usize, v: usize) -> i32 {
+    c[u][v] - f[u][v]
+}
 
-fn bfs_residual(c: &[Vec<i32>], f: &[Vec<i32>], s: usize, t: usize, parent: &mut [usize]) -> bool {
+fn bfs(c: &[Vec<i32>], f: &[Vec<i32>], t: usize, parent: &mut [usize], seen: &mut [bool], q: &mut Vec<usize>, head: usize) -> bool {
+    if head >= q.len() { return false; }
+    let u = q[head];
+    if u == t { return true; }
     let n = c.len();
-    let mut seen = vec![false; n];
-    let mut q = VecDeque::new();
-    q.push_back(s);
-    seen[s] = true;
-    parent[s] = s;
-    while let Some(u) = q.pop_front() {
-        if u == t { return true; }
-        for v in 0..n {
-            if !seen[v] && c[u][v] - f[u][v] > 0 {
-                seen[v] = true;
-                parent[v] = u;
-                q.push_back(v);
-            }
+    for v in 0..n {
+        if !seen[v] && residual(c, f, u, v) > 0 {
+            seen[v] = true;
+            parent[v] = u;
+            q.push(v);
         }
     }
-    seen[t]
+    bfs(c, f, t, parent, seen, q, head + 1)
+}
+
+fn find_augmenting_path(c: &[Vec<i32>], f: &[Vec<i32>], s: usize, t: usize, parent: &mut [usize]) -> bool {
+    let n = c.len();
+    let mut seen = vec![false; n];
+    seen[s] = true;
+    parent[s] = s;
+    let mut q = vec![s];
+    bfs(c, f, t, parent, &mut seen, &mut q, 0)
 }
 
 fn maxflow(c: &[Vec<i32>], s: usize, t: usize) -> Vec<Vec<i32>> {
     let n = c.len();
     let mut f = vec![vec![0i32; n]; n];
     let mut parent = vec![0usize; n];
-    while bfs_residual(c, &f, s, t, &mut parent) {
+    while find_augmenting_path(c, &f, s, t, &mut parent) {
         let mut bottleneck = i32::MAX;
         let mut v = t;
         while v != s {
-            bottleneck = bottleneck.min(c[parent[v]][v] - f[parent[v]][v]);
+            bottleneck = bottleneck.min(residual(c, &f, parent[v], v));
             v = parent[v];
         }
         let mut v = t;

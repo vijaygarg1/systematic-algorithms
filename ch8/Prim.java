@@ -1,4 +1,12 @@
-// Classical Prim MST: O(n²) linear-scan version using a weight matrix.
+// Classical Prim MST (bxx-mst.tex, algo:prim): d[v] is the cost of adding
+// v to the fragment, parent[v] the fragment vertex responsible for it,
+// fixed[v] marks vertices already in the fragment. Same control structure
+// as Dijkstra (bxx-shortestPath.tex's "Comparison with Dijkstra's
+// algorithm" paragraph): a heap<int> keyed by d finds the minimum
+// non-fixed vertex, with lazy deletion for stale entries. Since the heap
+// only ever holds vertices whose d has become finite, the book's "if
+// d[v] = infinity, return null" (no spanning tree) becomes "if the heap
+// empties before every vertex is fixed, return null" here.
 
 import java.util.*;
 
@@ -15,30 +23,27 @@ public class Prim {
       }
     }
     d[0] = 0;
+    java.util.PriorityQueue<int[]> H = new java.util.PriorityQueue<int[]>((a, b) -> a[0] != b[0] ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));
+    H.add(new int[]{d[0], 0});
     int count = 0;
     while ((count < n)) {
-      int v = (-1);
-      int best = Integer.MAX_VALUE;
-      int k = 0;
-      while ((k < n)) {
-        if (((!fixed[k]) && (d[k] < best))) {
-          v = k;
-          best = d[k];
-        }
-        k = (k + 1);
+      if (H.isEmpty()) {
+        return null;
       }
-      if ((v == (-1))) {
-        return parent;
-      }
-      fixed[v] = true;
-      count = (count + 1);
-      k = 0;
-      while ((k < n)) {
-        if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
-          d[k] = w[v][k];
-          parent[k] = v;
+      int v = H.peek()[1];
+      H.poll();
+      if ((!fixed[v])) {
+        fixed[v] = true;
+        count = (count + 1);
+        int k = 0;
+        while ((k < n)) {
+          if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
+            d[k] = w[v][k];
+            parent[k] = v;
+            H.add(new int[]{d[k], k});
+          }
+          k = (k + 1);
         }
-        k = (k + 1);
       }
     }
     return parent;

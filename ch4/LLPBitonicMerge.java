@@ -34,7 +34,6 @@ public class LLPBitonicMerge {
   public void LLPBitonicMerge(int[] A, int n) {
     this.A = A;
     this.n = n;
-    this.n = A.length;
     {
       boolean changed = true;
       while (changed) {

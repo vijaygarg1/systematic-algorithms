@@ -1,9 +1,13 @@
-// König's theorem: minimum vertex cover of size |M| from a maximum
+// Koenig's theorem: minimum vertex cover of size |M| from a maximum
 // bipartite matching, via alternating reachability. Matches
 // bxx-matchingReduced.tex Algorithm VertexCoverFromMatching: Z is the set
 // of vertices reachable from an unmatched L-vertex by an alternating path
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
-// intersect Z).
+// intersect Z). The book treats the matching M as given directly as a
+// partner lookup; here it is given as matchL[j] = R-partner of L-vertex
+// j (or -1 if unmatched), with matchR (the same matching read from the
+// R side -- the only direction the book's "partner[w]" needs, since w is
+// always an R-vertex at that point in the algorithm) derived from it.
 
 import java.util.*;
 
@@ -11,33 +15,25 @@ public class VertexCoverFromMatching {
   public boolean[] VertexCoverFromMatching(int[][] adj, int[] matchL) {
     int L = adj.length;
     int R = adj[0].length;
-    boolean[] inZ = new boolean[(L + R)];
-    int[] partner = new int[(L + R)];
-    int i = 0;
-    while ((i < (L + R))) {
-      partner[i] = (0 - 1);
-      i = (i + 1);
+    int[] matchR = new int[R];
+    for (int v = 0; v < R; v++) {
+      matchR[v] = (0 - 1);
     }
-    int u = 0;
-    while ((u < L)) {
-      int v = matchL[u];
-      if ((v != (0 - 1))) {
-        partner[u] = (L + v);
-        partner[(L + v)] = u;
+    for (int j = 0; j < L; j++) {
+      if ((matchL[j] != (0 - 1))) {
+        matchR[matchL[j]] = j;
       }
-      u = (u + 1);
     }
+    boolean[] inZ = new boolean[(L + R)];
     int[] Q = new int[(L + R)];
     int head = 0;
     int tail = 0;
-    u = 0;
-    while ((u < L)) {
-      if ((matchL[u] == (0 - 1))) {
-        inZ[u] = true;
-        Q[tail] = u;
+    for (int j = 0; j < L; j++) {
+      if ((matchL[j] == (0 - 1))) {
+        inZ[j] = true;
+        Q[tail] = j;
         tail = (tail + 1);
       }
-      u = (u + 1);
     }
     while ((head < tail)) {
       int w = Q[head];
@@ -45,7 +41,7 @@ public class VertexCoverFromMatching {
       if ((w < L)) {
         int v = 0;
         while ((v < R)) {
-          if ((((adj[w][v] == 1) && (partner[w] != (L + v))) && (!inZ[(L + v)]))) {
+          if ((((adj[w][v] == 1) && (matchL[w] != v)) && (!inZ[(L + v)]))) {
             inZ[(L + v)] = true;
             Q[tail] = (L + v);
             tail = (tail + 1);
@@ -53,23 +49,20 @@ public class VertexCoverFromMatching {
           v = (v + 1);
         }
       } else {
-        if (((partner[w] != (0 - 1)) && (!inZ[partner[w]]))) {
-          inZ[partner[w]] = true;
-          Q[tail] = partner[w];
+        int r = (w - L);
+        if (((matchR[r] != (0 - 1)) && (!inZ[matchR[r]]))) {
+          inZ[matchR[r]] = true;
+          Q[tail] = matchR[r];
           tail = (tail + 1);
         }
       }
     }
     boolean[] C = new boolean[(L + R)];
-    u = 0;
-    while ((u < L)) {
-      C[u] = (!inZ[u]);
-      u = (u + 1);
+    for (int j = 0; j < L; j++) {
+      C[j] = (!inZ[j]);
     }
-    int v = 0;
-    while ((v < R)) {
+    for (int v = 0; v < R; v++) {
       C[(L + v)] = inZ[(L + v)];
-      v = (v + 1);
     }
     return C;
   }

@@ -14,12 +14,6 @@ class LLPWeightedIntervalScheduling {
   // Right-hand side of the recurrence at index j: the larger of
   // skipping j (G[j-1]) and taking j (w[j] + G[p[j]]).
   int maxRhs(int j) {
-    int skip = G[j - 1];
-    int take = w[j] + G[p[j]];
-    if (take > skip) {
-      return take;
-    } else {
-      return skip;
-    }
+    return max(G[j - 1], w[j] + G[p[j]]);
   }
 }

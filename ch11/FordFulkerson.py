@@ -1,36 +1,47 @@
-"""Ford-Fulkerson max-flow via DFS-found augmenting paths."""
+"""Ford-Fulkerson max-flow: repeatedly find an augmenting path in the
+residual graph via DFS, push its bottleneck capacity, until none
+remains. Shares its outer loop verbatim with EdmondsKarp.py, which
+differs only in finding augmenting paths via BFS instead of DFS."""
 
-def augmenting_path(c, f, s, t, parent):
+
+def residual(c, f, u, v):
+    return c[u][v] - f[u][v]
+
+
+def dfs(c, f, u, t, parent, seen):
+    if u == t:
+        return True
+    n = len(c)
+    for v in range(n):
+        if not seen[v] and residual(c, f, u, v) > 0:
+            seen[v] = True
+            parent[v] = u
+            if dfs(c, f, v, t, parent, seen):
+                return True
+    return False
+
+
+def find_augmenting_path(c, f, s, t, parent):
     n = len(c)
     seen = [False] * n
-    stack = [s]
     seen[s] = True
     parent[s] = s
-    while stack:
-        u = stack.pop()
-        if u == t:
-            return True
-        for v in range(n):
-            if not seen[v] and c[u][v] - f[u][v] > 0:
-                seen[v] = True
-                parent[v] = u
-                stack.append(v)
-    return False
+    return dfs(c, f, s, t, parent, seen)
 
 
 def maxflow(c, s, t):
     n = len(c)
     f = [[0] * n for _ in range(n)]
     parent = [0] * n
-    while augmenting_path(c, f, s, t, parent):
+    while find_augmenting_path(c, f, s, t, parent):
         # Bottleneck residual capacity along the path.
         bottleneck = float("inf")
         v = t
         while v != s:
             u = parent[v]
-            bottleneck = min(bottleneck, c[u][v] - f[u][v])
+            bottleneck = min(bottleneck, residual(c, f, u, v))
             v = u
-        # Push bottleneck units along the path.
+        # Push bottleneck units along the path; subtract on reverse.
         v = t
         while v != s:
             u = parent[v]

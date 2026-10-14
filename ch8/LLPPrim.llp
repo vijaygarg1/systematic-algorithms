@@ -55,18 +55,16 @@ class LLPPrim {
   // the lightest edge in the cross-cut set E'(C).  Returns infinity when
   // E' is empty (all vertices fixed, or graph disconnected).
   double globalMinCrossCut() {
-    double best = infinity;
-    int j = 1;
-    while (j <= n) {
-      if (!fixed[j]) {
-        double m = minCrossCut(j);
-        if (m < best) {
-          best = m;
-        };
-      };
-      j = j + 1;
-    };
-    return best;
+    return min t in [1..n] : crossCutIfFree(t);
+  }
+
+  // minCrossCut, but infinity at an already-fixed vertex, so a fixed t can
+  // never win the minimum above.  The test is load-bearing: argMinCrossCut
+  // scans the *fixed* neighbours of its argument, so it still reports a
+  // real edge for a t that is itself fixed.
+  double crossCutIfFree(int t) {
+    if (fixed[t]) { return infinity; };
+    return minCrossCut(t);
   }
 
   // Mark every vertex whose parent chain now reaches a fixed vertex as

@@ -81,18 +81,19 @@ public class LLPPrim {
   }
 
   public double globalMinCrossCut() {
-    double best = Integer.MAX_VALUE;
-    int j = 1;
-    while ((j <= n)) {
-      if ((!fixed[j])) {
-        double m = minCrossCut(j);
-        if ((m < best)) {
-          best = m;
-        }
-      }
-      j = (j + 1);
+    double t1 = Double.POSITIVE_INFINITY;
+    for (int t = 1; t <= n; t++) {
+      double _v = crossCutIfFree(t);
+      if (_v < t1) t1 = _v;
     }
-    return best;
+    return t1;
+  }
+
+  public double crossCutIfFree(int t) {
+    if (fixed[t]) {
+      return Integer.MAX_VALUE;
+    }
+    return minCrossCut(t);
   }
 
   public void propagateFixed() {

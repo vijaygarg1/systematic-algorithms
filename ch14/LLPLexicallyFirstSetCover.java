@@ -61,40 +61,27 @@ public class LLPLexicallyFirstSetCover {
   }
 
   public int coverage(int j, int[][] S, boolean[] G) {
-    int u = S[j].length;
-    int count = 0;
-    int e = 0;
-    while ((e < u)) {
-      if (((S[j][e] == 1) && (!isCovered(e, S, G)))) {
-        count = (count + 1);
-      }
-      e = (e + 1);
+    int t1 = 0;
+    for (int e = 0; e < S[j].length; e++) {
+      if (((S[j][e] == 1) && (!isCovered(e, S, G)))) t1++;
     }
-    return count;
+    return t1;
   }
 
   public boolean isCovered(int e, int[][] S, boolean[] G) {
-    int m = G.length;
-    int s = 0;
-    while ((s < m)) {
-      if ((G[s] && (S[s][e] == 1))) {
-        return true;
-      }
-      s = (s + 1);
+    boolean t2 = false;
+    for (int s = 0; s < G.length; s++) {
+      if ((G[s] && (S[s][e] == 1))) { t2 = true; break; }
     }
-    return false;
+    return t2;
   }
 
   public boolean shareUncovered(int j, int k, int[][] S, boolean[] G) {
-    int u = S[j].length;
-    int e = 0;
-    while ((e < u)) {
-      if ((((S[j][e] == 1) && (S[k][e] == 1)) && (!isCovered(e, S, G)))) {
-        return true;
-      }
-      e = (e + 1);
+    boolean t3 = false;
+    for (int e = 0; e < S[j].length; e++) {
+      if ((((S[j][e] == 1) && (S[k][e] == 1)) && (!isCovered(e, S, G)))) { t3 = true; break; }
     }
-    return false;
+    return t3;
   }
 
   public static void main(String[] args) {

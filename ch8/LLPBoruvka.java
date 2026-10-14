@@ -137,15 +137,11 @@ public class LLPBoruvka {
   }
 
   public int countActive(int n, boolean[] active) {
-    int c = 0;
-    int i = 0;
-    while ((i < n)) {
-      if (active[i]) {
-        c = (c + 1);
-      }
-      i = (i + 1);
+    int t1 = 0;
+    for (int i = 0; i < n; i++) {
+      if (active[i]) t1++;
     }
-    return c;
+    return t1;
   }
 
   public int otherEndpoint(int e, int[] U, int[] V, int v) {

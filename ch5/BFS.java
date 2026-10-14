@@ -3,8 +3,8 @@
 import java.util.*;
 
 public class BFS {
-  public int[] traverse(int[][] dep, int s) {
-    int n = dep.length;
+  public int[] traverse(int[][] succ, int s) {
+    int n = succ.length;
     int[] G = new int[n];
     for (int i = 0; i < n; i++) {
       G[i] = Integer.MAX_VALUE;
@@ -18,7 +18,7 @@ public class BFS {
     while ((head < tail)) {
       int j = Q[head];
       head = (head + 1);
-      for (int k : dep[j]) {
+      for (int k : succ[j]) {
         if ((G[k] > (G[j] + 1))) {
           G[k] = (G[j] + 1);
           Q[tail] = k;

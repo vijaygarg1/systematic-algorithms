@@ -1,8 +1,8 @@
 // Generic queue-based reachability from vertex 0.
 
 class Traversal {
-  int[] reach(set<int>[] dep) {
-    int n = dep.length;
+  int[] reach(set<int>[] succ) {
+    int n = succ.length;
     int[] G = new int[n];
     int[] Q = new int[n];
     int head = 0;
@@ -13,7 +13,7 @@ class Traversal {
     while (head < tail) {
       int j = Q[head];
       head = head + 1;
-      forall k in dep[j] :
+      forall k in succ[j] :
         if (G[k] == 0) {
           G[k] = 1;
           Q[tail] = k;

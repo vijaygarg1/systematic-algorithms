@@ -7,21 +7,25 @@
 // items with scaled profit >= p; the answer is max { p : D[nf][p] <= W },
 // profit mu * p.
 //
-// Forbidden(i,p) with i>=1,p>=1: D[i,p] > min(D[i-1,p], w_i + D[i-1,max(0,p-v_i')]);
-// Advance: D[i,p] := that min -- realized below with the native
-// forbidden(i,p) => advance: ... construct. The guard's shared bound n is
-// set to max(nf,Vp)+1 (rather than nf+1 or Vp+1 individually, since the
-// compiler infers one bound for every index of a guard) and the
-// predicate explicitly re-restricts i to [1..nf] and p to [1..Vp], so
-// out-of-range (i,p) pairs in the padded square scan are simply never
-// forbidden. Every value the guard or its advance touches by bare name
-// (D, fw, vPrime, nf, Vp) must be a class field for the auto-generated
-// forbidden/advance helpers to see it, which this compiler only grants
-// to a *leading, uninterrupted run* of declarations at the very top of
-// the entry method -- hence the preprocessing (which genuinely needs
-// loops: discarding items, scaling profits, summing) is factored into
-// helper methods, so the entry method itself is nothing but one
-// declaration per step, each a single call.
+// Every value the guard or its advance touches by bare name (D, fw,
+// vPrime, nf, Vp) must be a class field for the auto-generated
+// forbidden/advance helpers to see it, and the compiler grants that only
+// to a *leading, uninterrupted run* of declarations at the top of the
+// entry method. The preprocessing is therefore written as aggregate
+// expressions -- filter, map, max, sum -- rather than loops, so each step
+// stays a single declaration and the run is never broken. Only the 2-D
+// table fill still needs a helper.
+//
+// The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
+// Vp+1 individually, since the compiler infers one bound for every index
+// of a guard) and the predicate explicitly re-restricts i to [1..nf] and
+// p to [1..Vp], so out-of-range (i,p) pairs in the padded square scan are
+// simply never forbidden.
+//
+// The aggregates deliberately avoid `i` and `p` as bound variables: a
+// quantifier helper is generated taking the guard's index variables as
+// parameters, so a `filter i in ...` inside a `forbidden (i, p)` program
+// collides with its own parameter and will not compile.
 
 import java.util.*;
 
@@ -32,6 +36,7 @@ public class LLPApproxKnapsack {
   int W;
   int epsNum;
   int epsDen;
+  int[] feas;
   int nf;
   int[] fw;
   int[] fv;
@@ -63,13 +68,14 @@ public class LLPApproxKnapsack {
     this.epsNum = epsNum;
     this.epsDen = epsDen;
     this.n = w.length;
-    this.nf = countFeasible(w, W);
-    this.fw = feasibleWeights(w, W, nf);
-    this.fv = feasibleValues(w, v, W, nf);
-    this.M = maxProfit(fv, nf);
-    this.vPrime = scaledProfits(fv, nf, M, epsNum, epsDen);
-    this.Vp = sumVPrime(vPrime, nf);
-    this.INF = totalWeightPlusOne(fw, nf);
+    this.feas = _q1(i, p);
+    this.nf = feas.length;
+    this.fw = _q2(i, p);
+    this.fv = _q3(i, p);
+    this.M = _q4(i, p);
+    this.vPrime = _q5(i, p);
+    this.Vp = _q6(i, p);
+    this.INF = (1 + _q7(i, p));
     this.D = initTable(nf, Vp, INF);
     n = (Math.max(nf, Vp) + 1);
     {
@@ -86,90 +92,14 @@ public class LLPApproxKnapsack {
         }
       }
     }
-    return readPStar(D, nf, Vp, W);
-  }
-
-  public int countFeasible(int[] w, int W) {
-    int nf = 0;
-    int i = 0;
-    while ((i < w.length)) {
-      if ((w[i] <= W)) {
-        nf = (nf + 1);
-      }
-      i = (i + 1);
+    java.util.ArrayList<Integer> t8_acc = new java.util.ArrayList<>();
+    for (int q = 0; q <= Vp; q++) {
+      if ((D[nf][q] <= W)) t8_acc.add(q);
     }
-    return nf;
-  }
-
-  public int[] feasibleWeights(int[] w, int W, int nf) {
-    int[] fw = new int[nf];
-    int k = 0;
-    int i = 0;
-    while ((i < w.length)) {
-      if ((w[i] <= W)) {
-        fw[k] = w[i];
-        k = (k + 1);
-      }
-      i = (i + 1);
-    }
-    return fw;
-  }
-
-  public int[] feasibleValues(int[] w, int[] v, int W, int nf) {
-    int[] fv = new int[nf];
-    int k = 0;
-    int i = 0;
-    while ((i < w.length)) {
-      if ((w[i] <= W)) {
-        fv[k] = v[i];
-        k = (k + 1);
-      }
-      i = (i + 1);
-    }
-    return fv;
-  }
-
-  public int maxProfit(int[] fv, int nf) {
-    int M = 1;
-    if ((nf > 0)) {
-      M = fv[0];
-      int i = 1;
-      while ((i < nf)) {
-        M = Math.max(M, fv[i]);
-        i = (i + 1);
-      }
-    }
-    return M;
-  }
-
-  public int[] scaledProfits(int[] fv, int nf, int M, int epsNum, int epsDen) {
-    int[] vPrime = new int[nf];
-    int i = 0;
-    while ((i < nf)) {
-      vPrime[i] = (((fv[i] * nf) * epsDen) / (epsNum * M));
-      i = (i + 1);
-    }
-    return vPrime;
-  }
-
-  public int sumVPrime(int[] vPrime, int nf) {
-    int Vp = 0;
-    int i = 0;
-    while ((i < nf)) {
-      Vp = (Vp + vPrime[i]);
-      i = (i + 1);
-    }
-    return Vp;
-  }
-
-  public int totalWeightPlusOne(int[] fw, int nf) {
-    int INF = 1;
-    int i = 0;
-    while ((i < nf)) {
-      INF = (INF + fw[i]);
-      i = (i + 1);
-    }
-    return INF;
+    int[] t8 = new int[t8_acc.size()];
+    for (int _i = 0; _i < t8.length; _i++) t8[_i] = t8_acc.get(_i);
+    int[] reach = t8;
+    return reach[(reach.length - 1)];
   }
 
   public int[][] initTable(int nf, int Vp, int INF) {
@@ -189,16 +119,69 @@ public class LLPApproxKnapsack {
     return D;
   }
 
-  public int readPStar(int[][] D, int nf, int Vp, int W) {
-    int pStar = 0;
-    int q = 0;
-    while ((q <= Vp)) {
-      if ((D[nf][q] <= W)) {
-        pStar = q;
-      }
-      q = (q + 1);
+  private int[] _q1(int i, int p) {
+    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+    for (int t = 0; t < w.length; t++) {
+      if ((w[t] <= W)) _acc.add(t);
     }
-    return pStar;
+    int[] arr = new int[_acc.size()];
+    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
+    return arr;
+  }
+
+  private int[] _q2(int i, int p) {
+    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+    for (int k = 0; k < nf; k++) {
+      _acc.add(w[feas[k]]);
+    }
+    int[] arr = new int[_acc.size()];
+    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
+    return arr;
+  }
+
+  private int[] _q3(int i, int p) {
+    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+    for (int k = 0; k < nf; k++) {
+      _acc.add(v[feas[k]]);
+    }
+    int[] arr = new int[_acc.size()];
+    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
+    return arr;
+  }
+
+  private int _q4(int i, int p) {
+    int _acc = Integer.MIN_VALUE;
+    for (int k = 0; k < nf; k++) {
+      int _v = fv[k];
+      if (_v > _acc) _acc = _v;
+    }
+    return _acc;
+  }
+
+  private int[] _q5(int i, int p) {
+    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+    for (int k = 0; k < nf; k++) {
+      _acc.add((((fv[k] * nf) * epsDen) / (epsNum * M)));
+    }
+    int[] arr = new int[_acc.size()];
+    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
+    return arr;
+  }
+
+  private int _q6(int i, int p) {
+    int _acc = 0;
+    for (int k = 0; k < nf; k++) {
+      _acc += vPrime[k];
+    }
+    return _acc;
+  }
+
+  private int _q7(int i, int p) {
+    int _acc = 0;
+    for (int k = 0; k < nf; k++) {
+      _acc += fw[k];
+    }
+    return _acc;
   }
 
   public static void main(String[] args) {

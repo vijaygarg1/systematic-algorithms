@@ -3,10 +3,7 @@
 class LLPMinMaxLate {
   int[] LLPMinMaxLate(int[] t, int[] d) {
     int[] G = 0;
-    forbidden (j) :
-      G[j] < (sum i in [0..j-1] : t[i])
-    =>
-      advance : G[j] = sum i in [0..j-1] : t[i];
+    ensure (j) : G[j] >= sum i in [0..j-1] : t[i];
     return G;
   }
 }

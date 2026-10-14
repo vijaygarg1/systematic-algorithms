@@ -12,7 +12,7 @@ public class ReleaseTimes {
   int j;
 
   private boolean forbidden(int j) {
-    if (!((G[j] < r[j]))) return false;
+    if ((G[j] >= r[j])) return false;
     return true;
   }
 

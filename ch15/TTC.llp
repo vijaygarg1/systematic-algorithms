@@ -7,6 +7,10 @@
 // leading into one); (3) every agent on ANY cycle this stage trades
 // and is fixed -- not a single pointer-chasing walk that resolves one
 // cycle at a time and rebuilds the whole graph for each one.
+//
+// Steps 1 and 3 are `forall`s, since each agent is handled independently
+// of the others; only the walk of step 2 is inherently sequential, and
+// even there the two sweeps over the recorded path are `forall`s.
 
 class TTC {
   int[] assign(int[][] pref) {
@@ -21,12 +25,8 @@ class TTC {
     while (numFixed < n) {
       // Step 1: advance wish[i] past houses owned by fixed agents, for
       // every unfixed agent i.
-      int i = 0;
-      while (i < n) {
-        if (!fixed[i]) {
-          while (fixed[pref[i][G[i]]]) { G[i] = G[i] + 1; };
-        };
-        i = i + 1;
+      forall i in [0..n-1] : if (!fixed[i]) {
+        while (fixed[pref[i][G[i]]]) { G[i] = G[i] + 1; };
       };
 
       // Step 2: find ALL cycles of the functional graph i -> pref[i][G[i]]
@@ -36,46 +36,36 @@ class TTC {
       int[] state = new int[n];
       boolean[] inCycle = new boolean[n];
       int[] path = new int[n];
-      i = 0;
-      while (i < n) {
-        if (!fixed[i] && state[i] == 0) {
+      int a = 0;
+      while (a < n) {
+        if (!fixed[a] && state[a] == 0) {
           int pathLen = 0;
-          int cur = i;
+          int cur = a;
           while (state[cur] == 0) {
             state[cur] = 1;
             path[pathLen] = cur;
             pathLen = pathLen + 1;
             cur = pref[cur][G[cur]];
           };
+          // state[cur] == 1 means cur is still on the current walk, so the
+          // suffix of path from cur onward is a cycle. The walk pushes each
+          // agent at most once, so cur occurs exactly once in path.
           if (state[cur] == 1) {
-            // cur is on the current walk: the path from cur onward is a cycle.
-            int p = 0;
-            boolean onCyc = false;
-            while (p < pathLen) {
-              if (path[p] == cur) { onCyc = true; };
-              if (onCyc) { inCycle[path[p]] = true; };
-              p = p + 1;
-            }
+            int start = 0;
+            while (path[start] != cur) { start = start + 1; };
+            forall p in [start..pathLen - 1] : inCycle[path[p]] = true;
           };
-          int p2 = 0;
-          while (p2 < pathLen) {
-            state[path[p2]] = 2;
-            p2 = p2 + 1;
-          }
+          forall p in [0..pathLen - 1] : state[path[p]] = 2;
         };
-        i = i + 1;
+        a = a + 1;
       };
 
       // Step 3: implement the trades for every agent on a cycle this stage.
-      i = 0;
-      while (i < n) {
-        if (inCycle[i]) {
-          house[i] = pref[i][G[i]];
-          fixed[i] = true;
-          numFixed = numFixed + 1;
-        };
-        i = i + 1;
-      }
+      forall i in [0..n-1] : if (inCycle[i]) {
+        house[i] = pref[i][G[i]];
+        fixed[i] = true;
+        numFixed = numFixed + 1;
+      };
     };
     return house;
   }

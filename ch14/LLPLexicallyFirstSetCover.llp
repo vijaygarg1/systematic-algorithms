@@ -30,39 +30,17 @@ class LLPLexicallyFirstSetCover {
 
   // |s_j ∩ R| where R is the set of currently uncovered elements.
   int coverage(int j, int[][] S, boolean[] G) {
-    int u = S[j].length;
-    int count = 0;
-    int e = 0;
-    while (e < u) {
-      if (S[j][e] == 1 && !isCovered(e, S, G)) {
-        count = count + 1;
-      };
-      e = e + 1;
-    };
-    return count;
+    return count e in [0..S[j].length - 1] : S[j][e] == 1 && !isCovered(e, S, G);
   }
 
   // True iff element e is covered by some currently-selected set.
   boolean isCovered(int e, int[][] S, boolean[] G) {
-    int m = G.length;
-    int s = 0;
-    while (s < m) {
-      if (G[s] && S[s][e] == 1) { return true; };
-      s = s + 1;
-    };
-    return false;
+    return exists s in [0..G.length - 1] : G[s] && S[s][e] == 1;
   }
 
   // True iff sets j and k share at least one currently-uncovered element.
   boolean shareUncovered(int j, int k, int[][] S, boolean[] G) {
-    int u = S[j].length;
-    int e = 0;
-    while (e < u) {
-      if (S[j][e] == 1 && S[k][e] == 1 && !isCovered(e, S, G)) {
-        return true;
-      };
-      e = e + 1;
-    };
-    return false;
+    return exists e in [0..S[j].length - 1] :
+      S[j][e] == 1 && S[k][e] == 1 && !isCovered(e, S, G);
   }
 }

@@ -1,7 +1,7 @@
 """Recursive DFS recording discovery and finish times."""
 
-def dfs(dep):
-    n = len(dep)
+def dfs(succ):
+    n = len(succ)
     visited    = [False] * n
     parent     = [-1] * n
     discovered = [0] * n
@@ -12,7 +12,7 @@ def dfs(dep):
         visited[j] = True
         discovered[j] = tick[0]
         tick[0] += 1
-        for k in dep[j]:
+        for k in succ[j]:
             if not visited[k]:
                 parent[k] = j
                 visit(k)
@@ -24,7 +24,7 @@ def dfs(dep):
 
 
 if __name__ == "__main__":
-    dep = [
+    succ = [
         [1, 2],
         [3],
         [3, 4],
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         [5],
         [],
     ]
-    discovered, parent, finished = dfs(dep)
+    discovered, parent, finished = dfs(succ)
     print("discovered:", discovered)
     print("parent:    ", parent)
     print("finished:  ", finished)

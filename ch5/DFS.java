@@ -3,8 +3,8 @@
 import java.util.*;
 
 public class DFS {
-  public int[] traverse(int[][] dep) {
-    int n = dep.length;
+  public int[] traverse(int[][] succ) {
+    int n = succ.length;
     int[] G = new int[n];
     int[] parent = new int[n];
     int[] discovered = new int[n];
@@ -14,18 +14,18 @@ public class DFS {
     }
     int[] t = new int[1];
     t[0] = 1;
-    visit(0, dep, G, parent, discovered, finished, t);
+    visit(0, succ, G, parent, discovered, finished, t);
     return discovered;
   }
 
-  public void visit(int j, int[][] dep, int[] G, int[] parent, int[] discovered, int[] finished, int[] t) {
+  public void visit(int j, int[][] succ, int[] G, int[] parent, int[] discovered, int[] finished, int[] t) {
     G[j] = 1;
     discovered[j] = t[0];
     t[0] = (t[0] + 1);
-    for (int k : dep[j]) {
+    for (int k : succ[j]) {
       if ((G[k] == 0)) {
         parent[k] = j;
-        visit(k, dep, G, parent, discovered, finished, t);
+        visit(k, succ, G, parent, discovered, finished, t);
       }
     }
     finished[j] = t[0];

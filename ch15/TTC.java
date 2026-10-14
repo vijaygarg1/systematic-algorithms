@@ -7,6 +7,10 @@
 // leading into one); (3) every agent on ANY cycle this stage trades
 // and is fixed -- not a single pointer-chasing walk that resolves one
 // cycle at a time and rebuilds the whole graph for each one.
+//
+// Steps 1 and 3 are `forall`s, since each agent is handled independently
+// of the others; only the walk of step 2 is inherently sequential, and
+// even there the two sweeps over the recorded path are `forall`s.
 
 import java.util.*;
 
@@ -24,23 +28,21 @@ public class TTC {
     }
     int numFixed = 0;
     while ((numFixed < n)) {
-      int i = 0;
-      while ((i < n)) {
+      for (int i = 0; i < n; i++) {
         if ((!fixed[i])) {
           while (fixed[pref[i][G[i]]]) {
             G[i] = (G[i] + 1);
           }
         }
-        i = (i + 1);
       }
       int[] state = new int[n];
       boolean[] inCycle = new boolean[n];
       int[] path = new int[n];
-      i = 0;
-      while ((i < n)) {
-        if (((!fixed[i]) && (state[i] == 0))) {
+      int a = 0;
+      while ((a < n)) {
+        if (((!fixed[a]) && (state[a] == 0))) {
           int pathLen = 0;
-          int cur = i;
+          int cur = a;
           while ((state[cur] == 0)) {
             state[cur] = 1;
             path[pathLen] = cur;
@@ -48,34 +50,26 @@ public class TTC {
             cur = pref[cur][G[cur]];
           }
           if ((state[cur] == 1)) {
-            int p = 0;
-            boolean onCyc = false;
-            while ((p < pathLen)) {
-              if ((path[p] == cur)) {
-                onCyc = true;
-              }
-              if (onCyc) {
-                inCycle[path[p]] = true;
-              }
-              p = (p + 1);
+            int start = 0;
+            while ((path[start] != cur)) {
+              start = (start + 1);
+            }
+            for (int p = start; p < pathLen; p++) {
+              inCycle[path[p]] = true;
             }
           }
-          int p2 = 0;
-          while ((p2 < pathLen)) {
-            state[path[p2]] = 2;
-            p2 = (p2 + 1);
+          for (int p = 0; p < pathLen; p++) {
+            state[path[p]] = 2;
           }
         }
-        i = (i + 1);
+        a = (a + 1);
       }
-      i = 0;
-      while ((i < n)) {
+      for (int i = 0; i < n; i++) {
         if (inCycle[i]) {
           house[i] = pref[i][G[i]];
           fixed[i] = true;
           numFixed = (numFixed + 1);
         }
-        i = (i + 1);
       }
     }
     return house;

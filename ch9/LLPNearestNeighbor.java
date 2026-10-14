@@ -11,7 +11,7 @@ public class LLPNearestNeighbor {
   int j;
 
   private boolean forbidden(int j) {
-    if (!((G[j] > nearestDist(px, py, j)))) return false;
+    if ((G[j] <= nearestDist(px, py, j))) return false;
     return true;
   }
 

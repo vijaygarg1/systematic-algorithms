@@ -4,15 +4,15 @@
 #include <vector>
 #include <queue>
 
-std::vector<int> traversal(const std::vector<std::vector<int>>& dep) {
-    int n = (int)dep.size();
+std::vector<int> traversal(const std::vector<std::vector<int>>& succ) {
+    int n = (int)succ.size();
     std::vector<int> G(n, 0);
     G[0] = 1;
     std::queue<int> q;
     q.push(0);
     while (!q.empty()) {
         int j = q.front(); q.pop();
-        for (int k : dep[j]) {
+        for (int k : succ[j]) {
             if (G[k] == 0) { G[k] = 1; q.push(k); }
         }
     }
@@ -20,10 +20,10 @@ std::vector<int> traversal(const std::vector<std::vector<int>>& dep) {
 }
 
 int main() {
-    std::vector<std::vector<int>> dep = {
+    std::vector<std::vector<int>> succ = {
         {1, 2}, {3}, {3, 4}, {5}, {5}, {}, {7}, {}
     };
-    auto G = traversal(dep);
+    auto G = traversal(succ);
     std::cout << "reachable:";
     for (int x : G) std::cout << ' ' << x;
     std::cout << '\n';

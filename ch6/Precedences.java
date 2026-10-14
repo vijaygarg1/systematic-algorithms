@@ -14,11 +14,12 @@ public class Precedences {
   int j;
 
   private boolean forbidden(int j) {
-    boolean t1 = false;
+    int t1 = Integer.MIN_VALUE;
     for (int i : pre[j]) {
-      if ((G[j] < (G[i] + t[i]))) { t1 = true; break; }
+      int _v = (G[i] + t[i]);
+      if (_v > t1) t1 = _v;
     }
-    return t1;
+    return (!(G[j] >= t1));
   }
 
   private void advance() {

@@ -13,8 +13,8 @@ public class LLPEdgeRelaxation {
   private boolean _forbidden0(int j) {
     int t1 = Integer.MAX_VALUE;
     for (int i : pre[j]) {
-      int v = (G[i] + w[i][j]);
-      if (v < t1) t1 = v;
+      int _v = (G[i] + w[i][j]);
+      if (_v < t1) t1 = _v;
     }
     return (!(G[j] <= t1));
   }

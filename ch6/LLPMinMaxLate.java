@@ -14,7 +14,7 @@ public class LLPMinMaxLate {
     for (int i = 0; i < j; i++) {
       t1 += t[i];
     }
-    return (G[j] < t1);
+    return (!(G[j] >= t1));
   }
 
   private void advance() {

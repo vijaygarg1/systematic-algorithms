@@ -3,8 +3,7 @@
 class LLPCountInversions {
   void LLPCountInversions(int[] A) {
     int[] G = 0;
-    forbidden (j) : G[j] < countLeft(A, j) =>
-      advance : G[j] = countLeft(A, j);
+    ensure (j) : G[j] >= countLeft(A, j);
   }
 
   int countLeft(int[] A, int j) {

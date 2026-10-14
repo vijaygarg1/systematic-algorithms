@@ -1,8 +1,8 @@
 // Sequential BFS distance from a source vertex (FIFO queue).
 
 class BFS {
-  int[] traverse(set<int>[] dep, int s) {
-    int n = dep.length;
+  int[] traverse(set<int>[] succ, int s) {
+    int n = succ.length;
     int[] G = new int[n];
     forall i in [0..n-1] : G[i] = infinity;
     G[s] = 0;
@@ -15,7 +15,7 @@ class BFS {
     while (head < tail) {
       int j = Q[head];
       head = head + 1;
-      forall k in dep[j] :
+      forall k in succ[j] :
         if (G[k] > G[j] + 1) {
           G[k] = G[j] + 1;
           Q[tail] = k;

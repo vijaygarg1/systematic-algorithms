@@ -24,14 +24,10 @@ class LLPWeightedVertexCover {
     return C;
   }
 
+  // adj is a 0/1 incidence matrix (every other use tests adj[.][.] == 1),
+  // so multiplying by it selects exactly the neighbours of v.
   double price(int v, int[][] adj, double[][] G, int nv) {
-    double sum = 0.0;
-    int u = 0;
-    while (u < nv) {
-      if (adj[u][v] == 1) { sum = sum + G[u][v]; };
-      u = u + 1;
-    };
-    return sum;
+    return sum u in [0..nv - 1] : G[u][v] * adj[u][v];
   }
 
   boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {

@@ -23,8 +23,8 @@ public class FastComponents {
   private boolean _forbidden1(int j) {
     int t1 = Integer.MIN_VALUE;
     for (int i : adj[j]) {
-      int v = G[i];
-      if (v > t1) t1 = v;
+      int _v = G[i];
+      if (_v > t1) t1 = _v;
     }
     return (!(G[j] >= t1));
   }

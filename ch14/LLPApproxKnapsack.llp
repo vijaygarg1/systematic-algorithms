@@ -7,111 +7,48 @@
 // items with scaled profit >= p; the answer is max { p : D[nf][p] <= W },
 // profit mu * p.
 //
-// Forbidden(i,p) with i>=1,p>=1: D[i,p] > min(D[i-1,p], w_i + D[i-1,max(0,p-v_i')]);
-// Advance: D[i,p] := that min -- realized below with the native
-// forbidden(i,p) => advance: ... construct. The guard's shared bound n is
-// set to max(nf,Vp)+1 (rather than nf+1 or Vp+1 individually, since the
-// compiler infers one bound for every index of a guard) and the
-// predicate explicitly re-restricts i to [1..nf] and p to [1..Vp], so
-// out-of-range (i,p) pairs in the padded square scan are simply never
-// forbidden. Every value the guard or its advance touches by bare name
-// (D, fw, vPrime, nf, Vp) must be a class field for the auto-generated
-// forbidden/advance helpers to see it, which this compiler only grants
-// to a *leading, uninterrupted run* of declarations at the very top of
-// the entry method -- hence the preprocessing (which genuinely needs
-// loops: discarding items, scaling profits, summing) is factored into
-// helper methods, so the entry method itself is nothing but one
-// declaration per step, each a single call.
+// Every value the guard or its advance touches by bare name (D, fw,
+// vPrime, nf, Vp) must be a class field for the auto-generated
+// forbidden/advance helpers to see it, and the compiler grants that only
+// to a *leading, uninterrupted run* of declarations at the top of the
+// entry method. The preprocessing is therefore written as aggregate
+// expressions -- filter, map, max, sum -- rather than loops, so each step
+// stays a single declaration and the run is never broken. Only the 2-D
+// table fill still needs a helper.
+//
+// The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
+// Vp+1 individually, since the compiler infers one bound for every index
+// of a guard) and the predicate explicitly re-restricts i to [1..nf] and
+// p to [1..Vp], so out-of-range (i,p) pairs in the padded square scan are
+// simply never forbidden.
+//
+// The aggregates deliberately avoid `i` and `p` as bound variables: a
+// quantifier helper is generated taking the guard's index variables as
+// parameters, so a `filter i in ...` inside a `forbidden (i, p)` program
+// collides with its own parameter and will not compile.
 
 class LLPApproxKnapsack {
   int LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
-    int nf = countFeasible(w, W);
-    int[] fw = feasibleWeights(w, W, nf);
-    int[] fv = feasibleValues(w, v, W, nf);
-    int M = maxProfit(fv, nf);
-    int[] vPrime = scaledProfits(fv, nf, M, epsNum, epsDen);
-    int Vp = sumVPrime(vPrime, nf);
-    int INF = totalWeightPlusOne(fw, nf);
-    int[][] D = initTable(nf, Vp, INF);
+    int[] feas   = filter t in [0..w.length - 1] : w[t] <= W;
+    int   nf     = feas.length;
+    int[] fw     = map k in [0..nf - 1] : w[feas[k]];
+    int[] fv     = map k in [0..nf - 1] : v[feas[k]];
+    int   M      = max k in [0..nf - 1] : fv[k];
+    int[] vPrime = map k in [0..nf - 1] : (fv[k] * nf * epsDen) / (epsNum * M);
+    int   Vp     = sum k in [0..nf - 1] : vPrime[k];
+    int   INF    = 1 + sum k in [0..nf - 1] : fw[k];
+    int[][] D    = initTable(nf, Vp, INF);
     n = max(nf, Vp) + 1;
     forbidden (i, p) :
       i >= 1 && i <= nf && p >= 1 && p <= Vp &&
       D[i][p] > min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])])
     =>
       advance : D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
-    return readPStar(D, nf, Vp, W);
+    int[] reach = filter q in [0..Vp] : D[nf][q] <= W;
+    return reach[reach.length - 1];
   }
 
-  // Number of items that fit the capacity on their own (discard the rest:
-  // they can never be in a feasible solution).
-  int countFeasible(int[] w, int W) {
-    int nf = 0;
-    int i = 0;
-    while (i < w.length) {
-      if (w[i] <= W) { nf = nf + 1; };
-      i = i + 1;
-    };
-    return nf;
-  }
-
-  int[] feasibleWeights(int[] w, int W, int nf) {
-    int[] fw = new int[nf];
-    int k = 0;
-    int i = 0;
-    while (i < w.length) {
-      if (w[i] <= W) { fw[k] = w[i]; k = k + 1; };
-      i = i + 1;
-    };
-    return fw;
-  }
-
-  int[] feasibleValues(int[] w, int[] v, int W, int nf) {
-    int[] fv = new int[nf];
-    int k = 0;
-    int i = 0;
-    while (i < w.length) {
-      if (w[i] <= W) { fv[k] = v[i]; k = k + 1; };
-      i = i + 1;
-    };
-    return fv;
-  }
-
-  // M = max profit among feasible items (this item fits, so M <= OPT).
-  int maxProfit(int[] fv, int nf) {
-    int M = 1;
-    if (nf > 0) {
-      M = fv[0];
-      int i = 1;
-      while (i < nf) { M = max(M, fv[i]); i = i + 1; };
-    };
-    return M;
-  }
-
-  // v'[k] = floor(fv[k] / mu), mu = eps*M/nf.
-  int[] scaledProfits(int[] fv, int nf, int M, int epsNum, int epsDen) {
-    int[] vPrime = new int[nf];
-    int i = 0;
-    while (i < nf) { vPrime[i] = (fv[i] * nf * epsDen) / (epsNum * M); i = i + 1; };
-    return vPrime;
-  }
-
-  // V' = sum of the scaled profits.
-  int sumVPrime(int[] vPrime, int nf) {
-    int Vp = 0;
-    int i = 0;
-    while (i < nf) { Vp = Vp + vPrime[i]; i = i + 1; };
-    return Vp;
-  }
-
-  // A weight strictly above any achievable total weight.
-  int totalWeightPlusOne(int[] fw, int nf) {
-    int INF = 1;
-    int i = 0;
-    while (i < nf) { INF = INF + fw[i]; i = i + 1; };
-    return INF;
-  }
-
-  // D[i][p] initialized to INF, except profit 0 needs weight 0.
+  // D[i][p] initialized to INF, except profit 0, which needs weight 0.
   int[][] initTable(int nf, int Vp, int INF) {
     int[][] D = new int[nf + 1][Vp + 1];
     int i = 0;
@@ -125,16 +62,5 @@ class LLPApproxKnapsack {
       i = i + 1;
     };
     return D;
-  }
-
-  // p* = max { p : D[nf][p] <= W }.
-  int readPStar(int[][] D, int nf, int Vp, int W) {
-    int pStar = 0;
-    int q = 0;
-    while (q <= Vp) {
-      if (D[nf][q] <= W) { pStar = q; };
-      q = q + 1;
-    };
-    return pStar;
   }
 }

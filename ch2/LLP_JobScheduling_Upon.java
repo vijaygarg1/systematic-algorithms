@@ -15,8 +15,8 @@ public class LLP_JobScheduling_Upon {
   private boolean forbidden(int j) {
     int t1 = Integer.MIN_VALUE;
     for (int i : pre[j]) {
-      int v = (G[i] + t[j]);
-      if (v > t1) t1 = v;
+      int _v = (G[i] + t[j]);
+      if (_v > t1) t1 = _v;
     }
     return (G[j] < t1);
   }

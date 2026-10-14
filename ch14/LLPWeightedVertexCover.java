@@ -60,15 +60,11 @@ public class LLPWeightedVertexCover {
   }
 
   public double price(int v, int[][] adj, double[][] G, int nv) {
-    double sum = 0.0;
-    int u = 0;
-    while ((u < nv)) {
-      if ((adj[u][v] == 1)) {
-        sum = (sum + G[u][v]);
-      }
-      u = (u + 1);
+    double t1 = 0;
+    for (int u = 0; u < nv; u++) {
+      t1 += (G[u][v] * adj[u][v]);
     }
-    return sum;
+    return t1;
   }
 
   public boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {

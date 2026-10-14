@@ -6,8 +6,7 @@
 
 class Precedences {
   int[] Precedences(set<int>[] pre, int[] t, int[] G) {
-    forbidden (j) : exists i in pre[j] : G[j] < G[i] + t[i] =>
-      advance : G[j] = max i in pre[j] : G[i] + t[i];
+    ensure (j) : G[j] >= max i in pre[j] : G[i] + t[i];
     return G;
   }
 }

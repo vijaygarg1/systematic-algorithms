@@ -9,7 +9,7 @@ public class LLPCountInversions {
   int j;
 
   private boolean forbidden(int j) {
-    if (!((G[j] < countLeft(A, j)))) return false;
+    if ((G[j] >= countLeft(A, j))) return false;
     return true;
   }
 

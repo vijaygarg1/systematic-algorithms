@@ -106,15 +106,7 @@ class LLPBoruvka {
   }
 
   int countActive(int n, boolean[] active) {
-    int c = 0;
-    int i = 0;
-    while (i < n) {
-      if (active[i]) {
-        c = c + 1;
-      };
-      i = i + 1;
-    };
-    return c;
+    return count i in [0..n - 1] : active[i];
   }
 
   // The endpoint of edge e other than v.

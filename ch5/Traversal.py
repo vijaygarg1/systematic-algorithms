@@ -3,14 +3,14 @@
 from collections import deque
 
 
-def traversal(dep):
-    n = len(dep)
+def traversal(succ):
+    n = len(succ)
     G = [0] * n
     G[0] = 1
     q = deque([0])
     while q:
         j = q.popleft()
-        for k in dep[j]:
+        for k in succ[j]:
             if G[k] == 0:
                 G[k] = 1
                 q.append(k)
@@ -18,7 +18,7 @@ def traversal(dep):
 
 
 if __name__ == "__main__":
-    dep = [
+    succ = [
         [1, 2],
         [3],
         [3, 4],
@@ -28,4 +28,4 @@ if __name__ == "__main__":
         [7],   # vertex 6 - unreachable from 0
         [],    # vertex 7 - unreachable from 0
     ]
-    print("reachable:", traversal(dep))
+    print("reachable:", traversal(succ))

@@ -1,4 +1,4 @@
-// LLP-Assignment-Spec (bxx-assignment.tex, fig:alg-price-hl): forbidden
+// LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden
 // when item j belongs to an inclusion-minimal overdemanded set J (found
 // via alternating-path reachability from an unmatched bidder, the
 // standard witness for a violated Hall's condition); advance then

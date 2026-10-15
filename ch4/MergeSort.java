@@ -1,51 +1,39 @@
-// Sequential merge sort (parallel companion in progs-divideConquer/).
+// Sequential merge sort, in the book's own shape: each call RETURNS a
+// newly sorted array rather than sorting a range of G in place, and the
+// merge step is the sibling MergeTwo program -- `MergeTwo(B, C)`,
+// compiling to `new MergeTwo().merge(B, C)` -- exactly as Algorithm
+// MergeSort in bxx-sort.tex writes `Return MergeTwo(B, C)`. That makes
+// MergeSort.java a multi-file program: it needs MergeTwo.java alongside
+// it to compile (see JAVA_MULTI_FILE in validate-site.py and the
+// `javaRequires` demo-spec field in llp.js).
+//
+// An earlier version sorted G[lo..hi] in place and carried its own
+// 26-line two-pointer merge, duplicating MergeTwo.llp.
+//
+// The parallel companion is MergeSortPar in progs-divideConquer/, which
+// is the same recurrence with the two recursive calls run in parallel --
+// a split only this out-of-place shape makes natural, since in-place
+// halves would contend for one array.
 
 import java.util.*;
 
 public class MergeSort {
-  public void sort(int lo, int hi, int[] G) {
+  public int[] sort(int[] A, int lo, int hi) {
     if ((lo < hi)) {
       int mid = ((lo + hi) / 2);
-      sort(lo, mid, G);
-      sort((mid + 1), hi, G);
-      Merge(lo, mid, hi, G);
+      int[] B = sort(A, lo, mid);
+      int[] C = sort(A, (mid + 1), hi);
+      return new MergeTwo().merge(B, C);
     }
-  }
-
-  public void Merge(int lo, int mid, int hi, int[] G) {
-    int[] B = new int[G.length];
-    for (int k = lo; k <= hi; k++) {
-      B[k] = G[k];
-    }
-    int i = lo;
-    int j = (mid + 1);
-    int k = lo;
-    while (((i <= mid) && (j <= hi))) {
-      if ((B[i] <= B[j])) {
-        G[k] = B[i];
-        i = (i + 1);
-      } else {
-        G[k] = B[j];
-        j = (j + 1);
-      }
-      k = (k + 1);
-    }
-    while ((i <= mid)) {
-      G[k] = B[i];
-      i = (i + 1);
-      k = (k + 1);
-    }
-    while ((j <= hi)) {
-      G[k] = B[j];
-      j = (j + 1);
-      k = (k + 1);
-    }
+    int[] single = new int[1];
+    single[0] = A[lo];
+    return single;
   }
 
   public static void main(String[] args) {
-    int[] G = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
+    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     MergeSort prog = new MergeSort();
-    prog.sort(0, G.length - 1, G);
-    System.out.println(Arrays.toString(G));
+    int[] result = prog.sort(A, 0, A.length - 1);
+    System.out.println(Arrays.toString(result));
   }
 }

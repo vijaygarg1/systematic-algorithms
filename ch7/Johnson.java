@@ -10,6 +10,17 @@
 // it to compile (validate-site.py's Java check and the website's
 // download links both know about this dependency; see JAVA_MULTI_FILE
 // in validate-site.py and the `javaRequires` demo-spec field in llp.js).
+//
+// The book's box says "Run BellmanFord" and "Run Dijkstra" symmetrically,
+// but only Dijkstra is called here; step 1 keeps its own relaxation loop.
+// That is a capability gap, not an oversight. Sibling BellmanFord.llp
+// takes an edge list -- shortestPath(n, U, V, W, s) -- where Johnson has
+// an adjacency matrix, and it runs its n-1 passes and returns dist with
+// no extra pass and no way to report a negative cycle. Johnson needs
+// exactly that report, so calling it would drop the check the book names
+// explicitly. Giving BellmanFord.llp a matrix entry point and a failure
+// signal would let step 1 become a call too, and would cut roughly 30
+// lines from this program.
 
 import java.util.*;
 

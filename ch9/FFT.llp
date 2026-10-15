@@ -1,4 +1,7 @@
 // Recursive FFT: evaluate a coefficient vector at the N-th roots of unity.
+// Matches bxx-divideConquer.tex Algorithm FFT. Pseudocode, not compilable
+// LL: complex arithmetic and the `a[0], a[2], ..., a[N-2]` stride have no
+// LL counterpart; see EXPECTED_UNSUPPORTED in sync-code-from-lang.py.
 
 complex[] fft(complex[] a, complex omega, int N) {
   if (N == 1) { return [a[0]]; };

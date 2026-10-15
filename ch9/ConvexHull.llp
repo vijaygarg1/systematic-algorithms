@@ -1,6 +1,13 @@
 // Classical divide-and-conquer planar convex hull.
 // Split by median x-coordinate, recursively hull each half, merge via
 // the upper and lower common tangents (computable in O(n) sequentially).
+//
+// The sequential edition prints no ConvexHull box of its own -- only
+// MergeHulls for the merge step, and ParallelConvexHull in the parallel
+// edition -- so this states the divide-and-conquer scheme the chapter
+// describes in prose. Pseudocode, not compilable LL (|P|, `sort P by
+// x-coordinate`, the tuple assignment); see EXPECTED_UNSUPPORTED in
+// sync-code-from-lang.py.
 
 Point[] convexHull(Point[] P) {
   if (|P| <= 3) { return bruteForceHull(P); };

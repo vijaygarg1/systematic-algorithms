@@ -9,7 +9,7 @@ std::vector<int> mergeTwo(const std::vector<int>& B,
     std::vector<int> D(nb + nc);
     int i = 0, j = 0, k = 0;
     while (i < nb && j < nc) {
-        if (B[i] < C[j]) D[k++] = B[i++];
+        if (B[i] <= C[j]) D[k++] = B[i++];
         else             D[k++] = C[j++];
     }
     while (i < nb) D[k++] = B[i++];

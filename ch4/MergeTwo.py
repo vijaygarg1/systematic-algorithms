@@ -8,7 +8,7 @@ def merge(B, C):
     j = 0
     k = 0
     while i < m and j < n:
-        if B[i] < C[j]:
+        if B[i] <= C[j]:
             D[k] = B[i]
             i += 1
         else:

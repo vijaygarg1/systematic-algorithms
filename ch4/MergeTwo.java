@@ -11,7 +11,7 @@ public class MergeTwo {
     int j = 0;
     int k = 0;
     while (((i < m) && (j < n))) {
-      if ((B[i] < C[j])) {
+      if ((B[i] <= C[j])) {
         D[k] = B[i];
         i = (i + 1);
       } else {

@@ -6,13 +6,27 @@
 // against the next 15 points in that y-order -- giving the book's
 // O(n log^2 n) bound (re-sorting the strip at every level), not an
 // O((hi-lo)^2) brute-force scan over every pair in range.
+//
+// PRECONDITION, the book's first line ("Sort P by x-coordinate --
+// presort once"): Px must already be in non-decreasing order, with
+// Py[k] the y-coordinate of the same point as Px[k]. The divide step
+// splits on index, so an unsorted Px silently gives a wrong answer.
+// The sort is done once by the caller, not per recursive call, which
+// is what keeps the bound at O(n log^2 n).
+//
+// Returns {best squared distance, index of one endpoint, index of the
+// other}, so the result names the closest PAIR as the book's KwOut
+// does, not just its separation. Distances stay squared throughout --
+// comparing d^2 orders points exactly as d does and avoids a sqrt.
 
 import java.util.*;
 
 public class ClosestPair {
   public double[] find(int lo, int hi, double[] Px, double[] Py) {
-    double[] G = new double[1];
+    double[] G = new double[3];
     G[0] = Double.POSITIVE_INFINITY;
+    G[1] = (0 - 1);
+    G[2] = (0 - 1);
     ClosestPair(lo, hi, Px, Py, G);
     return G;
   }
@@ -28,6 +42,8 @@ public class ClosestPair {
             double d = (sq((Px[i] - Px[j])) + sq((Py[i] - Py[j])));
             if ((d < G[0])) {
               G[0] = d;
+              G[1] = i;
+              G[2] = j;
             }
             j = (j + 1);
           }
@@ -61,6 +77,8 @@ public class ClosestPair {
             double d = (sq((Px[pi] - Px[pj])) + sq((Py[pi] - Py[pj])));
             if ((d < G[0])) {
               G[0] = d;
+              G[1] = pi;
+              G[2] = pj;
             }
             b = (b + 1);
           }

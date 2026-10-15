@@ -18,7 +18,7 @@ public class OptimalBinarySearchTree {
         {
           int hi = (lo + len);
           s[lo][hi] = (s[lo][(hi - 1)] + prob[hi]);
-          dp[lo][hi] = Integer.MAX_VALUE;
+          dp[lo][hi] = Double.POSITIVE_INFINITY;
           for (int r = lo; r <= hi; r++) {
             {
               double left = 0.0;

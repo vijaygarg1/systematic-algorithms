@@ -1,4 +1,8 @@
 // Dutch-flag partition: split A[low..high) into <, =, > pivot regions.
+// Matches bxx-sort.tex Algorithm ThreeWayPartition (fig:partition) line
+// for line. The book returns the pair (p, q); LL has no tuple return, so
+// the two boundary indices come back in a two-slot array instead -- the
+// only difference between the two.
 
 import java.util.*;
 

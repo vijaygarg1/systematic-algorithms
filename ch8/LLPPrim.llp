@@ -10,6 +10,28 @@
 // is the same setBase(1) convention LLP_StableMarriage uses for its
 // own 1-indexed aux methods).
 
+// PRECONDITION on the caller, which this program cannot check: on
+// entry, fixed[v] must mean "following the chosen edges from v reaches
+// the root" -- the book's derived definition of fixed (see
+// bxx-mst-llp-prim.tex). fixed, parent and C all arrive as parameters,
+// and propagateFixed() runs only inside the advance, so nothing here
+// establishes that meaning.
+//
+// Two initializations satisfy it:
+//   (a) the book's -- parent[v] := v's lightest-edge neighbour, C[v] :=
+//       that weight, then propagate fixed from the root along those
+//       chains before the first advance. Vertices then become fixed in
+//       chains, and the example in the book settles 5 vertices in 2
+//       advances.
+//   (b) the demo's -- parent[v] := v, fixed := {root}, C[v] := 0. No
+//       chain can be fixed prematurely because no parent points away
+//       from v, and the program degenerates to classical Prim: one
+//       advance per vertex.
+// Both reach the same C. What is NOT safe is (a) without the initial
+// propagation -- lightest-edge parents with fixed = {root} alone --
+// which leaves vertices that should already be fixed looking free and
+// yields a wrong answer on roughly a quarter of random graphs.
+
 class LLPPrim {
   double[] LLPPrim(int[] parent, boolean[] fixed,
                    double[][] W, double[] C, int root) {

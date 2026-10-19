@@ -16,16 +16,16 @@ def union(a, b, parent):
 
 def llp_kruskal(u, v, parent):
     m = len(u)
-    C = [False] * m
+    G = [False] * m
     changed = True
     while changed:
         changed = False
         for j in range(m):
-            if not C[j] and find(u[j], parent) != find(v[j], parent):
-                C[j] = True
+            if not G[j] and find(u[j], parent) != find(v[j], parent):
+                G[j] = True
                 union(u[j], v[j], parent)
                 changed = True
-    return C
+    return G
 
 
 if __name__ == "__main__":
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     v = [1, 2, 2, 3, 3]
     n = 4
     parent = list(range(n))
-    print("C:", llp_kruskal(u, v, parent))
+    print("G:", llp_kruskal(u, v, parent))

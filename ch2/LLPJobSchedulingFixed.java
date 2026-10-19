@@ -10,14 +10,14 @@ public class LLPJobSchedulingFixed {
   boolean[] fixed;
   int j;
 
-  private boolean _forbidden0(int j) {
+  private boolean forbidden(int j) {
     if (fixed[j]) return false;
     for (int i : pre[j]) if (!fixed[i]) return false;
     return true;
   }
 
-  private void _advance0() {
-    int m = Integer.MIN_VALUE;
+  private void advance() {
+    int m = t[j];
     for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
     G[j] = m;
     fixed[j] = true;
@@ -29,16 +29,13 @@ public class LLPJobSchedulingFixed {
     this.n = t.length;
     this.G = t.clone();
     this.fixed = new boolean[n];
-    for (int k = 0; k < n; k++) {
-      fixed[k] = (pre[k].length == 0);
-    }
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
-          if (_forbidden0(j)) {
-            this.j = j; _advance0();
+          if (forbidden(j)) {
+            this.j = j; advance();
             changed = true;
           }
         }

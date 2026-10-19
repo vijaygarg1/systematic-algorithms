@@ -1,12 +1,8 @@
 // LLP Horn SAT, matching bxx-horn.tex Algorithm LLP-HornSAT. head[c] is
 // the consequent variable of clause c, or -1 if clause c is a pure
-// negative (goal) clause (antecedents => false). Rule 1: a definite
-// clause with all antecedents true and a false consequent forbids that
-// consequent's index; advance sets it true. Rule 2 (independent of any
-// single index): a goal clause with all antecedents true proves no
-// satisfying assignment exists above the current G; advance returns
-// Unsatisfiable (null).
-//
+// negative (goal) clause. The book's two rules are written here as two
+// forbidden/advance clauses joined by `&&`, so they share one fixpoint.
+
 // Earlier version of this file (kept for reference, not used): had no
 // representation for a goal clause at all -- every clause was assumed
 // to have a positive head variable -- so rule 2 (UNSAT detection) was
@@ -48,32 +44,35 @@
 // }
 
 class LLPHornSAT {
-  // Returns the least satisfying assignment, or null if unsatisfiable.
   boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
     boolean[] G = new boolean[n];
-    boolean done = false;
-    while (!done) {
-      int chosen = 0 - 1;
-      int c = 0;
-      while (c < body.length && chosen == (0 - 1)) {
-        if (allTrue(body[c], G)) {
-          if (head[c] == (0 - 1)) {
-            return null;
-          } else {
-            if (!G[head[c]]) {
-              chosen = c;
-            }
-          }
-        };
-        c = c + 1;
-      };
-      if (chosen == (0 - 1)) {
-        done = true;
-      } else {
-        G[head[chosen]] = true;
-      }
-    };
+    forbidden (j) : definiteImplied(j, G, body, head) =>
+      advance : { G[j] = true; }
+    &&
+    forbidden (j) : goalFired(G, body, head) =>
+      advance : { return null; };
     return G;
+  }
+
+  // Some definite clause has all antecedents true and consequent j false.
+  boolean definiteImplied(int j, boolean[] G, int[][] body, int[] head) {
+    if (G[j]) { return false; };
+    int c = 0;
+    while (c < body.length) {
+      if (head[c] == j && allTrue(body[c], G)) { return true; };
+      c = c + 1;
+    };
+    return false;
+  }
+
+  // Some pure negative clause has all its antecedents true.
+  boolean goalFired(boolean[] G, int[][] body, int[] head) {
+    int c = 0;
+    while (c < body.length) {
+      if (head[c] == (0 - 1) && allTrue(body[c], G)) { return true; };
+      c = c + 1;
+    };
+    return false;
   }
 
   boolean allTrue(int[] vars, boolean[] G) {

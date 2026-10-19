@@ -1,34 +1,34 @@
-"""LLP-BellmanFord: when some d[j] is improvable, run one Jacobi-style relaxation."""
+"""LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation."""
 
 import math
 
 
-def forbidden(j, d, pre, w):
-    return any(d[i] != math.inf and d[i] + w[i][j] < d[j] for i in pre[j])
+def forbidden(j, G, pre, w):
+    return any(G[i] != math.inf and G[i] + w[i][j] < G[j] for i in pre[j])
 
 
-def advance(d, pre, w, n):
-    new_d = list(d)
-    for k in range(n):
+def advance(G, pre, w, n):
+    new_G = list(G)
+    for k in range(1, n):
         for i in pre[k]:
-            if d[i] != math.inf and d[i] + w[i][k] < new_d[k]:
-                new_d[k] = d[i] + w[i][k]
-    for k in range(n):
-        d[k] = new_d[k]
+            if G[i] != math.inf and G[i] + w[i][k] < new_G[k]:
+                new_G[k] = G[i] + w[i][k]
+    for k in range(1, n):
+        G[k] = new_G[k]
 
 
 def llp_bellman_ford(pre, w, n):
-    d = [math.inf] * n
-    d[0] = 0
+    G = [math.inf] * n
+    G[0] = 0
     changed = True
     while changed:
         changed = False
         for j in range(n):
-            if forbidden(j, d, pre, w):
-                advance(d, pre, w, n)
+            if forbidden(j, G, pre, w):
+                advance(G, pre, w, n)
                 changed = True
                 break
-    return d
+    return G
 
 
 if __name__ == "__main__":
@@ -39,4 +39,4 @@ if __name__ == "__main__":
          [math.inf, 0, -3, math.inf],
          [math.inf, math.inf, 0, 1],
          [math.inf, math.inf, math.inf, 0]]
-    print("d =", llp_bellman_ford(pre, w, n))
+    print("G =", llp_bellman_ford(pre, w, n))

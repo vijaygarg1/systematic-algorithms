@@ -1,9 +1,0 @@
-// LLP-Edge-Relaxation: ensure-based shortest path via edge relaxation.
-
-class LLPEdgeRelaxation {
-  void LLPEdgeRelaxation(int s, set<int>[] pre, int[][] w) {
-    int[] G = infinity;
-    G[s] = 0;
-    ensure (j) : G[j] <= min i in pre[j] : G[i] + w[i][j];
-  }
-}

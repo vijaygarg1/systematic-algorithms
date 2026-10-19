@@ -1,4 +1,12 @@
-// LLP weighted interval scheduling: G[j] >= max(G[j-1], w[j] + G[p[j]]).
+// LLP weighted interval scheduling. The book states B as two families of
+// inequalities, G[j] >= G[j-1] and G[j] >= w[j] + G[p[j]], which is
+// exactly what one `ensure` over their maximum says; the forbidden
+// predicate and advance are then read off B rather than restated.
+// Index 0 is pinned at 0, so the guard ranges over 1..n.
+// Since p[j] < j and j-1 < j, priority(j) = j settles each index in one
+// advance -- that schedule is what the boolean `fixed` array records in
+// the book's earlier presentation, and it is an efficiency choice, not
+// part of the predicate.
 
 import java.util.*;
 
@@ -10,13 +18,12 @@ public class LLPWeightedIntervalScheduling {
   int j;
 
   private boolean forbidden(int j) {
-    if (!((j >= 1))) return false;
-    if (!((G[j] < maxRhs(j)))) return false;
+    if ((G[j] >= Math.max(G[(j - 1)], (w[j] + G[p[j]])))) return false;
     return true;
   }
 
   private void advance() {
-    G[j] = maxRhs(j);
+    G[j] = Math.max(G[(j - 1)], (w[j] + G[p[j]]));
   }
 
   public int[] LLPWeightedIntervalScheduling(int[] w, int[] p) {
@@ -28,7 +35,7 @@ public class LLPWeightedIntervalScheduling {
       boolean changed = true;
       while (changed) {
         changed = false;
-        for (int j = 0; j < n; j++) {
+        for (int j = 1; j < n; j++) {
           if (forbidden(j)) {
             this.j = j; advance();
             changed = true;
@@ -37,10 +44,6 @@ public class LLPWeightedIntervalScheduling {
       }
     }
     return G;
-  }
-
-  public int maxRhs(int j) {
-    return Math.max(G[(j - 1)], (w[j] + G[p[j]]));
   }
 
   public static void main(String[] args) {

@@ -1,4 +1,9 @@
-"""LLP-Layering: each j advances once all predecessors are fixed."""
+"""LLP-Layering: longest path from a source to each vertex.
+
+The `fixed` array here is the SCHEDULE -- priority(j) = max{G[i]+1} --
+not part of the forbidden predicate, which is just the negation of
+B_layer at j. Scheduling this way advances each vertex exactly once.
+"""
 
 def llp_layering(pre):
     n = len(pre)

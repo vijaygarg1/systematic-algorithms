@@ -11,7 +11,7 @@ fn forbidden(j: usize, d: &[i32], pre: &[Vec<usize>], w: &[Vec<i32>]) -> bool {
 
 fn advance(d: &mut Vec<i32>, pre: &[Vec<usize>], w: &[Vec<i32>], n: usize) {
     let mut nd = d.clone();
-    for k in 0..n {
+    for k in 1..n {
         for &i in &pre[k] {
             if d[i] != INF && d[i] + w[i][k] < nd[k] { nd[k] = d[i] + w[i][k]; }
         }

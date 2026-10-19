@@ -1,4 +1,6 @@
-// LLP-Layering: each j advances once all predecessors are fixed.
+// LLP-Layering: longest path from a source to each vertex.
+// The `fixedFlag` array is the SCHEDULE -- priority(j) = max{G[i]+1} --
+// not part of the forbidden predicate; it advances each vertex once.
 
 #include <iostream>
 #include <vector>

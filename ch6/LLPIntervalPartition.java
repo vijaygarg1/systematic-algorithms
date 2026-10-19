@@ -1,14 +1,15 @@
-// LLP-IntervalPartition (bxx-greedy.tex, fig:intervalPartition): assign
-// each course j to the least free room not used by any overlapping
-// earlier course in pre[j]; advance fixes j once all of its pre-set is
-// fixed. The least-free-room computation uses a min-heap keyed by the
-// occupied room numbers in pre[j] (extract-min repeatedly to find the
-// smallest room number not present), matching the book's heap-based
-// advance step, not a linear re-scan of pre[j] for every candidate room
-// number. Uses the heap<int> builtin (-> java.util.PriorityQueue<int[]>)
-// instead of hand-rolled heapPush/heapPop/heapify, matching the
-// hand-written Python (heapq) and Rust (BinaryHeap) versions of this
-// same program, which already lean on their standard library's heap.
+// LLP-IntervalPartition (bxx-greedy.tex, fig:intervalPartition).  The
+// plain feasibility predicate ("overlapping courses get different
+// rooms") is not lattice-linear -- [1,2] and [2,1] both satisfy it but
+// their meet [1,1] does not -- so the book redefines B as the
+// lexicographically least assignment,
+// forall j: G[j] = min { r | forall i in pre(j): G[i] != r },
+// and this program's forbidden predicate is exactly the negation of
+// that, localized at j.  Processing courses in index order --
+// priority(j) = j, which is what the boolean `fixed` array implements
+// in the hand-written ports -- keeps each advance monotone and settles
+// every course in one advance.  The least free room is found with a
+// min-heap over the rooms occupied by pre[j].
 
 import java.util.*;
 
@@ -16,18 +17,15 @@ public class LLPIntervalPartition {
   int n;
   int[][] pre;
   int[] G;
-  boolean[] fixed;
   int j;
 
   private boolean forbidden(int j) {
-    if (fixed[j]) return false;
-    for (int i : pre[j]) if (!fixed[i]) return false;
+    if (!((G[j] < leastFreeRoom(j)))) return false;
     return true;
   }
 
   private void advance() {
     G[j] = leastFreeRoom(j);
-    fixed[j] = true;
   }
 
   public int[] LLPIntervalPartition(int[][] pre) {
@@ -35,7 +33,6 @@ public class LLPIntervalPartition {
     this.n = pre.length;
     this.G = new int[n];
     for (int i = 0; i < n; i++) this.G[i] = 1;
-    this.fixed = new boolean[n];
     {
       boolean changed = true;
       while (changed) {

@@ -7,29 +7,47 @@
 // x's price by the smallest remaining budget among the sets containing
 // it, tightening at least one of them.
 //
-// Written as an explicit scan-to-fixpoint rather than the native
-// forbidden(x) => advance: ... construct: the compiler infers a
-// single-index guard's loop bound from the first 1D array parameter's
-// length (here w.length, the number of SETS), but x ranges over
-// ELEMENTS -- a different count whenever sets and elements aren't
-// equinumerous. This compiles to exactly the boolean-changed/
-// while(changed) shape the native construct would generate, over the
-// correct bound.
+// The guard names its own range, `x in [0..u-1]`, because x ranges over
+// ELEMENTS while the bound the compiler would otherwise infer comes from
+// the first 1D array parameter (w.length, the number of SETS) -- a
+// different count whenever sets and elements aren't equinumerous.
 
 import java.util.*;
 
 public class LLPWeightedSetCover {
+  int n;
+  int[][] S;
+  double[] w;
+  int m;
+  int u;
+  double[] G;
+  int x;
+
+  private boolean _forbidden0(int x) {
+    if (!(slackMin(x, S, w, G))) return false;
+    return true;
+  }
+
+  private void _advance0() {
+    G[x] = (G[x] + minRemainingBudget(x, S, w, G, m));
+  }
+
   public boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
-    int m = w.length;
-    int u = S[0].length;
-    double[] G = new double[u];
-    boolean changed = true;
-    while (changed) {
-      changed = false;
-      for (int x = 0; x < u; x++) {
-        if (slackMin(x, S, w, G)) {
-          G[x] = (G[x] + minRemainingBudget(x, S, w, G, m));
-          changed = true;
+    this.S = S;
+    this.w = w;
+    this.n = w.length;
+    this.m = w.length;
+    this.u = S[0].length;
+    this.G = new double[u];
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int x = 0; x < u; x++) {
+          if (_forbidden0(x)) {
+            this.x = x; _advance0();
+            changed = true;
+          }
         }
       }
     }

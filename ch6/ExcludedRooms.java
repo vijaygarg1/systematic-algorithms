@@ -1,7 +1,13 @@
-// ExcludedRooms: composition program enforcing that course j is not
-// assigned a room from its excluded set R[j].  Composed onto
-// LLP-IntervalPartition via predicate conjunction:
-// [ LLP-IntervalPartition(s, f, G) && ExcludedRooms(R, G) ].
+// ExcludedRooms: a constraint program enforcing that course j is not
+// assigned a room from its excluded set R[j].  Its predicate is just
+// B_excl == forall j: G[j] not in R[j],
+// and the forbidden clause below is exactly the negation of that, so
+// the advance raises G[j] by the least amount that removes ITS own
+// violation.  It does not also avoid the rooms of overlapping courses:
+// that is LLP-IntervalPartition's constraint, and the two are composed
+// with `&&`, which forbids an index when either rule forbids it and
+// takes the advance from the rule that fired.  If this rule moves j
+// onto an occupied room, the partition rule fires next.
 
 import java.util.*;
 
@@ -9,7 +15,6 @@ public class ExcludedRooms {
   int n;
   int[][] R;
   int[] G;
-  int[][] pre;
   int j;
 
   private boolean forbidden(int j) {
@@ -21,13 +26,12 @@ public class ExcludedRooms {
   }
 
   private void advance() {
-    G[j] = leastValidRoom(j);
+    G[j] = leastAllowedRoom(j);
   }
 
-  public int[] ExcludedRooms(int[][] R, int[] G, int[][] pre) {
+  public int[] ExcludedRooms(int[][] R, int[] G) {
     this.R = R;
     this.G = G;
-    this.pre = pre;
     this.n = R.length;
     {
       boolean changed = true;
@@ -44,24 +48,17 @@ public class ExcludedRooms {
     return G;
   }
 
-  public int leastValidRoom(int j) {
-    int r = 1;
-    boolean conflict = true;
-    while (conflict) {
-      conflict = false;
+  public int leastAllowedRoom(int j) {
+    int r = G[j];
+    boolean excluded = true;
+    while (excluded) {
+      excluded = false;
       for (int x : R[j]) {
         if ((x == r)) {
-          conflict = true;
+          excluded = true;
         }
       }
-      if ((!conflict)) {
-        for (int k : pre[j]) {
-          if ((G[k] == r)) {
-            conflict = true;
-          }
-        }
-      }
-      if (conflict) {
+      if (excluded) {
         r = (r + 1);
       }
     }

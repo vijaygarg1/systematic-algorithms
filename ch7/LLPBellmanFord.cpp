@@ -20,7 +20,7 @@ void advance(std::vector<int>& d,
              const std::vector<std::vector<int>>& pre,
              const Matrix& w, int n) {
     std::vector<int> nd = d;
-    for (int k = 0; k < n; ++k) {
+    for (int k = 1; k < n; ++k) {
         for (int i : pre[k]) {
             if (d[i] != INF && d[i] + w[i][k] < nd[k]) nd[k] = d[i] + w[i][k];
         }

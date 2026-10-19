@@ -13,18 +13,18 @@ public class LLPKruskal {
   int[] u;
   int[] v;
   int[] parent;
-  boolean[] C;
+  boolean[] G;
   int[] rank;
   int j;
 
   private boolean forbidden(int j) {
-    if (C[j]) return false;
+    if (G[j]) return false;
     if (!((new UnionFind().find(parent, u[j]) != new UnionFind().find(parent, v[j])))) return false;
     return true;
   }
 
   private void advance() {
-    C[j] = true;
+    G[j] = true;
     new UnionFind().union(parent, rank, u[j], v[j]);
   }
 
@@ -33,7 +33,7 @@ public class LLPKruskal {
     this.v = v;
     this.parent = parent;
     this.n = u.length;
-    this.C = new boolean[n];
+    this.G = new boolean[n];
     this.rank = new int[parent.length];
     {
       boolean changed = true;
@@ -47,7 +47,7 @@ public class LLPKruskal {
         }
       }
     }
-    return C;
+    return G;
   }
 
   public static void main(String[] args) {

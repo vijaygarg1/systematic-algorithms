@@ -1,14 +1,22 @@
-// LLP-Layering: each j advances once all predecessors are fixed.
+// LLP-Layering: G[j] is the length of the longest path from a source to j.
+// The forbidden predicate is the negation of B_layer restricted to j's
+// incoming edges, so no index is forbidden exactly when B_layer holds.
+// A vertex with no predecessors is never forbidden and keeps its initial
+// label 0.  Advancing j only once all of its predecessors have reached
+// their final values -- priority(j) = max{G[i]+1 | i in pre(j)}, the
+// schedule of Section 2.9 -- advances each vertex exactly once; that
+// schedule is what the boolean `fixed` array implements in the
+// hand-written ports, and it is an efficiency choice, not part of the
+// predicate.
 
 class LLPLayering {
   int[] LLPLayering(set<int>[] pre) {
-    int[]      G      = 0;
-    boolean[]     fixed  = false;
+    int[] G = 0;
     forbidden (j) :
-      !fixed[j] && forall i in pre[j] : fixed[i]  =>
+      exists i in pre[j] : G[j] <= G[i]
+    =>
       advance : {
         G[j] = max(0, max i in pre[j] : G[i] + 1);
-        fixed[j] = true;
       };
     return G;
   }

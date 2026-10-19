@@ -1,13 +1,12 @@
 // LLP-IntervalScheduling (bxx-greedy.tex, fig:activity): jobs sorted by
 // finish time, held in a doubly linked list (prevArr/nextArr). Job 0 is
-// always fixed initially. A job j (not yet fixed or deleted) is
-// forbidden when either (a) its current list-predecessor has already
-// finished by s[j] -- advance: fix G[j] := true -- or (b) its
-// predecessor is fixed but still overlaps j -- advance: delete j from
-// the list in O(1) via the pointer update next[prev[j]] := next[j];
-// prev[next[j]] := prev[j]. This matches the book's O(1)-per-job
-// linked-list algorithm exactly, not a brute-force scan over every
-// earlier job.
+// always fixed initially. The book's two rules are written here as two
+// forbidden/advance clauses joined by `&&`, so they share one fixpoint:
+// every job is tested against both rules on each sweep. Rule 1 selects a
+// job whose list-predecessor has already finished by s[j]; rule 2 deletes
+// a job that its (selected) predecessor still overlaps, in O(1), via
+// next[prev[j]] := next[j]; prev[next[j]] := prev[j]. deleted[] records
+// the list removal that the book expresses by unlinking the node.
 
 import java.util.*;
 
@@ -23,23 +22,31 @@ public class LLPIntervalScheduling {
 
   private boolean _forbidden0(int j) {
     if (!((j > 0))) return false;
-    if (G[j]) return false;
     if (deleted[j]) return false;
-    if (!(((f[prevArr[j]] <= s[j]) || (G[prevArr[j]] && (s[j] < f[prevArr[j]]))))) return false;
+    if (G[j]) return false;
+    if (!((f[prevArr[j]] <= s[j]))) return false;
     return true;
   }
 
   private void _advance0() {
+    G[j] = true;
+  }
+
+  private boolean _forbidden1(int j) {
+    if (!((j > 0))) return false;
+    if (deleted[j]) return false;
+    if (!(G[prevArr[j]])) return false;
+    if (!((s[j] < f[prevArr[j]]))) return false;
+    return true;
+  }
+
+  private void _advance1() {
+    deleted[j] = true;
     int p = prevArr[j];
-    if ((f[p] <= s[j])) {
-      G[j] = true;
-    } else {
-      deleted[j] = true;
-      int nx = nextArr[j];
-      nextArr[p] = nx;
-      if ((nx < n)) {
-        prevArr[nx] = p;
-      }
+    int nx = nextArr[j];
+    nextArr[p] = nx;
+    if ((nx < n)) {
+      prevArr[nx] = p;
     }
   }
 
@@ -66,6 +73,10 @@ public class LLPIntervalScheduling {
         for (int j = 0; j < n; j++) {
           if (_forbidden0(j)) {
             this.j = j; _advance0();
+            changed = true;
+          }
+          if (_forbidden1(j)) {
+            this.j = j; _advance1();
             changed = true;
           }
         }

@@ -1,80 +1,83 @@
 // LLP Horn SAT, matching bxx-horn.tex Algorithm LLP-HornSAT. head[c] is
 // the consequent variable of clause c, or -1 if clause c is a pure
-// negative (goal) clause (antecedents => false). Rule 1: a definite
-// clause with all antecedents true and a false consequent forbids that
-// consequent's index; advance sets it true. Rule 2 (independent of any
-// single index): a goal clause with all antecedents true proves no
-// satisfying assignment exists above the current G; advance returns
-// Unsatisfiable (null).
-//
-// Earlier version of this file (kept for reference, not used): had no
-// representation for a goal clause at all -- every clause was assumed
-// to have a positive head variable -- so rule 2 (UNSAT detection) was
-// entirely missing, and n was derived as head.length (the number of
-// clauses, not variables).
-//
-// class LLPHornSAT {
-// boolean[] LLPHornSAT(int[][] body, int[] head) {
-// int n = head.length;
-// boolean[] G = new boolean[n];
-// forbidden (j) : hornImplied(j, G, body, head) =>
-// advance : G[j] = true;
-// return G;
-// }
-//
-// boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
-// if (G[j]) {
-// return false;
-// };
-// int c = 0;
-// while (c < body.length) {
-// if (head[c] == j) {
-// boolean allTrue = true;
-// int k = 0;
-// while (k < body[c].length) {
-// if (!G[body[c][k]]) {
-// allTrue = false;
-// };
-// k = k + 1;
-// };
-// if (allTrue) {
-// return true;
-// }
-// };
-// c = c + 1;
-// };
-// return false;
-// }
-// }
+// negative (goal) clause. The book's two rules are written here as two
+// forbidden/advance clauses joined by `&&`, so they share one fixpoint.
 
 import java.util.*;
 
 public class LLPHornSAT {
+  int n;
+  private static final boolean[] _NO_EARLY_EXIT = new boolean[0];
+  int[][] body;
+  int[] head;
+  boolean[] G;
+  int j;
+
+  private boolean _forbidden0(int j) {
+    if (!(definiteImplied(j, G, body, head))) return false;
+    return true;
+  }
+
+  private void _advance0() {
+    G[j] = true;
+  }
+
+  private boolean _forbidden1(int j) {
+    if (!(goalFired(G, body, head))) return false;
+    return true;
+  }
+
+  private boolean[] _advance1() {
+    return null;
+  }
+
   public boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
-    boolean[] G = new boolean[n];
-    boolean done = false;
-    while ((!done)) {
-      int chosen = (0 - 1);
-      int c = 0;
-      while (((c < body.length) && (chosen == (0 - 1)))) {
-        if (allTrue(body[c], G)) {
-          if ((head[c] == (0 - 1))) {
-            return null;
-          } else {
-            if ((!G[head[c]])) {
-              chosen = c;
-            }
+    this.body = body;
+    this.head = head;
+    this.n = n;
+    this.G = new boolean[n];
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int j = 0; j < n; j++) {
+          if (_forbidden0(j)) {
+            this.j = j; _advance0();
+            changed = true;
+          }
+          if (_forbidden1(j)) {
+            this.j = j; boolean[] _r = _advance1(); if (_r != _NO_EARLY_EXIT) return _r;
+            changed = true;
           }
         }
-        c = (c + 1);
-      }
-      if ((chosen == (0 - 1))) {
-        done = true;
-      } else {
-        G[head[chosen]] = true;
       }
     }
     return G;
+  }
+
+  public boolean definiteImplied(int j, boolean[] G, int[][] body, int[] head) {
+    if (G[j]) {
+      return false;
+    }
+    int c = 0;
+    while ((c < body.length)) {
+      if (((head[c] == j) && allTrue(body[c], G))) {
+        return true;
+      }
+      c = (c + 1);
+    }
+    return false;
+  }
+
+  public boolean goalFired(boolean[] G, int[][] body, int[] head) {
+    int c = 0;
+    while ((c < body.length)) {
+      if (((head[c] == (0 - 1)) && allTrue(body[c], G))) {
+        return true;
+      }
+      c = (c + 1);
+    }
+    return false;
   }
 
   public boolean allTrue(int[] vars, boolean[] G) {

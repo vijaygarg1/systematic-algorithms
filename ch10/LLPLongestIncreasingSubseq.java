@@ -1,4 +1,10 @@
-// LLP-LIS: G[j] >= G[i] + 1 for every i in pre(j) (i < j with A[i] < A[j]).
+// LLP-LIS. The book states B as two conjuncts, G[j] >= 1 and
+// G[j] >= max{G[i]+1 | i in pre(j)}, and proves it lattice-linear; one
+// `ensure` over their maximum says exactly that, so the forbidden
+// predicate and the advance are read off B rather than restated.
+// pre(j) = {i < j : A[i] < A[j]}, so priority(j) = j settles each index
+// in one advance -- the schedule the book's `fixed` array records, an
+// efficiency choice rather than part of the predicate.
 
 import java.util.*;
 
@@ -10,15 +16,16 @@ public class LLPLongestIncreasingSubseq {
   int j;
 
   private boolean forbidden(int j) {
-    boolean t1 = false;
+    int t1 = Integer.MIN_VALUE;
     for (int i : pre[j]) {
-      if ((G[j] < (G[i] + 1))) { t1 = true; break; }
+      int _v = (G[i] + 1);
+      if (_v > t1) t1 = _v;
     }
-    return t1;
+    return (!(G[j] >= Math.max(1, t1)));
   }
 
   private void advance() {
-    int m = Integer.MIN_VALUE;
+    int m = 1;
     for (int i : pre[j]) m = Math.max(m, (G[i] + 1));
     G[j] = m;
   }

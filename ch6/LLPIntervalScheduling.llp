@@ -1,13 +1,12 @@
 // LLP-IntervalScheduling (bxx-greedy.tex, fig:activity): jobs sorted by
 // finish time, held in a doubly linked list (prevArr/nextArr). Job 0 is
-// always fixed initially. A job j (not yet fixed or deleted) is
-// forbidden when either (a) its current list-predecessor has already
-// finished by s[j] -- advance: fix G[j] := true -- or (b) its
-// predecessor is fixed but still overlaps j -- advance: delete j from
-// the list in O(1) via the pointer update next[prev[j]] := next[j];
-// prev[next[j]] := prev[j]. This matches the book's O(1)-per-job
-// linked-list algorithm exactly, not a brute-force scan over every
-// earlier job.
+// always fixed initially. The book's two rules are written here as two
+// forbidden/advance clauses joined by `&&`, so they share one fixpoint:
+// every job is tested against both rules on each sweep. Rule 1 selects a
+// job whose list-predecessor has already finished by s[j]; rule 2 deletes
+// a job that its (selected) predecessor still overlaps, in O(1), via
+// next[prev[j]] := next[j]; prev[next[j]] := prev[j]. deleted[] records
+// the list removal that the book expresses by unlinking the node.
 
 class LLPIntervalScheduling {
   boolean[] LLPIntervalScheduling(int[] s, int[] f) {
@@ -20,21 +19,19 @@ class LLPIntervalScheduling {
     forall i in [0..n-1] : nextArr[i] = i + 1;
     G[0] = true;
     forbidden (j) :
-      j > 0 && !G[j] && !deleted[j] && (
-        f[prevArr[j]] <= s[j] ||
-        (G[prevArr[j]] && s[j] < f[prevArr[j]])
-      )
+      j > 0 && !deleted[j] && !G[j] && f[prevArr[j]] <= s[j]
+    =>
+      advance : { G[j] = true; }
+    &&
+    forbidden (j) :
+      j > 0 && !deleted[j] && G[prevArr[j]] && s[j] < f[prevArr[j]]
     =>
       advance : {
+        deleted[j] = true;
         int p = prevArr[j];
-        if (f[p] <= s[j]) {
-          G[j] = true;
-        } else {
-          deleted[j] = true;
-          int nx = nextArr[j];
-          nextArr[p] = nx;
-          if (nx < n) { prevArr[nx] = p; }
-        }
+        int nx = nextArr[j];
+        nextArr[p] = nx;
+        if (nx < n) { prevArr[nx] = p; }
       };
     return G;
   }

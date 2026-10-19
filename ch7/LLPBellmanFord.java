@@ -1,4 +1,6 @@
 // LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation.
+// The advance leaves G[0] alone -- the source distance is pinned at 0 -- and
+// recomputes every other G[k] from its predecessors, as in the book's box.
 
 import java.util.*;
 
@@ -6,7 +8,7 @@ public class LLPBellmanFord {
   int n;
   int[][] pre;
   int[][] w;
-  int[] G;
+  double[] G;
   int j;
 
   private boolean _forbidden0(int j) {
@@ -18,19 +20,19 @@ public class LLPBellmanFord {
   }
 
   private void _advance0() {
-    for (int k = 0; k <= n; k++) {
-      int m = G[k];
+    for (int k = 1; k < n; k++) {
+      double m = Double.POSITIVE_INFINITY;
       for (int i : pre[k]) m = Math.min(m, (G[i] + w[i][k]));
       G[k] = m;
     }
   }
 
-  public int[] LLPBellmanFord(int[][] pre, int[][] w) {
+  public double[] LLPBellmanFord(int[][] pre, int[][] w) {
     this.pre = pre;
     this.w = w;
     this.n = pre.length;
-    this.G = new int[n];
-    for (int i = 0; i < n; i++) this.G[i] = Integer.MAX_VALUE;
+    this.G = new double[n];
+    for (int i = 0; i < n; i++) this.G[i] = Double.POSITIVE_INFINITY;
     G[0] = 0;
     {
       boolean changed = true;

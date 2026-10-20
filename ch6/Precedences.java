@@ -23,9 +23,9 @@ public class Precedences {
   }
 
   private void advance() {
-    int m = Integer.MIN_VALUE;
-    for (int i : pre[j]) m = Math.max(m, (G[i] + t[i]));
-    G[j] = m;
+    int t2 = Integer.MIN_VALUE;
+    for (int i : pre[j]) t2 = Math.max(t2, (G[i] + t[i]));
+    G[j] = t2;
   }
 
   public int[] Precedences(int[][] pre, int[] t, int[] G) {

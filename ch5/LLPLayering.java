@@ -26,9 +26,9 @@ public class LLPLayering {
   }
 
   private void advance() {
-    int m = 0;
-    for (int i : pre[j]) m = Math.max(m, (G[i] + 1));
-    G[j] = m;
+    int t2 = 0;
+    for (int i : pre[j]) t2 = Math.max(t2, (G[i] + 1));
+    G[j] = t2;
   }
 
   public int[] LLPLayering(int[][] pre) {

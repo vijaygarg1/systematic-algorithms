@@ -1,44 +1,45 @@
 // 2-SAT via implication graph and SCC detection (Kosaraju's algorithm).
+//
+// Both dfs methods stay, and the pair is not redundancy: Kosaraju's two passes
+// do different jobs. dfs1 walks the FORWARD graph and pushes each vertex onto
+// `order` as it finishes, building the finish-time ordering; dfs2 walks the
+// REVERSE graph in decreasing finish order and stamps every vertex it reaches
+// with one component id. They differ in which graph they follow, what marks a
+// vertex seen (visited[] vs comp[] >= 0) and what they record. Folding them
+// into one routine behind a mode flag would save about a dozen lines and hide
+// the two-phase structure that makes Kosaraju correct.
+//
+// Literal x has index x; literal -x has index n + x. Clause (a or b) gives the
+// implications !a -> b and !b -> a.
 
 class TwoSAT {
   boolean[] TwoSAT(int[] clauseA, int[] clauseB) {
     int m = clauseA.length;
-    int n = 0;
+    // max(0, ...) covers the empty clause list, where the quantifier alone
+    // would yield -infinity.
+    int n = max(0, max i in [0..m-1] : max(abs(clauseA[i]), abs(clauseB[i])));
+    int sz = 2 * n + 2;
+    // Row width is the largest out-degree a literal can reach, not sz: each
+    // clause contributes two implications, and both can leave the SAME vertex
+    // (clause (a or a) gives !a -> a twice), so a literal can source up to 2m
+    // edges. Sizing the rows sz instead overflows whenever a literal is
+    // negated in more than 2n+2 clauses -- the common case for 2-SAT.
+    int cap = 2 * m + 1;
+    int[][] adjFwd = new int[sz][cap];
+    int[] degFwd = new int[sz];
+    int[][] adjRev = new int[sz][cap];
+    int[] degRev = new int[sz];
+
     int i = 0;
     while (i < m) {
-      int a = abs(clauseA[i]);
-      int b = abs(clauseB[i]);
-      if (a > n) { n = a; };
-      if (b > n) { n = b; };
+      addImplication(litIndex(0 - clauseA[i], n), litIndex(clauseB[i], n),
+                     adjFwd, degFwd, adjRev, degRev);
+      addImplication(litIndex(0 - clauseB[i], n), litIndex(clauseA[i], n),
+                     adjFwd, degFwd, adjRev, degRev);
       i = i + 1;
     };
-    int sz = 2 * n + 2;
-    int[][] adjFwd = new int[sz][sz];
-    int[] degFwd = new int[sz];
-    int[][] adjRev = new int[sz][sz];
-    int[] degRev = new int[sz];
-    i = 0;
-    while (i < m) {
-      int a = clauseA[i];
-      int b = clauseB[i];
-      int notA = neg(a, n);
-      int notB = neg(b, n);
-      int u1 = litIndex(notA, n);
-      int v1 = litIndex(b, n);
-      adjFwd[u1][degFwd[u1]] = v1;
-      degFwd[u1] = degFwd[u1] + 1;
-      adjRev[v1][degRev[v1]] = u1;
-      degRev[v1] = degRev[v1] + 1;
-      int u2 = litIndex(notB, n);
-      int v2 = litIndex(a, n);
-      adjFwd[u2][degFwd[u2]] = v2;
-      degFwd[u2] = degFwd[u2] + 1;
-      adjRev[v2][degRev[v2]] = u2;
-      degRev[v2] = degRev[v2] + 1;
-      i = i + 1;
-    };
-    int[] comp = new int[sz];
-    forall k in [0..sz-1] : comp[k] = 0 - 1;
+
+    // Pass 1: finish-time order on the forward graph.
     int[] order = new int[sz];
     int orderSize = 0;
     boolean[] visited = new boolean[sz];
@@ -49,31 +50,36 @@ class TwoSAT {
       };
       v = v + 1;
     };
+
+    // Pass 2: components on the reverse graph, in decreasing finish order.
+    int[] comp = new int[sz];
+    forall k in [0..sz-1] : comp[k] = 0 - 1;
     int numComp = 0;
     int idx = orderSize - 1;
     while (idx >= 0) {
-      int u = order[idx];
-      if (comp[u] < 0) {
-        dfs2(u, adjRev, degRev, comp, numComp);
+      if (comp[order[idx]] < 0) {
+        dfs2(order[idx], adjRev, degRev, comp, numComp);
         numComp = numComp + 1;
       };
       idx = idx - 1;
     };
+
+    // x is true iff its positive literal lands in the later component.
     boolean[] result = new boolean[n + 1];
-    int xi = 1;
-    while (xi <= n) {
-      int posIdx = litIndex(xi, n);
-      int negIdx = litIndex(neg(xi, n), n);
-      if (comp[posIdx] > comp[negIdx]) {
-        result[xi] = true;
-      } else {
-        result[xi] = false;
-      };
-      xi = xi + 1;
-    };
+    forall x in [1..n] : result[x] = comp[x] > comp[n + x];
     return result;
   }
 
+  // Record one implication, in the forward graph and the reverse graph at once.
+  void addImplication(int from, int to, int[][] adjFwd, int[] degFwd,
+                      int[][] adjRev, int[] degRev) {
+    adjFwd[from][degFwd[from]] = to;
+    degFwd[from] = degFwd[from] + 1;
+    adjRev[to][degRev[to]] = from;
+    degRev[to] = degRev[to] + 1;
+  }
+
+  // Forward pass: append u to `order` once every successor has finished.
   int dfs1(int u, int[][] adj, int[] deg, boolean[] visited, int[] order, int orderSize) {
     visited[u] = true;
     int i = 0;
@@ -88,6 +94,7 @@ class TwoSAT {
     return orderSize + 1;
   }
 
+  // Reverse pass: stamp u and everything reachable from it with component c.
   void dfs2(int u, int[][] adj, int[] deg, int[] comp, int c) {
     comp[u] = c;
     int i = 0;
@@ -98,15 +105,6 @@ class TwoSAT {
       };
       i = i + 1;
     }
-  }
-
-  int abs(int x) {
-    if (x < 0) { return 0 - x; };
-    return x;
-  }
-
-  int neg(int lit, int n) {
-    return 0 - lit;
   }
 
   int litIndex(int lit, int n) {

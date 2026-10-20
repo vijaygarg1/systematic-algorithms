@@ -36,7 +36,6 @@ public class LLPKnapsack {
     this.w = w;
     this.v = v;
     this.W = W;
-    this.n = w.length;
     this.n = (w.length - 1);
     this.G = new int[(n + 1)][(W + 1)];
     {

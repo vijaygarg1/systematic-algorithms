@@ -1,4 +1,13 @@
-// LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each fraction G[j] in [0,1] to its target G*[j] derived from prefix-sum of weights vs capacity W.
+// LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each
+// fraction G[j] in [0,1] to its target G*[j], read in O(1) from one
+// prefix scan of the weights.
+//
+// S is the EXCLUSIVE prefix sum, S[k] = w[0] + ... + w[k-1], with
+// S[0] = 0 -- one slot longer than w. That is what removes target's
+// j > 0 special case: the weight before item j is just S[j], and the
+// weight through item j is S[j+1], so both ends of the breakpoint test
+// are plain reads. The scan stays a sequential while loop because
+// S[i+1] depends on S[i]; a forall would not be a prefix sum.
 
 import java.util.*;
 
@@ -8,14 +17,16 @@ public class LLPFractionalKnapsack {
   double[] w;
   double W;
   double[] G;
+  double[] S;
+  int i;
   int j;
 
-  private boolean forbidden(int j) {
+  private boolean _forbidden0(int j) {
     if (!((G[j] < target(j)))) return false;
     return true;
   }
 
-  private void advance() {
+  private void _advance0() {
     G[j] = target(j);
   }
 
@@ -25,13 +36,19 @@ public class LLPFractionalKnapsack {
     this.W = W;
     this.n = v.length;
     this.G = new double[n];
+    this.S = new double[(n + 1)];
+    this.i = 0;
+    while ((i < n)) {
+      S[(i + 1)] = (S[i] + w[i]);
+      i = (i + 1);
+    }
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
+          if (_forbidden0(j)) {
+            this.j = j; _advance0();
             changed = true;
           }
         }
@@ -41,27 +58,13 @@ public class LLPFractionalKnapsack {
   }
 
   public double target(int j) {
-    double prev = prefixWeight((j - 1));
-    double cur = (prev + w[j]);
-    if ((cur <= W)) {
+    if ((S[(j + 1)] <= W)) {
       return 1.0;
-    } else {
-      if ((prev >= W)) {
-        return 0.0;
-      } else {
-        return ((W - prev) / w[j]);
-      }
     }
-  }
-
-  public double prefixWeight(int upto) {
-    double s = 0.0;
-    int i = 0;
-    while ((i <= upto)) {
-      s = (s + w[i]);
-      i = (i + 1);
+    if ((S[j] >= W)) {
+      return 0.0;
     }
-    return s;
+    return ((W - S[j]) / w[j]);
   }
 
   public static void main(String[] args) {

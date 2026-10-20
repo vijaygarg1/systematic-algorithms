@@ -18,9 +18,7 @@
 // an adjacency matrix, and it runs its n-1 passes and returns dist with
 // no extra pass and no way to report a negative cycle. Johnson needs
 // exactly that report, so calling it would drop the check the book names
-// explicitly. Giving BellmanFord.llp a matrix entry point and a failure
-// signal would let step 1 become a call too, and would cut roughly 30
-// lines from this program.
+// explicitly.
 
 import java.util.*;
 
@@ -29,75 +27,67 @@ public class Johnson {
     int n = w.length;
     int INF = Integer.MAX_VALUE;
     int[] dist = new int[n];
-    for (int i = 0; i < n; i++) {
-      dist[i] = 0;
-    }
     int k = 0;
     while ((k < (n - 1))) {
       boolean changed = false;
-      int i = 0;
-      while ((i < n)) {
-        int j = 0;
-        while ((j < n)) {
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
           if (((w[i][j] < INF) && ((dist[i] + w[i][j]) < dist[j]))) {
             dist[j] = (dist[i] + w[i][j]);
             changed = true;
           }
-          j = (j + 1);
         }
-        i = (i + 1);
       }
-      if ((!changed)) {
-        k = n;
-      } else {
+      if (changed) {
         k = (k + 1);
+      } else {
+        k = n;
       }
     }
-    int i = 0;
-    while ((i < n)) {
-      int j = 0;
-      while ((j < n)) {
-        if (((w[i][j] < INF) && ((dist[i] + w[i][j]) < dist[j]))) {
-          return null;
-        }
-        j = (j + 1);
-      }
-      i = (i + 1);
+    if (_q1(n, INF, k, dist, w)) {
+      return null;
     }
     int[] price = new int[n];
     for (int v = 0; v < n; v++) {
       price[v] = (0 - dist[v]);
     }
     int[][] wPrime = new int[n][n];
-    i = 0;
-    while ((i < n)) {
-      int j = 0;
-      while ((j < n)) {
-        if ((w[i][j] < INF)) {
-          wPrime[i][j] = ((w[i][j] + price[j]) - price[i]);
-        } else {
-          wPrime[i][j] = INF;
-        }
-        j = (j + 1);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        wPrime[i][j] = reweight(w[i][j], price[j], price[i]);
       }
-      i = (i + 1);
     }
     int[][] D = new int[n][n];
     int u = 0;
     while ((u < n)) {
       int[] distPrime = new Dijkstra().shortestPath(wPrime, u);
-      int v = 0;
-      while ((v < n)) {
-        if ((distPrime[v] < INF)) {
-          D[u][v] = ((distPrime[v] + price[u]) - price[v]);
-        } else {
-          D[u][v] = INF;
-        }
-        v = (v + 1);
+      for (int v = 0; v < n; v++) {
+        D[u][v] = reweight(distPrime[v], price[u], price[v]);
       }
       u = (u + 1);
     }
     return D;
+  }
+
+  public int reweight(int len, int plus, int minus) {
+    if ((len >= Integer.MAX_VALUE)) {
+      return Integer.MAX_VALUE;
+    }
+    return ((len + plus) - minus);
+  }
+
+  private boolean _q2(int n, int INF, int k, int i, int[] dist, int[][] w) {
+    for (int j = 0; j < n; j++) {
+      if (((w[i][j] < INF) && ((dist[i] + w[i][j]) < dist[j]))) return true;
+    }
+    return false;
+  }
+
+  private boolean _q1(int n, int INF, int k, int[] dist, int[][] w) {
+    for (int i = 0; i < n; i++) {
+      if (_q2(n, INF, k, i, dist, w)) return true;
+    }
+    return false;
   }
 
   public static void main(String[] args) {

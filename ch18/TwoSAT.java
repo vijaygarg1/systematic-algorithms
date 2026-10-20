@@ -1,51 +1,39 @@
 // 2-SAT via implication graph and SCC detection (Kosaraju's algorithm).
+//
+// Both dfs methods stay, and the pair is not redundancy: Kosaraju's two passes
+// do different jobs. dfs1 walks the FORWARD graph and pushes each vertex onto
+// `order` as it finishes, building the finish-time ordering; dfs2 walks the
+// REVERSE graph in decreasing finish order and stamps every vertex it reaches
+// with one component id. They differ in which graph they follow, what marks a
+// vertex seen (visited[] vs comp[] >= 0) and what they record. Folding them
+// into one routine behind a mode flag would save about a dozen lines and hide
+// the two-phase structure that makes Kosaraju correct.
+//
+// Literal x has index x; literal -x has index n + x. Clause (a or b) gives the
+// implications !a -> b and !b -> a.
 
 import java.util.*;
 
 public class TwoSAT {
   public boolean[] TwoSAT(int[] clauseA, int[] clauseB) {
     int m = clauseA.length;
-    int n = 0;
+    int t1 = Integer.MIN_VALUE;
+    for (int i = 0; i < m; i++) {
+      int _v = Math.max(Math.abs(clauseA[i]), Math.abs(clauseB[i]));
+      if (_v > t1) t1 = _v;
+    }
+    int n = Math.max(0, t1);
+    int sz = ((2 * n) + 2);
+    int cap = ((2 * m) + 1);
+    int[][] adjFwd = new int[sz][cap];
+    int[] degFwd = new int[sz];
+    int[][] adjRev = new int[sz][cap];
+    int[] degRev = new int[sz];
     int i = 0;
     while ((i < m)) {
-      int a = Math.abs(clauseA[i]);
-      int b = Math.abs(clauseB[i]);
-      if ((a > n)) {
-        n = a;
-      }
-      if ((b > n)) {
-        n = b;
-      }
+      addImplication(litIndex((0 - clauseA[i]), n), litIndex(clauseB[i], n), adjFwd, degFwd, adjRev, degRev);
+      addImplication(litIndex((0 - clauseB[i]), n), litIndex(clauseA[i], n), adjFwd, degFwd, adjRev, degRev);
       i = (i + 1);
-    }
-    int sz = ((2 * n) + 2);
-    int[][] adjFwd = new int[sz][sz];
-    int[] degFwd = new int[sz];
-    int[][] adjRev = new int[sz][sz];
-    int[] degRev = new int[sz];
-    i = 0;
-    while ((i < m)) {
-      int a = clauseA[i];
-      int b = clauseB[i];
-      int notA = neg(a, n);
-      int notB = neg(b, n);
-      int u1 = litIndex(notA, n);
-      int v1 = litIndex(b, n);
-      adjFwd[u1][degFwd[u1]] = v1;
-      degFwd[u1] = (degFwd[u1] + 1);
-      adjRev[v1][degRev[v1]] = u1;
-      degRev[v1] = (degRev[v1] + 1);
-      int u2 = litIndex(notB, n);
-      int v2 = litIndex(a, n);
-      adjFwd[u2][degFwd[u2]] = v2;
-      degFwd[u2] = (degFwd[u2] + 1);
-      adjRev[v2][degRev[v2]] = u2;
-      degRev[v2] = (degRev[v2] + 1);
-      i = (i + 1);
-    }
-    int[] comp = new int[sz];
-    for (int k = 0; k < sz; k++) {
-      comp[k] = (0 - 1);
     }
     int[] order = new int[sz];
     int orderSize = 0;
@@ -57,29 +45,31 @@ public class TwoSAT {
       }
       v = (v + 1);
     }
+    int[] comp = new int[sz];
+    for (int k = 0; k < sz; k++) {
+      comp[k] = (0 - 1);
+    }
     int numComp = 0;
     int idx = (orderSize - 1);
     while ((idx >= 0)) {
-      int u = order[idx];
-      if ((comp[u] < 0)) {
-        dfs2(u, adjRev, degRev, comp, numComp);
+      if ((comp[order[idx]] < 0)) {
+        dfs2(order[idx], adjRev, degRev, comp, numComp);
         numComp = (numComp + 1);
       }
       idx = (idx - 1);
     }
     boolean[] result = new boolean[(n + 1)];
-    int xi = 1;
-    while ((xi <= n)) {
-      int posIdx = litIndex(xi, n);
-      int negIdx = litIndex(neg(xi, n), n);
-      if ((comp[posIdx] > comp[negIdx])) {
-        result[xi] = true;
-      } else {
-        result[xi] = false;
-      }
-      xi = (xi + 1);
+    for (int x = 1; x <= n; x++) {
+      result[x] = (comp[x] > comp[(n + x)]);
     }
     return result;
+  }
+
+  public void addImplication(int from, int to, int[][] adjFwd, int[] degFwd, int[][] adjRev, int[] degRev) {
+    adjFwd[from][degFwd[from]] = to;
+    degFwd[from] = (degFwd[from] + 1);
+    adjRev[to][degRev[to]] = from;
+    degRev[to] = (degRev[to] + 1);
   }
 
   public int dfs1(int u, int[][] adj, int[] deg, boolean[] visited, int[] order, int orderSize) {
@@ -106,17 +96,6 @@ public class TwoSAT {
       }
       i = (i + 1);
     }
-  }
-
-  public int abs(int x) {
-    if ((x < 0)) {
-      return (0 - x);
-    }
-    return x;
-  }
-
-  public int neg(int lit, int n) {
-    return (0 - lit);
   }
 
   public int litIndex(int lit, int n) {

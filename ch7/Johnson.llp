@@ -18,85 +18,59 @@
 // an adjacency matrix, and it runs its n-1 passes and returns dist with
 // no extra pass and no way to report a negative cycle. Johnson needs
 // exactly that report, so calling it would drop the check the book names
-// explicitly. Giving BellmanFord.llp a matrix entry point and a failure
-// signal would let step 1 become a call too, and would cut roughly 30
-// lines from this program.
+// explicitly.
 
 class Johnson {
   int[][] allPairs(int[][] w) {
     int n = w.length;
     int INF = infinity;
-    // Step 1: BellmanFord from auxiliary source s* (0-weight edges to every v).
-    // Init dist[i] = 0 (the auxiliary edge); n-1 relaxation passes follow.
+
+    // Step 1: BellmanFord from an auxiliary source with a 0-weight edge to
+    // every vertex, so every dist starts at 0. Stops early once a pass
+    // changes nothing.
     int[] dist = new int[n];
-    forall i in [0..n-1] : dist[i] = 0;
     int k = 0;
     while (k < n - 1) {
       boolean changed = false;
-      int i = 0;
-      while (i < n) {
-        int j = 0;
-        while (j < n) {
-          if (w[i][j] < INF && dist[i] + w[i][j] < dist[j]) {
-            dist[j] = dist[i] + w[i][j];
-            changed = true;
-          };
-          j = j + 1;
-        };
-        i = i + 1;
-      };
-      if (!changed) {
-        k = n;
-      } else {
-        k = k + 1;
-      }
-    };
-    // One more pass: any further relaxation means negative cycle.
-    int i = 0;
-    while (i < n) {
-      int j = 0;
-      while (j < n) {
+      forall i in [0..n-1] : forall j in [0..n-1] :
         if (w[i][j] < INF && dist[i] + w[i][j] < dist[j]) {
-          return null;
+          dist[j] = dist[i] + w[i][j];
+          changed = true;
         };
-        j = j + 1;
-      };
-      i = i + 1;
+      if (changed) { k = k + 1; } else { k = n; }
     };
-    // Step 2: price[v] = -dist[v].
+
+    // One more pass: any further relaxation means a negative cycle.
+    if (exists i in [0..n-1] : (exists j in [0..n-1] :
+          (w[i][j] < INF && dist[i] + w[i][j] < dist[j]))) {
+      return null;
+    };
+
+    // Steps 2 and 3: price[v] = -dist[v], then reweight every edge.
     int[] price = new int[n];
     forall v in [0..n-1] : price[v] = 0 - dist[v];
-    // Step 3: reweight every edge.
     int[][] wPrime = new int[n][n];
-    i = 0;
-    while (i < n) {
-      int j = 0;
-      while (j < n) {
-        if (w[i][j] < INF) {
-          wPrime[i][j] = w[i][j] + price[j] - price[i];
-        } else {
-          wPrime[i][j] = INF;
-        };
-        j = j + 1;
-      };
-      i = i + 1;
-    };
+    forall i in [0..n-1] : forall j in [0..n-1] :
+      wPrime[i][j] = reweight(w[i][j], price[j], price[i]);
+
     // Step 4: Dijkstra from every source; undo the reweighting.
     int[][] D = new int[n][n];
     int u = 0;
     while (u < n) {
       int[] distPrime = Dijkstra(wPrime, u);
-      int v = 0;
-      while (v < n) {
-        if (distPrime[v] < INF) {
-          D[u][v] = distPrime[v] + price[u] - price[v];
-        } else {
-          D[u][v] = INF;
-        };
-        v = v + 1;
-      };
+      forall v in [0..n-1] :
+        D[u][v] = reweight(distPrime[v], price[u], price[v]);
       u = u + 1;
     };
     return D;
+  }
+
+  // len + plus - minus, with infinity left alone. Steps 3 and 4 are the same
+  // shift in opposite directions -- step 3 puts price[j] - price[i] onto edge
+  // (i,j), step 4 takes price[u] - price[v] back off the path (u,v) -- so both
+  // are this one helper with the two prices the other way round.
+  int reweight(int len, int plus, int minus) {
+    if (len >= infinity) { return infinity; };
+    return len + plus - minus;
   }
 }

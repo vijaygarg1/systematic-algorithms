@@ -11,6 +11,10 @@
 // ELEMENTS while the bound the compiler would otherwise infer comes from
 // the first 1D array parameter (w.length, the number of SETS) -- a
 // different count whenever sets and elements aren't equinumerous.
+//
+// S, w and G are program fields, so the aux methods read them directly
+// rather than taking them as parameters; each predicate is the quantifier it
+// is defined as, and each reduction names its own range with `where`.
 
 import java.util.*;
 
@@ -24,12 +28,12 @@ public class LLPWeightedSetCover {
   int x;
 
   private boolean _forbidden0(int x) {
-    if (!(slackMin(x, S, w, G))) return false;
+    if (!(slackMin(x))) return false;
     return true;
   }
 
   private void _advance0() {
-    G[x] = (G[x] + minRemainingBudget(x, S, w, G, m));
+    G[x] = (G[x] + minRemainingBudget(x));
   }
 
   public boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
@@ -53,80 +57,56 @@ public class LLPWeightedSetCover {
     }
     boolean[] C = new boolean[m];
     for (int s = 0; s < m; s++) {
-      C[s] = setTight(s, S, w, G);
+      C[s] = setTight(s);
     }
     return C;
   }
 
-  public double setPrice(int s, int[][] S, double[] G) {
-    double sum = 0.0;
-    int e = 0;
-    while ((e < G.length)) {
-      if ((S[s][e] == 1)) {
-        sum = (sum + G[e]);
-      }
-      e = (e + 1);
+  public double setPrice(int s) {
+    double t1 = 0;
+    for (int e = 0; e < u; e++) {
+      if (!((S[s][e] == 1))) continue;
+      t1 += G[e];
     }
-    return sum;
+    return t1;
   }
 
-  public boolean setTight(int s, int[][] S, double[] w, double[] G) {
-    return (setPrice(s, S, G) >= w[s]);
+  public boolean setTight(int s) {
+    return (setPrice(s) >= w[s]);
   }
 
-  public boolean isSlack(int e, int[][] S, double[] w, double[] G, int m) {
-    int s = 0;
-    while ((s < m)) {
-      if (((S[s][e] == 1) && setTight(s, S, w, G))) {
-        return false;
-      }
-      s = (s + 1);
+  public boolean isSlack(int e) {
+    boolean t2 = false;
+    for (int s = 0; s < m; s++) {
+      if (((S[s][e] == 1) && setTight(s))) { t2 = true; break; }
     }
-    return true;
+    return (!t2);
   }
 
-  public double minRemainingBudget(int e, int[][] S, double[] w, double[] G, int m) {
-    double best = Integer.MAX_VALUE;
-    int s = 0;
-    while ((s < m)) {
-      if ((S[s][e] == 1)) {
-        double slack = (w[s] - setPrice(s, S, G));
-        if ((slack < best)) {
-          best = slack;
-        }
-      }
-      s = (s + 1);
+  public double minRemainingBudget(int e) {
+    double t3 = Double.POSITIVE_INFINITY;
+    for (int s = 0; s < m; s++) {
+      if (!((S[s][e] == 1))) continue;
+      double _v = (w[s] - setPrice(s));
+      if (_v < t3) t3 = _v;
     }
-    return best;
+    return t3;
   }
 
-  public boolean slackMin(int x, int[][] S, double[] w, double[] G) {
-    int m = w.length;
-    int u = G.length;
-    if ((!isSlack(x, S, w, G, m))) {
-      return false;
+  public boolean slackMin(int x) {
+    boolean t4 = false;
+    for (int y = 0; y < x; y++) {
+      if ((isSlack(y) && shareSet(x, y))) { t4 = true; break; }
     }
-    int y = 0;
-    while ((y < u)) {
-      if ((((y != x) && isSlack(y, S, w, G, m)) && shareSet(x, y, S, m))) {
-        if ((y < x)) {
-          return false;
-        }
-      }
-      y = (y + 1);
-    }
-    return true;
+    return (isSlack(x) && (!t4));
   }
 
-  public boolean shareSet(int x, int y, int[][] S, int m) {
-    int s = 0;
-    while ((s < m)) {
-      if (((S[s][x] == 1) && (S[s][y] == 1))) {
-        return true;
-      }
-      s = (s + 1);
+  public boolean shareSet(int x, int y) {
+    boolean t5 = false;
+    for (int s = 0; s < m; s++) {
+      if (((S[s][x] == 1) && (S[s][y] == 1))) { t5 = true; break; }
     }
-    return false;
+    return t5;
   }
 
   public static void main(String[] args) {

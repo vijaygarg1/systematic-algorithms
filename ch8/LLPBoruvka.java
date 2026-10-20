@@ -33,6 +33,8 @@ public class LLPBoruvka {
   boolean[] T;
   int[] G;
   boolean[] active;
+  int[] mweEdge;
+  double[] mweW;
   int j;
 
   private boolean _forbidden0(int j) {
@@ -53,6 +55,8 @@ public class LLPBoruvka {
     this.T = new boolean[U.length];
     this.G = new int[n];
     this.active = new boolean[n];
+    this.mweEdge = new int[n];
+    this.mweW = new double[n];
     for (int i = 0; i < n; i++) {
       {
         G[i] = i;
@@ -60,46 +64,33 @@ public class LLPBoruvka {
       }
     }
     boolean progress = true;
-    while (((countActive(n, active) > 1) && progress)) {
-      int before = countActive(n, active);
-      int m = U.length;
-      int[] mweEdge = new int[n];
-      double[] mweW = new double[n];
+    while (((countActive() > 1) && progress)) {
+      int before = countActive();
       for (int i = 0; i < n; i++) {
-        mweEdge[i] = (-1);
+        {
+          mweEdge[i] = (0 - 1);
+          mweW[i] = Double.POSITIVE_INFINITY;
+        }
       }
-      for (int i = 0; i < n; i++) {
-        mweW[i] = Integer.MAX_VALUE;
-      }
-      int e = 0;
-      while ((e < m)) {
-        int ru = find(U[e], G);
-        int rv = find(V[e], G);
-        if (((active[ru] && active[rv]) && (ru != rv))) {
-          if ((W[e] < mweW[ru])) {
-            mweW[ru] = W[e];
-            mweEdge[ru] = e;
-          }
-          if ((W[e] < mweW[rv])) {
-            mweW[rv] = W[e];
-            mweEdge[rv] = e;
+      for (int e = 0; e < U.length; e++) {
+        {
+          int ru = find(U[e]);
+          int rv = find(V[e]);
+          if (((active[ru] && active[rv]) && (ru != rv))) {
+            if ((W[e] < mweW[ru])) {
+              mweW[ru] = W[e];
+              mweEdge[ru] = e;
+            }
+            if ((W[e] < mweW[rv])) {
+              mweW[rv] = W[e];
+              mweEdge[rv] = e;
+            }
           }
         }
-        e = (e + 1);
       }
       for (int i = 0; i < n; i++) {
         if (active[i]) {
-          if ((mweEdge[i] == (0 - 1))) {
-            G[i] = i;
-          } else {
-            int w = otherEndpoint(mweEdge[i], U, V, i);
-            int wEdge = mweEdge[w];
-            if ((((wEdge != (0 - 1)) && (otherEndpoint(wEdge, U, V, w) == i)) && (i < w))) {
-              G[i] = i;
-            } else {
-              G[i] = w;
-            }
-          }
+          G[i] = pointTo(i);
         }
       }
       {
@@ -124,19 +115,31 @@ public class LLPBoruvka {
           active[i] = false;
         }
       }
-      progress = (countActive(n, active) < before);
+      progress = (countActive() < before);
     }
     return T;
   }
 
-  public int find(int v, int[] G) {
+  public int pointTo(int i) {
+    if ((mweEdge[i] == (0 - 1))) {
+      return i;
+    }
+    int w = otherEndpoint(mweEdge[i], i);
+    int wEdge = mweEdge[w];
+    if ((((wEdge != (0 - 1)) && (otherEndpoint(wEdge, w) == i)) && (i < w))) {
+      return i;
+    }
+    return w;
+  }
+
+  public int find(int v) {
     while ((G[v] != v)) {
       v = G[v];
     }
     return v;
   }
 
-  public int countActive(int n, boolean[] active) {
+  public int countActive() {
     int t1 = 0;
     for (int i = 0; i < n; i++) {
       if (active[i]) t1++;
@@ -144,7 +147,7 @@ public class LLPBoruvka {
     return t1;
   }
 
-  public int otherEndpoint(int e, int[] U, int[] V, int v) {
+  public int otherEndpoint(int e, int v) {
     if ((U[e] == v)) {
       return V[e];
     }

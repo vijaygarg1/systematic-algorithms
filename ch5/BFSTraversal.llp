@@ -1,0 +1,27 @@
+// Sequential BFS distance from a source vertex (FIFO queue).
+
+class BFSTraversal {
+  int[] traverse(set<int>[] succ, int s) {
+    int n = succ.length;
+    int[] G = new int[n];
+    forall i in [0..n-1] : G[i] = infinity;
+    G[s] = 0;
+    // FIFO queue simulated via an int[] with head/tail indices.
+    int[] Q = new int[n];
+    int head = 0;
+    int tail = 0;
+    Q[tail] = s;
+    tail = tail + 1;
+    while (head < tail) {
+      int j = Q[head];
+      head = head + 1;
+      forall k in succ[j] :
+        if (G[k] > G[j] + 1) {
+          G[k] = G[j] + 1;
+          Q[tail] = k;
+          tail = tail + 1;
+        };
+    };
+    return G;
+  }
+}

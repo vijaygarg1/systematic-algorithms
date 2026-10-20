@@ -1,0 +1,44 @@
+// LLP parallel H_n-approximation for Set Cover: pick every set that
+// maximises coverage among its neighbours and is lex-minimal among ties.
+// A neighbour of j is another unpicked set sharing an uncovered element
+// with j; j is forbidden (i.e. should be picked) when it still covers
+// something and no neighbour outranks it.
+//
+// S and G are program fields, so the aux methods read them directly
+// rather than threading them through every call, and the tie-break scan
+// is the single `exists ... where` it is defined as.
+
+class LLPLexGreedySetCover {
+  boolean[] LLPLexGreedySetCover(int[][] S) {
+    int m = S.length;
+    int u = S[0].length;
+    boolean[] G = false;
+    forbidden (j) : isLexMaxCov(j) =>
+      advance : G[j] = true;
+    return G;
+  }
+
+  // j is unpicked, covers at least one uncovered element, and no
+  // neighbour k beats it -- more coverage, or equal coverage and a
+  // smaller index.
+  boolean isLexMaxCov(int j) {
+    return !G[j] && coverage(j) > 0
+        && !(exists k in [0..m-1] where k != j && !G[k] && shareUncovered(j, k) :
+               coverage(k) > coverage(j) || (coverage(k) == coverage(j) && k < j));
+  }
+
+  // |s_j ∩ R| where R is the set of currently uncovered elements.
+  int coverage(int j) {
+    return count e in [0..u-1] : S[j][e] == 1 && !isCovered(e);
+  }
+
+  // True iff element e is covered by some currently-selected set.
+  boolean isCovered(int e) {
+    return exists s in [0..m-1] : G[s] && S[s][e] == 1;
+  }
+
+  // True iff sets j and k share at least one currently-uncovered element.
+  boolean shareUncovered(int j, int k) {
+    return exists e in [0..u-1] : S[j][e] == 1 && S[k][e] == 1 && !isCovered(e);
+  }
+}

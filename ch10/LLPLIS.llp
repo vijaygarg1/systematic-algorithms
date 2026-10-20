@@ -1,0 +1,15 @@
+// LLP-LIS. The book states B as two conjuncts, G[j] >= 1 and
+// G[j] >= max{G[i]+1 | i in pre(j)}, and proves it lattice-linear; one
+// `ensure` over their maximum says exactly that, so the forbidden
+// predicate and the advance are read off B rather than restated.
+// pre(j) = {i < j : A[i] < A[j]}, so priority(j) = j settles each index
+// in one advance -- the schedule the book's `fixed` array records, an
+// efficiency choice rather than part of the predicate.
+
+class LLPLIS {
+  int[] LLPLIS(int[] A, set<int>[] pre) {
+    int[] G = 1;
+    ensure (j) : G[j] >= max(1, max i in pre[j] : G[i] + 1);
+    return G;
+  }
+}

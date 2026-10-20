@@ -1,0 +1,24 @@
+// Classical sequential weighted-interval-scheduling DP given p[].
+
+class WeightedIntervalScheduling {
+  int[] schedule(int[] s, int[] f, int[] w, int[] p) {
+    int n = s.length;
+    int[] opt = new int[n];
+    int[] G   = new int[n];
+    // Phase 1: compute optimal values.
+    opt[0] = 0;
+    forall cur in [1..n-1] :
+      opt[cur] = max(w[cur] + opt[p[cur]], opt[cur - 1]);
+    // Phase 2: backtrack to find selected intervals.
+    int cur = n - 1;
+    while (cur > 0) {
+      if (w[cur] + opt[p[cur]] >= opt[cur - 1]) {
+        G[cur] = 1;
+        cur = p[cur];
+      } else {
+        cur = cur - 1;
+      }
+    };
+    return G;
+  }
+}

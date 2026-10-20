@@ -28,32 +28,22 @@ class LLPBoruvka {
     boolean[] T = new boolean[U.length];
     int[] G = new int[n];
     boolean[] active = new boolean[n];
+    int[] mweEdge = new int[n];
+    double[] mweW = new double[n];
     forall i in [0..n-1] : { G[i] = i; active[i] = true; };
 
     boolean progress = true;
-    while (countActive(n, active) > 1 && progress) {
-      int before = countActive(n, active);
-      int m = U.length;
-      int[] mweEdge = new int[n];
-      double[] mweW = new double[n];
-      forall i in [0..n-1] : mweEdge[i] = -1;
-      forall i in [0..n-1] : mweW[i] = infinity;
+    while (countActive() > 1 && progress) {
+      int before = countActive();
+      forall i in [0..n-1] : { mweEdge[i] = 0 - 1; mweW[i] = infinity; };
 
-      int e = 0;
-      while (e < m) {
-        int ru = find(U[e], G);
-        int rv = find(V[e], G);
+      forall e in [0..U.length-1] : {
+        int ru = find(U[e]);
+        int rv = find(V[e]);
         if (active[ru] && active[rv] && ru != rv) {
-          if (W[e] < mweW[ru]) {
-            mweW[ru] = W[e];
-            mweEdge[ru] = e;
-          };
-          if (W[e] < mweW[rv]) {
-            mweW[rv] = W[e];
-            mweEdge[rv] = e;
-          };
+          if (W[e] < mweW[ru]) { mweW[ru] = W[e]; mweEdge[ru] = e; };
+          if (W[e] < mweW[rv]) { mweW[rv] = W[e]; mweEdge[rv] = e; };
         };
-        e = e + 1;
       };
 
       // Initialize G per the book's tie-breaking rule: G[i] := i's mwe
@@ -62,55 +52,50 @@ class LLPBoruvka {
       // cross-component edge at all (mweEdge[i] == -1, impossible under
       // the book's connected-input assumption) just stays self-rooted.
       forall i in [0..n-1] :
-        if (active[i]) {
-          if (mweEdge[i] == 0 - 1) {
-            G[i] = i;
-          } else {
-            int w = otherEndpoint(mweEdge[i], U, V, i);
-            int wEdge = mweEdge[w];
-            if (wEdge != 0 - 1 && otherEndpoint(wEdge, U, V, w) == i && i < w) {
-              G[i] = i;
-            } else {
-              G[i] = w;
-            };
-          };
-        };
+        if (active[i]) { G[i] = pointTo(i); };
 
       forbidden (j) : active[j] && G[j] != G[G[j]]  =>
         advance : G[j] = G[G[j]];
 
       // T := every active vertex's own mwe edge, when it has one.
       forall i in [0..n-1] :
-        if (active[i] && mweEdge[i] != 0 - 1) {
-          T[mweEdge[i]] = true;
-        };
+        if (active[i] && mweEdge[i] != 0 - 1) { T[mweEdge[i]] = true; };
 
       // V' := the roots; everyone else is absorbed and stays frozen.
       forall i in [0..n-1] :
-        if (active[i] && G[i] != i) {
-          active[i] = false;
-        };
-      progress = countActive(n, active) < before;
+        if (active[i] && G[i] != i) { active[i] = false; };
+      progress = countActive() < before;
     };
     return T;
+  }
+
+  // Where i points this round: its mwe neighbour, or itself when it has no
+  // cross-component edge, or when it and that neighbour are each other's mwe
+  // and i is the smaller (the book's tie-break).
+  int pointTo(int i) {
+    if (mweEdge[i] == 0 - 1) { return i; };
+    int w = otherEndpoint(mweEdge[i], i);
+    int wEdge = mweEdge[w];
+    if (wEdge != 0 - 1 && otherEndpoint(wEdge, w) == i && i < w) { return i; };
+    return w;
   }
 
   // Global find: follows G to a fixpoint. Safe for an already-absorbed
   // vertex too, since its frozen pointer still leads toward that
   // round's root, which may itself since have been absorbed further.
-  int find(int v, int[] G) {
+  int find(int v) {
     while (G[v] != v) {
       v = G[v];
     };
     return v;
   }
 
-  int countActive(int n, boolean[] active) {
-    return count i in [0..n - 1] : active[i];
+  int countActive() {
+    return count i in [0..n-1] : active[i];
   }
 
   // The endpoint of edge e other than v.
-  int otherEndpoint(int e, int[] U, int[] V, int v) {
+  int otherEndpoint(int e, int v) {
     if (U[e] == v) {
       return V[e];
     };

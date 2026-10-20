@@ -1,0 +1,40 @@
+// LLP parallel 2-approximation for Vertex Cover: pick every endpoint of a lex-minimal uncovered edge.
+
+class LLPLexMatchVertexCover {
+  boolean[] LLPLexMatchVertexCover(int[][] adj) {
+    // n must be bound explicitly: the compiler infers it from the first 1D
+    // array parameter, and this program's only parameter is 2D. Without this
+    // the field stays 0, G comes out empty and the fixpoint never runs -- the
+    // program silently returned an empty cover for every input.
+    int n = adj.length;
+    boolean[] G = false;
+    forbidden (j) :
+      exists i in [0..n-1] : isLexMinIncident(i, j)
+    =>
+      advance : G[j] = true;
+    return G;
+  }
+
+  // Edge (i, j) is uncovered and lex-minimal among all uncovered edges
+  // sharing an endpoint with it -- i.e. no smaller uncovered edge touches
+  // i or j.  Edges are ordered by (min(u,v), max(u,v)).
+  boolean isLexMinIncident(int i, int j) {
+    return adj[i][j] == 1 && !G[i] && !G[j]
+        && !(exists x in [0..n-1] : (exists y in [x+1..n-1]
+               where adj[x][y] == 1 && (x == i || x == j || y == i || y == j) :
+               (!G[x] && !G[y] && lexLess(x, y, i, j) && !(x == i && y == j))));
+  }
+
+  // Edge (a, b) is lexicographically smaller than (c, d).
+  boolean lexLess(int a, int b, int c, int d) {
+    int amin = a;
+    int amax = b;
+    if (b < a) { amin = b; amax = a; };
+    int cmin = c;
+    int cmax = d;
+    if (d < c) { cmin = d; cmax = c; };
+    if (amin < cmin) { return true; };
+    if (amin > cmin) { return false; };
+    return amax < cmax;
+  }
+}

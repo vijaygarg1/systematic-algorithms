@@ -19,9 +19,9 @@ public class LLPJohnson {
 
   private void advance() {
     for (int k = 0; k <= n; k++) {
-      int m = G[k];
-      for (int i : pre[k]) m = Math.max(m, (G[i] - w[i][k]));
-      G[k] = m;
+      int t2 = G[k];
+      for (int i : pre[k]) t2 = Math.max(t2, (G[i] - w[i][k]));
+      G[k] = t2;
     }
   }
 

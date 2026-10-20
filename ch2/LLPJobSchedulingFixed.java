@@ -17,9 +17,9 @@ public class LLPJobSchedulingFixed {
   }
 
   private void advance() {
-    int m = t[j];
-    for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
-    G[j] = m;
+    int t1 = t[j];
+    for (int i : pre[j]) t1 = Math.max(t1, (G[i] + t[j]));
+    G[j] = t1;
     fixed[j] = true;
   }
 

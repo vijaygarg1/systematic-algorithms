@@ -11,83 +11,51 @@
 // ELEMENTS while the bound the compiler would otherwise infer comes from
 // the first 1D array parameter (w.length, the number of SETS) -- a
 // different count whenever sets and elements aren't equinumerous.
+//
+// S, w and G are program fields, so the aux methods read them directly
+// rather than taking them as parameters; each predicate is the quantifier it
+// is defined as, and each reduction names its own range with `where`.
 
 class LLPWeightedSetCover {
   boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
     int m = w.length;
     int u = S[0].length;
     double[] G = new double[u];
-    forbidden (x in [0..u-1]) : slackMin(x, S, w, G) =>
-      advance : { G[x] = G[x] + minRemainingBudget(x, S, w, G, m); };
+    forbidden (x in [0..u-1]) : slackMin(x) =>
+      advance : { G[x] = G[x] + minRemainingBudget(x); };
     boolean[] C = new boolean[m];
-    forall s in [0..m-1] : C[s] = setTight(s, S, w, G);
+    forall s in [0..m-1] : C[s] = setTight(s);
     return C;
   }
 
-  double setPrice(int s, int[][] S, double[] G) {
-    double sum = 0.0;
-    int e = 0;
-    while (e < G.length) {
-      if (S[s][e] == 1) { sum = sum + G[e]; };
-      e = e + 1;
-    };
-    return sum;
+  // Sum of the prices on the elements of s.
+  double setPrice(int s) {
+    return sum e in [0..u-1] where S[s][e] == 1 : G[e];
   }
 
-  boolean setTight(int s, int[][] S, double[] w, double[] G) {
-    return setPrice(s, S, G) >= w[s];
+  boolean setTight(int s) {
+    return setPrice(s) >= w[s];
   }
 
-  boolean isSlack(int e, int[][] S, double[] w, double[] G, int m) {
-    int s = 0;
-    while (s < m) {
-      if (S[s][e] == 1 && setTight(s, S, w, G)) { return false; };
-      s = s + 1;
-    };
-    return true;
+  // e lies in no tight set.
+  boolean isSlack(int e) {
+    return !(exists s in [0..m-1] : (S[s][e] == 1 && setTight(s)));
   }
 
   // Smallest remaining budget among the sets containing element e.
-  double minRemainingBudget(int e, int[][] S, double[] w, double[] G, int m) {
-    double best = infinity;
-    int s = 0;
-    while (s < m) {
-      if (S[s][e] == 1) {
-        double slack = w[s] - setPrice(s, S, G);
-        if (slack < best) { best = slack; };
-      };
-      s = s + 1;
-    };
-    return best;
+  double minRemainingBudget(int e) {
+    return min s in [0..m-1] where S[s][e] == 1 : w[s] - setPrice(s);
   }
 
-  // True iff element x is slack and lex-minimal among every slack
-  // element sharing a set with it.
-  boolean slackMin(int x, int[][] S, double[] w, double[] G) {
-    int m = w.length;
-    int u = G.length;
-    if (!isSlack(x, S, w, G, m)) {
-      return false;
-    };
-    int y = 0;
-    while (y < u) {
-      if (y != x && isSlack(y, S, w, G, m) && shareSet(x, y, S, m)) {
-        if (y < x) {
-          return false;
-        }
-      };
-      y = y + 1;
-    };
-    return true;
+  // x is slack and lex-minimal among the slack elements sharing a set
+  // with it -- i.e. no slack element below x shares a set with x.
+  boolean slackMin(int x) {
+    return isSlack(x)
+        && !(exists y in [0..x-1] : (isSlack(y) && shareSet(x, y)));
   }
 
-  // True iff elements x and y both belong to some common set.
-  boolean shareSet(int x, int y, int[][] S, int m) {
-    int s = 0;
-    while (s < m) {
-      if (S[s][x] == 1 && S[s][y] == 1) { return true; };
-      s = s + 1;
-    };
-    return false;
+  // x and y both belong to some common set.
+  boolean shareSet(int x, int y) {
+    return exists s in [0..m-1] : (S[s][x] == 1 && S[s][y] == 1);
   }
 }

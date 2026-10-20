@@ -19,9 +19,9 @@ public class LLPBFS {
   }
 
   private void advance() {
-    int m = Integer.MAX_VALUE;
-    for (int i : pre[j]) m = Math.min(m, (G[i] + 1));
-    G[j] = m;
+    int t2 = Integer.MAX_VALUE;
+    for (int i : pre[j]) t2 = Math.min(t2, (G[i] + 1));
+    G[j] = t2;
   }
 
   public void LLPBFS(int[][] pre, int[] G) {

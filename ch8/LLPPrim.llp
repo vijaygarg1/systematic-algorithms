@@ -37,7 +37,7 @@ class LLPPrim {
                    double[][] W, double[] C, int root) {
     setBase(1);
     forbidden (j) : !fixed[j]
-                 && argMinCrossCut(j) >= 1
+                 && minCrossCut(j) < infinity
                  && minCrossCut(j) <= globalMinCrossCut()
                  && C[j] < minCrossCut(j)  =>
       advance : {
@@ -49,8 +49,22 @@ class LLPPrim {
     return C;
   }
 
-  // The vertex i that achieves the minimum weight W[i][j] among fixed
-  // neighbours of j; -1 when no fixed neighbour is incident to j.
+  // Min weight of an edge (i, j) with fixed[i] = true; infinity when no
+  // fixed neighbour is incident to j, which is also the "j has no fixed
+  // neighbour" test the forbidden predicate needs.
+  double minCrossCut(int j) {
+    return min i in [1..n] where fixed[i] : W[i][j];
+  }
+
+  // The lightest edge in the cross-cut set E'(C): the least minCrossCut
+  // over the vertices still free.  Infinity when E' is empty (every vertex
+  // fixed, or the graph disconnected).
+  double globalMinCrossCut() {
+    return min t in [1..n] where !fixed[t] : minCrossCut(t);
+  }
+
+  // The fixed neighbour i achieving minCrossCut(j).  Only the advance needs
+  // the index rather than the weight.
   int argMinCrossCut(int j) {
     int besti = 0 - 1;
     double best = infinity;
@@ -65,44 +79,17 @@ class LLPPrim {
     return besti;
   }
 
-  // Min weight of an edge (i, j) with fixed[i] = true; infinity if no
-  // such edge exists yet.
-  double minCrossCut(int j) {
-    int i = argMinCrossCut(j);
-    if (i == 0 - 1) { return infinity; };
-    return W[i][j];
-  }
-
-  // Global minimum of minCrossCut(j) over every non-fixed j, equivalently
-  // the lightest edge in the cross-cut set E'(C).  Returns infinity when
-  // E' is empty (all vertices fixed, or graph disconnected).
-  double globalMinCrossCut() {
-    return min t in [1..n] : crossCutIfFree(t);
-  }
-
-  // minCrossCut, but infinity at an already-fixed vertex, so a fixed t can
-  // never win the minimum above.  The test is load-bearing: argMinCrossCut
-  // scans the *fixed* neighbours of its argument, so it still reports a
-  // real edge for a t that is itself fixed.
-  double crossCutIfFree(int t) {
-    if (fixed[t]) { return infinity; };
-    return minCrossCut(t);
-  }
-
   // Mark every vertex whose parent chain now reaches a fixed vertex as
   // fixed.  Idempotent; reaches a fixpoint in at most n rounds.
   void propagateFixed() {
     boolean changed = true;
     while (changed) {
       changed = false;
-      int j = 1;
-      while (j <= n) {
+      forall j in [1..n] :
         if (!fixed[j] && fixed[parent[j]]) {
           fixed[j] = true;
           changed = true;
         };
-        j = j + 1;
-      };
     }
   }
 }

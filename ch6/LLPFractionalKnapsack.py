@@ -1,16 +1,21 @@
-"""LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each fraction G[j] in [0,1] to its target G*[j] derived from prefix-sum of weights vs capacity W."""
+"""LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each fraction G[j] in [0,1] to its target G*[j], read in O(1) from one prefix scan of the weights."""
 
 
-def prefix_weight(upto, w):
-    return sum(w[: upto + 1])
+def prefix_scan(w):
+    """One left-to-right scan: S[j] = w[0] + ... + w[j]."""
+    S = [0.0] * len(w)
+    run = 0.0
+    for i in range(len(w)):
+        run += w[i]
+        S[i] = run
+    return S
 
 
-def target(j, w, W):
-    """G*[j]: 1 while cumulative weight stays under W, the partial fraction
-    at the breakpoint, then 0 thereafter."""
-    prev = prefix_weight(j - 1, w) if j > 0 else 0.0
-    cur = prev + w[j]
-    if cur <= W:
+def target(j, w, W, S):
+    """G*[j], read in O(1) from S: 1 while the cumulative weight S[j] stays
+    under W, the partial fraction at the breakpoint, then 0 thereafter."""
+    prev = S[j - 1] if j > 0 else 0.0
+    if S[j] <= W:
         return 1.0
     if prev >= W:
         return 0.0
@@ -20,11 +25,12 @@ def target(j, w, W):
 def llp_fractional_knapsack(v, w, W):
     n = len(v)
     G = [0.0] * n
+    S = prefix_scan(w)
     changed = True
     while changed:
         changed = False
         for j in range(n):
-            t = target(j, w, W)
+            t = target(j, w, W, S)
             if G[j] < t:
                 G[j] = t
                 changed = True

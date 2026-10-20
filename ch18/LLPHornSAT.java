@@ -14,7 +14,7 @@ public class LLPHornSAT {
   int j;
 
   private boolean _forbidden0(int j) {
-    if (!(definiteImplied(j, G, body, head))) return false;
+    if (!(definiteImplied(j))) return false;
     return true;
   }
 
@@ -23,7 +23,7 @@ public class LLPHornSAT {
   }
 
   private boolean _forbidden1(int j) {
-    if (!(goalFired(G, body, head))) return false;
+    if (!(goalFired())) return false;
     return true;
   }
 
@@ -55,40 +55,30 @@ public class LLPHornSAT {
     return G;
   }
 
-  public boolean definiteImplied(int j, boolean[] G, int[][] body, int[] head) {
-    if (G[j]) {
-      return false;
+  public boolean definiteImplied(int j) {
+    boolean t1 = false;
+    for (int c = 0; c < body.length; c++) {
+      if (!((head[c] == j))) continue;
+      if (allTrue(c)) { t1 = true; break; }
     }
-    int c = 0;
-    while ((c < body.length)) {
-      if (((head[c] == j) && allTrue(body[c], G))) {
-        return true;
-      }
-      c = (c + 1);
-    }
-    return false;
+    return ((!G[j]) && t1);
   }
 
-  public boolean goalFired(boolean[] G, int[][] body, int[] head) {
-    int c = 0;
-    while ((c < body.length)) {
-      if (((head[c] == (0 - 1)) && allTrue(body[c], G))) {
-        return true;
-      }
-      c = (c + 1);
+  public boolean goalFired() {
+    boolean t2 = false;
+    for (int c = 0; c < body.length; c++) {
+      if (!((head[c] == (0 - 1)))) continue;
+      if (allTrue(c)) { t2 = true; break; }
     }
-    return false;
+    return t2;
   }
 
-  public boolean allTrue(int[] vars, boolean[] G) {
-    int k = 0;
-    while ((k < vars.length)) {
-      if ((!G[vars[k]])) {
-        return false;
-      }
-      k = (k + 1);
+  public boolean allTrue(int c) {
+    boolean t3 = true;
+    for (int k = 0; k < body[c].length; k++) {
+      if (!(G[body[c][k]])) { t3 = false; break; }
     }
-    return true;
+    return t3;
   }
 
   public static void main(String[] args) {

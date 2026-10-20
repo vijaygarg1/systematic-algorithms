@@ -5,7 +5,7 @@
 // edge is slack when neither endpoint is tight; slackMin(u,v) further
 // requires {u,v} to be lex-minimal among every slack edge sharing an
 // endpoint with it -- the same lex-minimality check as
-// LLPLexicallyFirstVertexCover, just over slack edges instead of
+// LLPLexMatchVertexCover, just over slack edges instead of
 // uncovered ones. Advancing raises the edge's price by the smaller of
 // its two endpoints' remaining budgets, tightening at least one.
 
@@ -22,12 +22,12 @@ public class LLPWeightedVertexCover {
 
   private boolean _forbidden0(int u, int v) {
     if (!((u < v))) return false;
-    if (!(slackMin(u, v, adj, w, G))) return false;
+    if (!(slackMin(u, v))) return false;
     return true;
   }
 
   private void _advance0() {
-    double step = Math.min((w[u] - price(u, adj, G, nv)), (w[v] - price(v, adj, G, nv)));
+    double step = Math.min((w[u] - price(u)), (w[v] - price(v)));
     G[u][v] = (G[u][v] + step);
     G[v][u] = G[u][v];
   }
@@ -54,48 +54,39 @@ public class LLPWeightedVertexCover {
     }
     boolean[] C = new boolean[nv];
     for (int i = 0; i < nv; i++) {
-      C[i] = tight(i, adj, w, G, nv);
+      C[i] = tight(i);
     }
     return C;
   }
 
-  public double price(int v, int[][] adj, double[][] G, int nv) {
+  public double price(int v) {
     double t1 = 0;
     for (int u = 0; u < nv; u++) {
-      t1 += (G[u][v] * adj[u][v]);
+      if (!((adj[u][v] == 1))) continue;
+      t1 += G[u][v];
     }
     return t1;
   }
 
-  public boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {
-    return (price(v, adj, G, nv) >= w[v]);
+  public boolean tight(int v) {
+    return (price(v) >= w[v]);
   }
 
-  public boolean slack(int u, int v, int[][] adj, double[] w, double[][] G, int nv) {
-    return ((!tight(u, adj, w, G, nv)) && (!tight(v, adj, w, G, nv)));
+  public boolean slack(int u, int v) {
+    return ((!tight(u)) && (!tight(v)));
   }
 
-  public boolean slackMin(int u, int v, int[][] adj, double[] w, double[][] G) {
-    int nv = w.length;
-    if (((adj[u][v] != 1) || (!slack(u, v, adj, w, G, nv)))) {
-      return false;
-    }
-    int x = 0;
-    while ((x < nv)) {
-      int y = (x + 1);
-      while ((y < nv)) {
-        if (((adj[x][y] == 1) && slack(x, y, adj, w, G, nv))) {
-          if (((((x == u) || (x == v)) || (y == u)) || (y == v))) {
-            if ((lexLess(x, y, u, v) && (!((x == u) && (y == v))))) {
-              return false;
-            }
-          }
-        }
-        y = (y + 1);
+  public boolean slackMin(int u, int v) {
+    boolean t2 = false;
+    for (int x = 0; x < nv; x++) {
+      boolean t3 = false;
+      for (int y = (x + 1); y < nv; y++) {
+        if (!(((adj[x][y] == 1) && ((((x == u) || (x == v)) || (y == u)) || (y == v))))) continue;
+        if (((slack(x, y) && lexLess(x, y, u, v)) && (!((x == u) && (y == v))))) { t3 = true; break; }
       }
-      x = (x + 1);
+      if (t3) { t2 = true; break; }
     }
-    return true;
+    return (((adj[u][v] == 1) && slack(u, v)) && (!t2));
   }
 
   public boolean lexLess(int a, int b, int c, int d) {

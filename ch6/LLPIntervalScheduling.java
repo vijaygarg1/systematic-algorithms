@@ -54,7 +54,6 @@ public class LLPIntervalScheduling {
     this.s = s;
     this.f = f;
     this.n = s.length;
-    this.n = s.length;
     this.G = new boolean[n];
     this.deleted = new boolean[n];
     this.prevArr = new int[n];

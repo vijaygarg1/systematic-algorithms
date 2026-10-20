@@ -21,9 +21,9 @@ public class LLPBellmanFord {
 
   private void _advance0() {
     for (int k = 1; k < n; k++) {
-      double m = Double.POSITIVE_INFINITY;
-      for (int i : pre[k]) m = Math.min(m, (G[i] + w[i][k]));
-      G[k] = m;
+      double t2 = Double.POSITIVE_INFINITY;
+      for (int i : pre[k]) t2 = Math.min(t2, (G[i] + w[i][k]));
+      G[k] = t2;
     }
   }
 

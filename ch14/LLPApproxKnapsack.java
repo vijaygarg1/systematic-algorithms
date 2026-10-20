@@ -13,8 +13,7 @@
 // to a *leading, uninterrupted run* of declarations at the top of the
 // entry method. The preprocessing is therefore written as aggregate
 // expressions -- filter, map, max, sum -- rather than loops, so each step
-// stays a single declaration and the run is never broken. Only the 2-D
-// table fill still needs a helper.
+// stays a single declaration and the run is never broken.
 //
 // The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
 // Vp+1 individually, since the compiler infers one bound for every index
@@ -76,7 +75,12 @@ public class LLPApproxKnapsack {
     this.vPrime = _q5(i, p);
     this.Vp = _q6(i, p);
     this.INF = (1 + _q7(i, p));
-    this.D = initTable(nf, Vp, INF);
+    this.D = new int[(nf + 1)][(Vp + 1)];
+    for (int a = 0; a <= nf; a++) {
+      for (int b = 1; b <= Vp; b++) {
+        D[a][b] = INF;
+      }
+    }
     n = (Math.max(nf, Vp) + 1);
     {
       boolean changed = true;
@@ -100,23 +104,6 @@ public class LLPApproxKnapsack {
     for (int _i = 0; _i < t8.length; _i++) t8[_i] = t8_acc.get(_i);
     int[] reach = t8;
     return reach[(reach.length - 1)];
-  }
-
-  public int[][] initTable(int nf, int Vp, int INF) {
-    int[][] D = new int[(nf + 1)][(Vp + 1)];
-    int i = 0;
-    while ((i <= nf)) {
-      int p = 0;
-      while ((p <= Vp)) {
-        D[i][p] = INF;
-        if ((p == 0)) {
-          D[i][p] = 0;
-        }
-        p = (p + 1);
-      }
-      i = (i + 1);
-    }
-    return D;
   }
 
   private int[] _q1(int i, int p) {

@@ -30,9 +30,9 @@ public class FastComponents {
   }
 
   private void _advance1() {
-    int m = Integer.MIN_VALUE;
-    for (int i : adj[j]) m = Math.max(m, G[i]);
-    G[j] = m;
+    int t2 = Integer.MIN_VALUE;
+    for (int i : adj[j]) t2 = Math.max(t2, G[i]);
+    G[j] = t2;
   }
 
   public int[] FastComponents(int[][] adj) {

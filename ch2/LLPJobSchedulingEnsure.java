@@ -19,9 +19,9 @@ public class LLPJobSchedulingEnsure {
   }
 
   private void advance() {
-    int m = Integer.MIN_VALUE;
-    for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
-    G[j] = m;
+    int t2 = Integer.MIN_VALUE;
+    for (int i : pre[j]) t2 = Math.max(t2, (G[i] + t[j]));
+    G[j] = t2;
   }
 
   public int[] LLPJobSchedulingEnsure(int[] t, int[][] pre) {

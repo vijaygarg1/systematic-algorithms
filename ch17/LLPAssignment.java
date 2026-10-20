@@ -1,15 +1,17 @@
-// LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden
-// when item j belongs to an inclusion-minimal overdemanded set J (found
-// via alternating-path reachability from an unmatched bidder, the
-// standard witness for a violated Hall's condition); advance then
-// recomputes that same set J and the shared slack-jump
-// delta := min over bidders b demanding into J of [b's best surplus -
-// b's best surplus using an item outside J], and raises EVERY item in
-// J by that one shared delta -- exactly the book's rule
+// LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden when
+// item j belongs to an inclusion-minimal overdemanded set J (found via
+// alternating-path reachability from an unmatched bidder, the standard witness
+// for a violated Hall's condition); advance raises EVERY item in J by one
+// shared slack-jump delta := min over bidders demanding into J of [best
+// surplus - best surplus using an item outside J] -- the book's
 // "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
-// See LLPAssignment.llp in this same directory for the equivalent
-// procedural \While{true} form (bxx-assignment.tex Algorithm
-// LLP-Assignment) that reaches the identical clearing price.
+//
+// J depends only on G, so it is computed ONCE per value of G and held in the
+// fields itemInJ/bidderInB: the forbidden test refreshes it when stale and
+// then just reads itemInJ[j], and the advance consumes the same arrays and
+// marks them stale. The previous version recomputed the whole matching and
+// reachability inside every forbidden(j) call -- n times per sweep -- and
+// once more inside the advance.
 
 import java.util.*;
 
@@ -18,15 +20,19 @@ public class LLPAssignment {
   int[][] v;
   int m;
   int[] G;
+  boolean[] itemInJ;
+  boolean[] bidderInB;
+  int[] partner;
+  boolean fresh;
   int j;
 
-  private boolean _forbidden0(int j) {
-    if (!(inOverdemandedSet(j, v, G))) return false;
+  private boolean forbidden(int j) {
+    if (!(overdemanded(j))) return false;
     return true;
   }
 
-  private void _advance0() {
-    raiseOverdemandedSet(j, v, G);
+  private void advance() {
+    raiseJ();
   }
 
   public int[] LLPAssignment(int[][] v) {
@@ -34,16 +40,17 @@ public class LLPAssignment {
     this.n = v[0].length;
     this.m = v.length;
     this.G = new int[n];
-    for (int k = 0; k < n; k++) {
-      G[k] = 0;
-    }
+    this.itemInJ = new boolean[n];
+    this.bidderInB = new boolean[m];
+    this.partner = new int[n];
+    this.fresh = false;
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
-          if (_forbidden0(j)) {
-            this.j = j; _advance0();
+          if (forbidden(j)) {
+            this.j = j; advance();
             changed = true;
           }
         }
@@ -52,143 +59,116 @@ public class LLPAssignment {
     return G;
   }
 
-  public boolean witnessSet(int[][] v, int[] G, boolean[] itemInJ, boolean[] bidderInB) {
-    int n = G.length;
-    int m = v.length;
-    int[] partner = new int[n];
-    for (int k = 0; k < n; k++) {
-      partner[k] = (0 - 1);
-    }
-    int b = 0;
-    while ((b < m)) {
-      boolean[] seen = new boolean[n];
-      tryMatch(b, v, G, partner, seen);
-      b = (b + 1);
-    }
-    boolean[] bidderMatched = new boolean[m];
-    int i = 0;
-    while ((i < n)) {
-      if ((partner[i] != (0 - 1))) {
-        bidderMatched[partner[i]] = true;
-      }
-      i = (i + 1);
-    }
-    int unmatched = (0 - 1);
-    b = 0;
-    while (((b < m) && (unmatched == (0 - 1)))) {
-      if ((!bidderMatched[b])) {
-        unmatched = b;
-      }
-      b = (b + 1);
-    }
-    if ((unmatched == (0 - 1))) {
-      return false;
-    }
-    reach(unmatched, v, G, partner, itemInJ, bidderInB);
-    return true;
-  }
-
-  public boolean inOverdemandedSet(int j, int[][] v, int[] G) {
-    int n = G.length;
-    int m = v.length;
-    boolean[] itemInJ = new boolean[n];
-    boolean[] bidderInB = new boolean[m];
-    if ((!witnessSet(v, G, itemInJ, bidderInB))) {
-      return false;
-    }
+  public boolean overdemanded(int j) {
+    refresh();
     return itemInJ[j];
   }
 
-  public void raiseOverdemandedSet(int j, int[][] v, int[] G) {
-    int n = G.length;
-    int m = v.length;
-    boolean[] itemInJ = new boolean[n];
-    boolean[] bidderInB = new boolean[m];
-    witnessSet(v, G, itemInJ, bidderInB);
-    int delta = Integer.MAX_VALUE;
-    int b = 0;
-    b = 0;
-    while ((b < m)) {
-      if (bidderInB[b]) {
-        int best = bestSurplus(b, v, G);
-        int bestOutside = bestSurplusOutside(b, v, G, itemInJ);
-        int gap = (best - bestOutside);
-        delta = Math.min(delta, gap);
+  public void refresh() {
+    if ((!fresh)) {
+      for (int i = 0; i < n; i++) {
+        {
+          itemInJ[i] = false;
+          partner[i] = (0 - 1);
+        }
       }
-      b = (b + 1);
+      for (int b = 0; b < m; b++) {
+        bidderInB[b] = false;
+      }
+      for (int b = 0; b < m; b++) {
+        {
+          boolean[] seen = new boolean[n];
+          tryMatch(b, seen);
+        }
+      }
+      int u = firstUnmatched();
+      if ((u >= 0)) {
+        reach(u);
+      }
+      fresh = true;
     }
-    int i = 0;
-    while ((i < n)) {
+  }
+
+  public void raiseJ() {
+    int t1 = Integer.MAX_VALUE;
+    for (int b = 0; b < m; b++) {
+      if (!(bidderInB[b])) continue;
+      int _v = (bestSurplus(b) - bestOutside(b));
+      if (_v < t1) t1 = _v;
+    }
+    int delta = t1;
+    for (int i = 0; i < n; i++) {
       if (itemInJ[i]) {
         G[i] = (G[i] + delta);
       }
-      i = (i + 1);
     }
+    fresh = false;
   }
 
-  public int bestSurplus(int b, int[][] v, int[] G) {
-    int n = G.length;
-    int best = (0 - Integer.MAX_VALUE);
-    int i = 0;
-    while ((i < n)) {
-      int s = (v[b][i] - G[i]);
-      best = Math.max(best, s);
-      i = (i + 1);
-    }
-    return best;
-  }
-
-  public int bestSurplusOutside(int b, int[][] v, int[] G, boolean[] itemInJ) {
-    int n = G.length;
-    int best = (0 - Integer.MAX_VALUE);
-    int i = 0;
-    while ((i < n)) {
-      if ((!itemInJ[i])) {
-        int s = (v[b][i] - G[i]);
-        best = Math.max(best, s);
+  public int firstUnmatched() {
+    int b = 0;
+    while ((b < m)) {
+      if ((!_q2(b))) {
+        return b;
       }
-      i = (i + 1);
+      b = (b + 1);
     }
-    return best;
+    return (0 - 1);
   }
 
-  public void reach(int b, int[][] v, int[] G, int[] partner, boolean[] itemInJ, boolean[] bidderInB) {
+  public int bestSurplus(int b) {
+    int t3 = Integer.MIN_VALUE;
+    for (int i = 0; i < n; i++) {
+      int _v = (v[b][i] - G[i]);
+      if (_v > t3) t3 = _v;
+    }
+    return t3;
+  }
+
+  public int bestOutside(int b) {
+    int t4 = Integer.MIN_VALUE;
+    for (int i = 0; i < n; i++) {
+      if (!((!itemInJ[i]))) continue;
+      int _v = (v[b][i] - G[i]);
+      if (_v > t4) t4 = _v;
+    }
+    return t4;
+  }
+
+  public void reach(int b) {
     if ((!bidderInB[b])) {
       bidderInB[b] = true;
-      int n = G.length;
-      int best = bestSurplus(b, v, G);
-      int i = 0;
-      while ((i < n)) {
+      int best = bestSurplus(b);
+      for (int i = 0; i < n; i++) {
         if ((((v[b][i] - G[i]) == best) && (!itemInJ[i]))) {
           itemInJ[i] = true;
           if ((partner[i] != (0 - 1))) {
-            reach(partner[i], v, G, partner, itemInJ, bidderInB);
+            reach(partner[i]);
           }
         }
-        i = (i + 1);
       }
     }
   }
 
-  public boolean tryMatch(int b, int[][] v, int[] G, int[] partner, boolean[] seen) {
-    int n = G.length;
-    int bestSurplus = (0 - Integer.MAX_VALUE);
+  public boolean tryMatch(int b, boolean[] seen) {
+    int best = bestSurplus(b);
     int i = 0;
     while ((i < n)) {
-      int s = (v[b][i] - G[i]);
-      bestSurplus = Math.max(bestSurplus, s);
-      i = (i + 1);
-    }
-    i = 0;
-    while ((i < n)) {
-      if ((((v[b][i] - G[i]) == bestSurplus) && (!seen[i]))) {
+      if ((((v[b][i] - G[i]) == best) && (!seen[i]))) {
         seen[i] = true;
-        if (((partner[i] == (0 - 1)) || tryMatch(partner[i], v, G, partner, seen))) {
+        if (((partner[i] == (0 - 1)) || tryMatch(partner[i], seen))) {
           partner[i] = b;
           return true;
         }
       }
       i = (i + 1);
+    }
+    return false;
+  }
+
+  private boolean _q2(int b) {
+    for (int i = 0; i < n; i++) {
+      if ((partner[i] == b)) return true;
     }
     return false;
   }

@@ -1,167 +1,104 @@
-// LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden
-// when item j belongs to an inclusion-minimal overdemanded set J (found
-// via alternating-path reachability from an unmatched bidder, the
-// standard witness for a violated Hall's condition); advance then
-// recomputes that same set J and the shared slack-jump
-// delta := min over bidders b demanding into J of [b's best surplus -
-// b's best surplus using an item outside J], and raises EVERY item in
-// J by that one shared delta -- exactly the book's rule
+// LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden when
+// item j belongs to an inclusion-minimal overdemanded set J (found via
+// alternating-path reachability from an unmatched bidder, the standard witness
+// for a violated Hall's condition); advance raises EVERY item in J by one
+// shared slack-jump delta := min over bidders demanding into J of [best
+// surplus - best surplus using an item outside J] -- the book's
 // "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
-// See LLPAssignment.llp in this same directory for the equivalent
-// procedural \While{true} form (bxx-assignment.tex Algorithm
-// LLP-Assignment) that reaches the identical clearing price.
+//
+// J depends only on G, so it is computed ONCE per value of G and held in the
+// fields itemInJ/bidderInB: the forbidden test refreshes it when stale and
+// then just reads itemInJ[j], and the advance consumes the same arrays and
+// marks them stale. The previous version recomputed the whole matching and
+// reachability inside every forbidden(j) call -- n times per sweep -- and
+// once more inside the advance.
+
 class LLPAssignment {
   int[] LLPAssignment(int[][] v) {
     int n = v[0].length;
     int m = v.length;
     int[] G = new int[n];
-    forall k in [0..n-1] : G[k] = 0;
-    forbidden (j) : inOverdemandedSet(j, v, G) =>
-      advance : raiseOverdemandedSet(j, v, G);
+    boolean[] itemInJ = new boolean[n];
+    boolean[] bidderInB = new boolean[m];
+    int[] partner = new int[n];
+    boolean fresh = false;
+    forbidden (j) : overdemanded(j) =>
+      advance : raiseJ();
     return G;
   }
 
-  // The witness set for a violated Hall's condition: run a maximum
-  // matching of the current tight-edge (max-surplus) graph, take a
-  // bidder it leaves unmatched, and mark in itemInJ/bidderInB
-  // everything reachable from that bidder by alternating paths. The
-  // marked items are an overdemanded set -- not necessarily unique,
-  // but always inclusion-valid. Returns false, leaving both arrays
-  // clear, when the matching is perfect and no such set exists.
-  // Both the forbidden test and the advance need exactly this, so it
-  // is computed in one place rather than twice.
-  boolean witnessSet(int[][] v, int[] G, boolean[] itemInJ, boolean[] bidderInB) {
-    int n = G.length;
-    int m = v.length;
-    int[] partner = new int[n];
-    forall k in [0..n-1] : partner[k] = 0 - 1;
-    int b = 0;
-    while (b < m) {
-      boolean[] seen = new boolean[n];
-      tryMatch(b, v, G, partner, seen);
-      b = b + 1;
-    };
-    boolean[] bidderMatched = new boolean[m];
-    int i = 0;
-    while (i < n) {
-      if (partner[i] != 0 - 1) { bidderMatched[partner[i]] = true; };
-      i = i + 1;
-    };
-    int unmatched = 0 - 1;
-    b = 0;
-    while (b < m && unmatched == (0 - 1)) {
-      if (!bidderMatched[b]) { unmatched = b; };
-      b = b + 1;
-    };
-    if (unmatched == (0 - 1)) {
-      return false;
-    };
-    reach(unmatched, v, G, partner, itemInJ, bidderInB);
-    return true;
-  }
-
-  // True iff item j belongs to the witness set.
-  boolean inOverdemandedSet(int j, int[][] v, int[] G) {
-    int n = G.length;
-    int m = v.length;
-    boolean[] itemInJ = new boolean[n];
-    boolean[] bidderInB = new boolean[m];
-    if (!witnessSet(v, G, itemInJ, bidderInB)) {
-      return false;
-    };
+  // True iff item j is in the witness set for the current G.
+  boolean overdemanded(int j) {
+    refresh();
     return itemInJ[j];
   }
 
-  // Raises every item of the witness set J by one shared slack-jump
-  // delta: the least, over the bidders demanding into J, of the drop
-  // in surplus from their best item to their best item outside J.
-  void raiseOverdemandedSet(int j, int[][] v, int[] G) {
-    int n = G.length;
-    int m = v.length;
-    boolean[] itemInJ = new boolean[n];
-    boolean[] bidderInB = new boolean[m];
-    witnessSet(v, G, itemInJ, bidderInB);
-    int delta = infinity;
-    int b = 0;
-    b = 0;
-    while (b < m) {
-      if (bidderInB[b]) {
-        int best = bestSurplus(b, v, G);
-        int bestOutside = bestSurplusOutside(b, v, G, itemInJ);
-        int gap = best - bestOutside;
-        delta = min(delta, gap);
+  // Rebuild itemInJ/bidderInB when G has moved since they were last built:
+  // match the tight-edge graph, then mark everything alternating-reachable
+  // from a bidder it leaves unmatched. A perfect matching leaves both arrays
+  // clear, so no index is forbidden.
+  void refresh() {
+    if (!fresh) {
+      forall i in [0..n-1] : { itemInJ[i] = false; partner[i] = 0 - 1; };
+      forall b in [0..m-1] : bidderInB[b] = false;
+      forall b in [0..m-1] : {
+        boolean[] seen = new boolean[n];
+        tryMatch(b, seen);
       };
+      int u = firstUnmatched();
+      if (u >= 0) { reach(u); };
+      fresh = true;
+    }
+  }
+
+  // Raise every item of J by the one shared slack jump: the least, over the
+  // bidders demanding into J, of the drop from their best surplus to their
+  // best surplus outside J.
+  void raiseJ() {
+    int delta = min b in [0..m-1] where bidderInB[b] : bestSurplus(b) - bestOutside(b);
+    forall i in [0..n-1] : if (itemInJ[i]) { G[i] = G[i] + delta; };
+    fresh = false;
+  }
+
+  // The first bidder the matching leaves unmatched, or -1 if it is perfect.
+  int firstUnmatched() {
+    int b = 0;
+    while (b < m) {
+      if (!(exists i in [0..n-1] : partner[i] == b)) { return b; };
       b = b + 1;
     };
-    int i = 0;
-    while (i < n) {
-      if (itemInJ[i]) { G[i] = G[i] + delta; };
-      i = i + 1;
-    }
+    return 0 - 1;
   }
 
-  int bestSurplus(int b, int[][] v, int[] G) {
-    int n = G.length;
-    int best = 0 - infinity;
-    int i = 0;
-    while (i < n) {
-      int s = v[b][i] - G[i];
-      best = max(best, s);
-      i = i + 1;
-    };
-    return best;
+  int bestSurplus(int b) {
+    return max i in [0..n-1] : v[b][i] - G[i];
   }
 
-  // Best surplus available to bidder b using an item NOT in J.
-  int bestSurplusOutside(int b, int[][] v, int[] G, boolean[] itemInJ) {
-    int n = G.length;
-    int best = 0 - infinity;
-    int i = 0;
-    while (i < n) {
-      if (!itemInJ[i]) {
-        int s = v[b][i] - G[i];
-        best = max(best, s);
-      };
-      i = i + 1;
-    };
-    return best;
+  // bestSurplus restricted to the items outside J.
+  int bestOutside(int b) {
+    return max i in [0..n-1] where !itemInJ[i] : v[b][i] - G[i];
   }
 
-  // Marks, in itemInJ/bidderInB, every item and bidder reachable from
-  // bidder b by alternating paths in the tight-edge graph w.r.t. the
-  // current matching `partner`.
-  void reach(int b, int[][] v, int[] G, int[] partner, boolean[] itemInJ, boolean[] bidderInB) {
+  // Mark every item and bidder alternating-reachable from bidder b.
+  void reach(int b) {
     if (!bidderInB[b]) {
       bidderInB[b] = true;
-      int n = G.length;
-      int best = bestSurplus(b, v, G);
-      int i = 0;
-      while (i < n) {
+      int best = bestSurplus(b);
+      forall i in [0..n-1] :
         if (v[b][i] - G[i] == best && !itemInJ[i]) {
           itemInJ[i] = true;
-          if (partner[i] != 0 - 1) {
-            reach(partner[i], v, G, partner, itemInJ, bidderInB);
-          }
+          if (partner[i] != 0 - 1) { reach(partner[i]); }
         };
-        i = i + 1;
-      };
     }
   }
 
-  boolean tryMatch(int b, int[][] v, int[] G, int[] partner, boolean[] seen) {
-    int n = G.length;
-    int bestSurplus = 0 - infinity;
+  boolean tryMatch(int b, boolean[] seen) {
+    int best = bestSurplus(b);
     int i = 0;
     while (i < n) {
-      int s = v[b][i] - G[i];
-      bestSurplus = max(bestSurplus, s);
-      i = i + 1;
-    };
-    i = 0;
-    while (i < n) {
-      if (v[b][i] - G[i] == bestSurplus && !seen[i]) {
+      if (v[b][i] - G[i] == best && !seen[i]) {
         seen[i] = true;
-        if (partner[i] == 0 - 1 || tryMatch(partner[i], v, G, partner, seen)) {
+        if (partner[i] == 0 - 1 || tryMatch(partner[i], seen)) {
           partner[i] = b;
           return true;
         }

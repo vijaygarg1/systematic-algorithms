@@ -6,38 +6,22 @@ class LLPQHornSAT {
   boolean[] LLPQHornSAT(int[][] body1, int[] head1, int[][] clauses2, int n1, int n2) {
     boolean[] G = new boolean[n1];
     boolean[] H = new boolean[n2];
-    // Phase 1: solve Horn clauses on X variables
-    int j = 0;
-    while (j < n1) {
-      G[j] = false;
-      j = j + 1;
-    };
-    forbidden (j) : hornImplied(j, G, body1, head1) =>
+    // Phase 1: solve Horn clauses on X variables.  G and H start all-false,
+    // which is Java's default for a fresh boolean[].
+    forbidden (j) : hornImplied(j) =>
       advance : G[j] = true;
     // Phase 2: substitute X values into Type-2 clauses, solve 2-SAT on Y
-    j = 0;
-    while (j < n2) {
-      H[j] = false;
-      j = j + 1;
-    };
     return G;
   }
 
-  boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
-    if (G[j]) { return false; };
-    int c = 0;
-    while (c < body.length) {
-      if (head[c] == j) {
-        boolean allTrue = true;
-        int k = 0;
-        while (k < body[c].length) {
-          if (!G[body[c][k]]) { allTrue = false; };
-          k = k + 1;
-        };
-        if (allTrue) { return true; }
-      };
-      c = c + 1;
-    };
-    return false;
+  // Some definite clause has all antecedents true and consequent j false.
+  boolean hornImplied(int j) {
+    return !G[j]
+        && (exists c in [0..body1.length-1] where head1[c] == j : allTrue(c));
+  }
+
+  // Every antecedent of clause c is true.
+  boolean allTrue(int c) {
+    return forall k in [0..body1[c].length-1] : G[body1[c][k]];
   }
 }

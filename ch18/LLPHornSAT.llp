@@ -46,41 +46,27 @@
 class LLPHornSAT {
   boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
     boolean[] G = new boolean[n];
-    forbidden (j) : definiteImplied(j, G, body, head) =>
+    forbidden (j) : definiteImplied(j) =>
       advance : { G[j] = true; }
     &&
-    forbidden (j) : goalFired(G, body, head) =>
+    forbidden (j) : goalFired() =>
       advance : { return null; };
     return G;
   }
 
   // Some definite clause has all antecedents true and consequent j false.
-  boolean definiteImplied(int j, boolean[] G, int[][] body, int[] head) {
-    if (G[j]) { return false; };
-    int c = 0;
-    while (c < body.length) {
-      if (head[c] == j && allTrue(body[c], G)) { return true; };
-      c = c + 1;
-    };
-    return false;
+  boolean definiteImplied(int j) {
+    return !G[j]
+        && (exists c in [0..body.length-1] where head[c] == j : allTrue(c));
   }
 
   // Some pure negative clause has all its antecedents true.
-  boolean goalFired(boolean[] G, int[][] body, int[] head) {
-    int c = 0;
-    while (c < body.length) {
-      if (head[c] == (0 - 1) && allTrue(body[c], G)) { return true; };
-      c = c + 1;
-    };
-    return false;
+  boolean goalFired() {
+    return exists c in [0..body.length-1] where head[c] == (0 - 1) : allTrue(c);
   }
 
-  boolean allTrue(int[] vars, boolean[] G) {
-    int k = 0;
-    while (k < vars.length) {
-      if (!G[vars[k]]) { return false; };
-      k = k + 1;
-    };
-    return true;
+  // Every antecedent of clause c is true.
+  boolean allTrue(int c) {
+    return forall k in [0..body[c].length-1] : G[body[c][k]];
   }
 }

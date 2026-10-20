@@ -34,7 +34,6 @@ public class MandatoryIntervals {
     this.f = f;
     this.S = S;
     this.n = s.length;
-    this.n = s.length;
     this.G = new boolean[n];
     {
       boolean changed = true;

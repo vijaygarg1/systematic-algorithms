@@ -15,12 +15,12 @@ public class LLPQHornSAT {
   boolean[] H;
   int j;
 
-  private boolean _forbidden0(int j) {
-    if (!(hornImplied(j, G, body1, head1))) return false;
+  private boolean forbidden(int j) {
+    if (!(hornImplied(j))) return false;
     return true;
   }
 
-  private void _advance0() {
+  private void advance() {
     G[j] = true;
   }
 
@@ -33,53 +33,36 @@ public class LLPQHornSAT {
     this.n = head1.length;
     this.G = new boolean[n1];
     this.H = new boolean[n2];
-    this.j = 0;
-    while ((j < n1)) {
-      G[j] = false;
-      j = (j + 1);
-    }
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
-          if (_forbidden0(j)) {
-            this.j = j; _advance0();
+          if (forbidden(j)) {
+            this.j = j; advance();
             changed = true;
           }
         }
       }
     }
-    j = 0;
-    while ((j < n2)) {
-      H[j] = false;
-      j = (j + 1);
-    }
     return G;
   }
 
-  public boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
-    if (G[j]) {
-      return false;
+  public boolean hornImplied(int j) {
+    boolean t1 = false;
+    for (int c = 0; c < body1.length; c++) {
+      if (!((head1[c] == j))) continue;
+      if (allTrue(c)) { t1 = true; break; }
     }
-    int c = 0;
-    while ((c < body.length)) {
-      if ((head[c] == j)) {
-        boolean allTrue = true;
-        int k = 0;
-        while ((k < body[c].length)) {
-          if ((!G[body[c][k]])) {
-            allTrue = false;
-          }
-          k = (k + 1);
-        }
-        if (allTrue) {
-          return true;
-        }
-      }
-      c = (c + 1);
+    return ((!G[j]) && t1);
+  }
+
+  public boolean allTrue(int c) {
+    boolean t2 = true;
+    for (int k = 0; k < body1[c].length; k++) {
+      if (!(G[body1[c][k]])) { t2 = false; break; }
     }
-    return false;
+    return t2;
   }
 
   public static void main(String[] args) {

@@ -5,7 +5,7 @@
 // edge is slack when neither endpoint is tight; slackMin(u,v) further
 // requires {u,v} to be lex-minimal among every slack edge sharing an
 // endpoint with it -- the same lex-minimality check as
-// LLPLexicallyFirstVertexCover, just over slack edges instead of
+// LLPLexMatchVertexCover, just over slack edges instead of
 // uncovered ones. Advancing raises the edge's price by the smaller of
 // its two endpoints' remaining budgets, tightening at least one.
 
@@ -13,57 +13,41 @@ class LLPWeightedVertexCover {
   boolean[] LLPWeightedVertexCover(int[][] adj, double[] w) {
     int nv = w.length;
     double[][] G = new double[nv][nv];
-    forbidden (u, v) : u < v && slackMin(u, v, adj, w, G) =>
+    forbidden (u, v) : u < v && slackMin(u, v) =>
       advance : {
-        double step = min(w[u] - price(u, adj, G, nv), w[v] - price(v, adj, G, nv));
+        double step = min(w[u] - price(u), w[v] - price(v));
         G[u][v] = G[u][v] + step;
         G[v][u] = G[u][v];
       };
     boolean[] C = new boolean[nv];
-    forall i in [0..nv-1] : C[i] = tight(i, adj, w, G, nv);
+    forall i in [0..nv-1] : C[i] = tight(i);
     return C;
   }
 
-  // adj is a 0/1 incidence matrix (every other use tests adj[.][.] == 1),
-  // so multiplying by it selects exactly the neighbours of v.
-  double price(int v, int[][] adj, double[][] G, int nv) {
-    return sum u in [0..nv - 1] : G[u][v] * adj[u][v];
+  // Total dual charged to v across its incident edges.
+  double price(int v) {
+    return sum u in [0..nv-1] where adj[u][v] == 1 : G[u][v];
   }
 
-  boolean tight(int v, int[][] adj, double[] w, double[][] G, int nv) {
-    return price(v, adj, G, nv) >= w[v];
+  boolean tight(int v) {
+    return price(v) >= w[v];
   }
 
-  boolean slack(int u, int v, int[][] adj, double[] w, double[][] G, int nv) {
-    return !tight(u, adj, w, G, nv) && !tight(v, adj, w, G, nv);
+  boolean slack(int u, int v) {
+    return !tight(u) && !tight(v);
   }
 
-  // True iff edge (u, v) is slack and lex-minimal among every slack edge
-  // sharing an endpoint with it.
-  boolean slackMin(int u, int v, int[][] adj, double[] w, double[][] G) {
-    int nv = w.length;
-    if (adj[u][v] != 1 || !slack(u, v, adj, w, G, nv)) {
-      return false;
-    };
-    int x = 0;
-    while (x < nv) {
-      int y = x + 1;
-      while (y < nv) {
-        if (adj[x][y] == 1 && slack(x, y, adj, w, G, nv)) {
-          if (x == u || x == v || y == u || y == v) {
-            if (lexLess(x, y, u, v) && !(x == u && y == v)) {
-              return false;
-            }
-          }
-        };
-        y = y + 1;
-      };
-      x = x + 1;
-    };
-    return true;
+  // Edge (u, v) is slack and lex-minimal among every slack edge sharing an
+  // endpoint with it -- i.e. no slack edge (x, y) that touches u or v is
+  // lexicographically smaller.
+  boolean slackMin(int u, int v) {
+    return adj[u][v] == 1 && slack(u, v)
+        && !(exists x in [0..nv-1] : (exists y in [x+1..nv-1]
+               where adj[x][y] == 1 && (x == u || x == v || y == u || y == v) :
+               (slack(x, y) && lexLess(x, y, u, v) && !(x == u && y == v))));
   }
 
-  // True iff edge (a, b) is lexicographically smaller than (c, d).
+  // Edge (a, b) is lexicographically smaller than (c, d).
   boolean lexLess(int a, int b, int c, int d) {
     if (a < c) { return true; };
     if (a > c) { return false; };

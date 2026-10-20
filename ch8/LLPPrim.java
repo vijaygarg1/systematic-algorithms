@@ -23,7 +23,7 @@ public class LLPPrim {
 
   private boolean forbidden(int j) {
     if (fixed[j]) return false;
-    if (!((argMinCrossCut(j) >= 1))) return false;
+    if (!((minCrossCut(j) < Integer.MAX_VALUE))) return false;
     if (!((minCrossCut(j) <= globalMinCrossCut()))) return false;
     if (!((C[j] < minCrossCut(j)))) return false;
     return true;
@@ -58,6 +58,26 @@ public class LLPPrim {
     return C;
   }
 
+  public double minCrossCut(int j) {
+    double t1 = Double.POSITIVE_INFINITY;
+    for (int i = 1; i <= n; i++) {
+      if (!(fixed[i])) continue;
+      double _v = W[i][j];
+      if (_v < t1) t1 = _v;
+    }
+    return t1;
+  }
+
+  public double globalMinCrossCut() {
+    double t2 = Double.POSITIVE_INFINITY;
+    for (int t = 1; t <= n; t++) {
+      if (!((!fixed[t]))) continue;
+      double _v = minCrossCut(t);
+      if (_v < t2) t2 = _v;
+    }
+    return t2;
+  }
+
   public int argMinCrossCut(int j) {
     int besti = (0 - 1);
     double best = Integer.MAX_VALUE;
@@ -72,41 +92,15 @@ public class LLPPrim {
     return besti;
   }
 
-  public double minCrossCut(int j) {
-    int i = argMinCrossCut(j);
-    if ((i == (0 - 1))) {
-      return Integer.MAX_VALUE;
-    }
-    return W[i][j];
-  }
-
-  public double globalMinCrossCut() {
-    double t1 = Double.POSITIVE_INFINITY;
-    for (int t = 1; t <= n; t++) {
-      double _v = crossCutIfFree(t);
-      if (_v < t1) t1 = _v;
-    }
-    return t1;
-  }
-
-  public double crossCutIfFree(int t) {
-    if (fixed[t]) {
-      return Integer.MAX_VALUE;
-    }
-    return minCrossCut(t);
-  }
-
   public void propagateFixed() {
     boolean changed = true;
     while (changed) {
       changed = false;
-      int j = 1;
-      while ((j <= n)) {
+      for (int j = 1; j <= n; j++) {
         if (((!fixed[j]) && fixed[parent[j]])) {
           fixed[j] = true;
           changed = true;
         }
-        j = (j + 1);
       }
     }
   }

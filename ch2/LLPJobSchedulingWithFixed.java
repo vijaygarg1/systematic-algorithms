@@ -25,9 +25,9 @@ public class LLPJobSchedulingWithFixed {
     while ((head < tail)) {
       int j = candidate[head];
       head = (head + 1);
-      int m = G[j];
-      for (int i : pre[j]) m = Math.max(m, (G[i] + t[j]));
-      G[j] = m;
+      int t1 = G[j];
+      for (int i : pre[j]) t1 = Math.max(t1, (G[i] + t[j]));
+      G[j] = t1;
       for (int k : succ[j]) {
         {
           count[k] = (count[k] - 1);

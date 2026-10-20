@@ -13,8 +13,7 @@
 // to a *leading, uninterrupted run* of declarations at the top of the
 // entry method. The preprocessing is therefore written as aggregate
 // expressions -- filter, map, max, sum -- rather than loops, so each step
-// stays a single declaration and the run is never broken. Only the 2-D
-// table fill still needs a helper.
+// stays a single declaration and the run is never broken.
 //
 // The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
 // Vp+1 individually, since the compiler infers one bound for every index
@@ -37,7 +36,9 @@ class LLPApproxKnapsack {
     int[] vPrime = map k in [0..nf - 1] : (fv[k] * nf * epsDen) / (epsNum * M);
     int   Vp     = sum k in [0..nf - 1] : vPrime[k];
     int   INF    = 1 + sum k in [0..nf - 1] : fw[k];
-    int[][] D    = initTable(nf, Vp, INF);
+    int[][] D    = new int[nf + 1][Vp + 1];
+    // D[a][0] = 0: profit 0 needs weight 0. Every other cell starts at INF.
+    forall a in [0..nf] : forall b in [1..Vp] : D[a][b] = INF;
     n = max(nf, Vp) + 1;
     forbidden (i, p) :
       i >= 1 && i <= nf && p >= 1 && p <= Vp &&
@@ -46,21 +47,5 @@ class LLPApproxKnapsack {
       advance : D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
     int[] reach = filter q in [0..Vp] : D[nf][q] <= W;
     return reach[reach.length - 1];
-  }
-
-  // D[i][p] initialized to INF, except profit 0, which needs weight 0.
-  int[][] initTable(int nf, int Vp, int INF) {
-    int[][] D = new int[nf + 1][Vp + 1];
-    int i = 0;
-    while (i <= nf) {
-      int p = 0;
-      while (p <= Vp) {
-        D[i][p] = INF;
-        if (p == 0) { D[i][p] = 0; };
-        p = p + 1;
-      };
-      i = i + 1;
-    };
-    return D;
   }
 }

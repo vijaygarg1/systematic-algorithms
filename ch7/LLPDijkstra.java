@@ -1,7 +1,27 @@
-// LLP-Dijkstra: a particular LLP schedule of LLP-BellmanFord that fixes
-// one vertex per round -- the non-fixed vertex of minimum G[j] -- using
-// a priority-queue scheduler instead of relaxing every forbidden index
-// concurrently.
+// LLP-Dijkstra, matching bxx-sp-llp-dijkstra.tex Algorithm LLP-Dijkstra
+// (fig:alg-llp-dijk). The lattice points are PAIRS (fixed, G): a vertex is
+// settled by flipping fixed[j], and distances only ever decrease. The
+// predicate has two clauses -- every discovered vertex is settled, and the
+// shortest-path recurrence holds.
+//
+// The forbidden index is the cheapest unsettled discovered vertex. The
+// minimality is not tested here: setContainer(PriorityQueue, G[j], min)
+// holds the
+// candidate indices in a min-heap keyed by G, so the index offered to the
+// guard is already the smallest one, and all that remains to check is that
+// it is unsettled and discovered. That is the same division of labour as
+// the classical Dijkstra of Algorithm Dijkstra, whose heap of (j, c) pairs
+// supplies the vertex and whose `if not fixed[j]` supplies the rest.
+//
+// Lowering G[k] in the advance pushes k back onto the heap with its new
+// key, exactly as the classical algorithm does H.add(k, d[k]); the stale
+// entry is discarded when it surfaces and the guard rejects it. Each edge
+// contributes at most one push, so the whole loop runs in O(m log n).
+//
+// Completeness of this cheap guard needs non-negative weights: it never
+// looks at settled vertices, so it is a valid detector of a violated
+// recurrence only while every settled vertex has had its out-edges relaxed
+// and carries a key no larger than any unsettled one (Lemma lem:dijk).
 
 import java.util.*;
 
@@ -12,7 +32,7 @@ public class LLPDijkstra {
   double[] G;
   boolean[] fixed;
   int j;
-  PriorityQueue<Integer> forbiddenHeap;
+  java.util.PriorityQueue<double[]> _container;
 
   private boolean _forbidden0(int j) {
     if (fixed[j]) return false;
@@ -28,6 +48,7 @@ public class LLPDijkstra {
           double cand = (G[j] + w[j][k]);
           if ((cand < G[k])) {
             G[k] = cand;
+            if (_container != null) _container.add(new double[]{priority(k), k});
           }
         }
       }
@@ -45,13 +66,15 @@ public class LLPDijkstra {
     this.G = new double[n];
     for (int i = 0; i < n; i++) this.G[i] = Double.POSITIVE_INFINITY;
     this.fixed = new boolean[n];
-    forbiddenHeap = new PriorityQueue<>(
-      (a, b) -> Double.compare(priority(a), priority(b)));
-    for (int j = 0; j < n; j++) forbiddenHeap.add(j);
     G[0] = 0;
-    while (!forbiddenHeap.isEmpty()) {
-      int j = forbiddenHeap.poll();
-      if (_forbidden0(j)) { this.j = j; _advance0(); }
+    java.util.PriorityQueue<double[]> _C = new java.util.PriorityQueue<>(
+        (a, b) -> Double.compare(a[0], b[0]));
+    this._container = _C;
+    for (int j = 0; j < n; j++) _C.add(new double[]{priority(j), j});
+    while (!_C.isEmpty()) {
+      int j = (int) _C.poll()[1];
+      if (!_forbidden0(j)) continue;
+      this.j = j; _advance0();
     }
     return G;
   }

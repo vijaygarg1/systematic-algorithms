@@ -1,36 +1,22 @@
-// LLP-Prim: each non-root vertex advances when the global cross-cut is its lightest edge.
+// LLP-Prim: each non-root vertex advances when the global cross-cut is its
+// lightest edge.
 //
-// setBase(1): every aux method here (minCrossCut, argMinCrossCut,
-// globalMinCrossCut, propagateFixed) loops `i = 1; while (i <= n)`,
-// a 1-indexed convention (index 0 reserved/unused) that was never
-// declared -- without it, this.n = parent.length (0-indexed), so the
-// very same loops read/write parent[n], one past the end of a
-// length-n array. Declaring the 1-indexed base makes this.n =
-// parent.length - 1, matching the loops as written (confirmed: this
-// is the same setBase(1) convention LLP_StableMarriage uses for its
-// own 1-indexed aux methods).
-
-// PRECONDITION on the caller, which this program cannot check: on
-// entry, fixed[v] must mean "following the chosen edges from v reaches
-// the root" -- the book's derived definition of fixed (see
-// bxx-mst-llp-prim.tex). fixed, parent and C all arrive as parameters,
-// and propagateFixed() runs only inside the advance, so nothing here
-// establishes that meaning.
+// setBase(1) because every aux method here loops i = 1; while (i <= n),
+// a 1-indexed convention with index 0 unused. Declaring it makes
+// this.n = parent.length - 1; without it this.n = parent.length and those
+// same loops read parent[n], one past the end.
 //
-// Two initializations satisfy it:
-//   (a) the book's -- parent[v] := v's lightest-edge neighbour, C[v] :=
-//       that weight, then propagate fixed from the root along those
-//       chains before the first advance. Vertices then become fixed in
-//       chains, and the example in the book settles 5 vertices in 2
-//       advances.
-//   (b) the demo's -- parent[v] := v, fixed := {root}, C[v] := 0. No
-//       chain can be fixed prematurely because no parent points away
-//       from v, and the program degenerates to classical Prim: one
-//       advance per vertex.
-// Both reach the same C. What is NOT safe is (a) without the initial
-// propagation -- lightest-edge parents with fixed = {root} alone --
-// which leaves vertices that should already be fixed looking free and
-// yields a wrong answer on roughly a quarter of random graphs.
+// PRECONDITION the caller must establish, which this program cannot check:
+// on entry fixed[v] means "following the chosen edges from v reaches the
+// root" (the book's derived definition, bxx-mst-llp-prim.tex). fixed,
+// parent and C all arrive as parameters and propagateFixed() runs only
+// inside the advance, so nothing here establishes that meaning. Either the
+// book's initialization (lightest-edge parents, then propagate fixed from
+// the root BEFORE the first advance) or the demo's (parent[v] := v,
+// fixed := {root}, C[v] := 0, which degenerates to classical Prim) works,
+// and both reach the same C. Lightest-edge parents WITHOUT that initial
+// propagation do not: vertices that should already be fixed look free, and
+// roughly a quarter of random graphs come out wrong.
 
 class LLPPrim {
   double[] LLPPrim(int[] parent, boolean[] fixed,
@@ -42,54 +28,54 @@ class LLPPrim {
                  && C[j] < minCrossCut(j)  =>
       advance : {
         int i = argMinCrossCut(j);
-        parent[j] = i;
-        C[j] = W[i][j];
+        parent[j] = i; C[j] = W[i][j];
         propagateFixed();
       };
     return C;
   }
 
-  // Min weight of an edge (i, j) with fixed[i] = true; infinity when no
-  // fixed neighbour is incident to j, which is also the "j has no fixed
-  // neighbour" test the forbidden predicate needs.
+  // Min weight of an edge (i, j) with fixed[i]; infinity when j has no
+  // fixed neighbour, which is also the test the forbidden predicate needs.
   double minCrossCut(int j) {
-    return min i in [1..n] where fixed[i] : W[i][j];
+    double best = infinity;
+    forall i in [1..n] : {
+      if (fixed[i] && W[i][j] < best) { best = W[i][j]; };
+    };
+    return best;
   }
 
-  // The lightest edge in the cross-cut set E'(C): the least minCrossCut
-  // over the vertices still free.  Infinity when E' is empty (every vertex
-  // fixed, or the graph disconnected).
+  // The lightest edge in the cross-cut set E'(C). Infinity when E' is empty
+  // (every vertex fixed, or the graph disconnected).
   double globalMinCrossCut() {
-    return min t in [1..n] where !fixed[t] : minCrossCut(t);
+    double best = infinity;
+    forall t in [1..n] : {
+      if (!fixed[t] && minCrossCut(t) < best) { best = minCrossCut(t); };
+    };
+    return best;
   }
 
-  // The fixed neighbour i achieving minCrossCut(j).  Only the advance needs
-  // the index rather than the weight.
+  // The fixed neighbour i achieving minCrossCut(j). Only the advance needs
+  // the index rather than the weight, and it runs only where the guard has
+  // already established that some fixed neighbour achieves it.
   int argMinCrossCut(int j) {
     int besti = 0 - 1;
     double best = infinity;
-    int i = 1;
-    while (i <= n) {
+    forall i in [1..n] : {
       if (fixed[i] && W[i][j] < best) {
         best = W[i][j];
         besti = i;
       };
-      i = i + 1;
     };
     return besti;
   }
 
   // Mark every vertex whose parent chain now reaches a fixed vertex as
-  // fixed.  Idempotent; reaches a fixpoint in at most n rounds.
+  // fixed. Idempotent; reaches a fixpoint in at most n rounds.
   void propagateFixed() {
     boolean changed = true;
     while (changed) {
       changed = false;
-      forall j in [1..n] :
-        if (!fixed[j] && fixed[parent[j]]) {
-          fixed[j] = true;
-          changed = true;
-        };
+      forall j in [1..n] : if (!fixed[j] && fixed[parent[j]]) { fixed[j] = true; changed = true; };
     }
   }
 }

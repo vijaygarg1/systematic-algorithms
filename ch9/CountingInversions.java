@@ -1,4 +1,11 @@
-// Count inversions in O(n log n) via merge sort.
+// Counting inversions by divide and conquer, matching bxx-divideConquer.tex
+// Algorithm CountingInversions (algo:counting-inversions): inversions in the
+// left half, plus those in the right half, plus those spanning the two,
+// which a merge counts for free -- when A[j] from the right half is taken
+// first, it is inverted with every element still left in the left half.
+//
+// Laid out as the book prints it: one declaration line for the four
+// counters, and a single line for each leftover-copy loop.
 
 import java.util.*;
 

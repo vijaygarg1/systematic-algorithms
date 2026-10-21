@@ -5,16 +5,16 @@ import java.util.*;
 public class PairSum {
   public int PairSum(int[] A, int target) {
     int count = 0;
-    int i = 0;
-    while ((i < A.length)) {
-      int j = (i + 1);
-      while ((j < A.length)) {
-        if (((A[i] + A[j]) == target)) {
-          count = (count + 1);
+    for (int i = 0; i < A.length; i++) {
+      {
+        for (int j = (i + 1); j < A.length; j++) {
+          {
+            if (((A[i] + A[j]) == target)) {
+              count = (count + 1);
+            }
+          }
         }
-        j = (j + 1);
       }
-      i = (i + 1);
     }
     return count;
   }

@@ -11,9 +11,9 @@
 // vPrime, nf, Vp) must be a class field for the auto-generated
 // forbidden/advance helpers to see it, and the compiler grants that only
 // to a *leading, uninterrupted run* of declarations at the top of the
-// entry method. The preprocessing is therefore written as aggregate
-// expressions -- filter, map, max, sum -- rather than loops, so each step
-// stays a single declaration and the run is never broken.
+// entry method. Each preprocessing step is therefore written as a single
+// declaration initialised by a helper call, so the run is never broken;
+// the loops themselves live in those helpers below.
 //
 // The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
 // Vp+1 individually, since the compiler infers one bound for every index
@@ -21,10 +21,10 @@
 // p to [1..Vp], so out-of-range (i,p) pairs in the padded square scan are
 // simply never forbidden.
 //
-// The aggregates deliberately avoid `i` and `p` as bound variables: a
+// The aggregates deliberately avoid i and p as bound variables: a
 // quantifier helper is generated taking the guard's index variables as
-// parameters, so a `filter i in ...` inside a `forbidden (i, p)` program
-// collides with its own parameter and will not compile.
+// parameters, so a bound i inside a forbidden (i, p) program collides
+// with its own parameter and will not compile.
 
 import java.util.*;
 
@@ -67,14 +67,14 @@ public class LLPApproxKnapsack {
     this.epsNum = epsNum;
     this.epsDen = epsDen;
     this.n = w.length;
-    this.feas = _q1(i, p);
+    this.feas = feasible(w, W);
     this.nf = feas.length;
-    this.fw = _q2(i, p);
-    this.fv = _q3(i, p);
-    this.M = _q4(i, p);
-    this.vPrime = _q5(i, p);
-    this.Vp = _q6(i, p);
-    this.INF = (1 + _q7(i, p));
+    this.fw = gather(w, feas);
+    this.fv = gather(v, feas);
+    this.M = _q1(i, p);
+    this.vPrime = scaled(fv, nf, epsNum, epsDen, M);
+    this.Vp = _q2(i, p);
+    this.INF = (1 + _q3(i, p));
     this.D = new int[(nf + 1)][(Vp + 1)];
     for (int a = 0; a <= nf; a++) {
       for (int b = 1; b <= Vp; b++) {
@@ -96,47 +96,52 @@ public class LLPApproxKnapsack {
         }
       }
     }
-    java.util.ArrayList<Integer> t8_acc = new java.util.ArrayList<>();
+    return bestProfit();
+  }
+
+  public int bestProfit() {
+    int best = 0;
     for (int q = 0; q <= Vp; q++) {
-      if ((D[nf][q] <= W)) t8_acc.add(q);
+      {
+        if ((D[nf][q] <= W)) {
+          best = q;
+        }
+      }
     }
-    int[] t8 = new int[t8_acc.size()];
-    for (int _i = 0; _i < t8.length; _i++) t8[_i] = t8_acc.get(_i);
-    int[] reach = t8;
-    return reach[(reach.length - 1)];
+    return best;
   }
 
-  private int[] _q1(int i, int p) {
-    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+  public int[] feasible(int[] w, int W) {
+    int[] idx = new int[w.length];
+    int c = 0;
     for (int t = 0; t < w.length; t++) {
-      if ((w[t] <= W)) _acc.add(t);
+      {
+        if ((w[t] <= W)) {
+          idx[c] = t;
+          c = (c + 1);
+        }
+      }
     }
-    int[] arr = new int[_acc.size()];
-    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
-    return arr;
+    return java.util.Arrays.copyOfRange(idx, 0, Math.max(0, ((c - 1)) + 1));
   }
 
-  private int[] _q2(int i, int p) {
-    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
+  public int[] gather(int[] a, int[] idx) {
+    int[] out = new int[idx.length];
+    for (int k = 0; k < idx.length; k++) {
+      out[k] = a[idx[k]];
+    }
+    return out;
+  }
+
+  public int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int M) {
+    int[] out = new int[nf];
     for (int k = 0; k < nf; k++) {
-      _acc.add(w[feas[k]]);
+      out[k] = (((fv[k] * nf) * epsDen) / (epsNum * M));
     }
-    int[] arr = new int[_acc.size()];
-    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
-    return arr;
+    return out;
   }
 
-  private int[] _q3(int i, int p) {
-    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
-    for (int k = 0; k < nf; k++) {
-      _acc.add(v[feas[k]]);
-    }
-    int[] arr = new int[_acc.size()];
-    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
-    return arr;
-  }
-
-  private int _q4(int i, int p) {
+  private int _q1(int i, int p) {
     int _acc = Integer.MIN_VALUE;
     for (int k = 0; k < nf; k++) {
       int _v = fv[k];
@@ -145,17 +150,7 @@ public class LLPApproxKnapsack {
     return _acc;
   }
 
-  private int[] _q5(int i, int p) {
-    java.util.ArrayList<Integer> _acc = new java.util.ArrayList<>();
-    for (int k = 0; k < nf; k++) {
-      _acc.add((((fv[k] * nf) * epsDen) / (epsNum * M)));
-    }
-    int[] arr = new int[_acc.size()];
-    for (int _i = 0; _i < arr.length; _i++) arr[_i] = _acc.get(_i);
-    return arr;
-  }
-
-  private int _q6(int i, int p) {
+  private int _q2(int i, int p) {
     int _acc = 0;
     for (int k = 0; k < nf; k++) {
       _acc += vPrime[k];
@@ -163,7 +158,7 @@ public class LLPApproxKnapsack {
     return _acc;
   }
 
-  private int _q7(int i, int p) {
+  private int _q3(int i, int p) {
     int _acc = 0;
     for (int k = 0; k < nf; k++) {
       _acc += fw[k];

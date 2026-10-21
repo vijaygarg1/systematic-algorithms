@@ -11,9 +11,9 @@
 // vPrime, nf, Vp) must be a class field for the auto-generated
 // forbidden/advance helpers to see it, and the compiler grants that only
 // to a *leading, uninterrupted run* of declarations at the top of the
-// entry method. The preprocessing is therefore written as aggregate
-// expressions -- filter, map, max, sum -- rather than loops, so each step
-// stays a single declaration and the run is never broken.
+// entry method. Each preprocessing step is therefore written as a single
+// declaration initialised by a helper call, so the run is never broken;
+// the loops themselves live in those helpers below.
 //
 // The guard's shared bound n is set to max(nf,Vp)+1 (rather than nf+1 or
 // Vp+1 individually, since the compiler infers one bound for every index
@@ -21,19 +21,19 @@
 // p to [1..Vp], so out-of-range (i,p) pairs in the padded square scan are
 // simply never forbidden.
 //
-// The aggregates deliberately avoid `i` and `p` as bound variables: a
+// The aggregates deliberately avoid i and p as bound variables: a
 // quantifier helper is generated taking the guard's index variables as
-// parameters, so a `filter i in ...` inside a `forbidden (i, p)` program
-// collides with its own parameter and will not compile.
+// parameters, so a bound i inside a forbidden (i, p) program collides
+// with its own parameter and will not compile.
 
 class LLPApproxKnapsack {
   int LLPApproxKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
-    int[] feas   = filter t in [0..w.length - 1] : w[t] <= W;
+    int[] feas   = feasible(w, W);
     int   nf     = feas.length;
-    int[] fw     = map k in [0..nf - 1] : w[feas[k]];
-    int[] fv     = map k in [0..nf - 1] : v[feas[k]];
+    int[] fw     = gather(w, feas);
+    int[] fv     = gather(v, feas);
     int   M      = max k in [0..nf - 1] : fv[k];
-    int[] vPrime = map k in [0..nf - 1] : (fv[k] * nf * epsDen) / (epsNum * M);
+    int[] vPrime = scaled(fv, nf, epsNum, epsDen, M);
     int   Vp     = sum k in [0..nf - 1] : vPrime[k];
     int   INF    = 1 + sum k in [0..nf - 1] : fw[k];
     int[][] D    = new int[nf + 1][Vp + 1];
@@ -45,7 +45,43 @@ class LLPApproxKnapsack {
       D[i][p] > min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])])
     =>
       advance : D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
-    int[] reach = filter q in [0..Vp] : D[nf][q] <= W;
-    return reach[reach.length - 1];
+    return bestProfit();
+  }
+
+  // The largest scaled profit whose least weight still fits in the knapsack.
+  int bestProfit() {
+    int best = 0;
+    forall q in [0..Vp] : {
+      if (D[nf][q] <= W) { best = q; };
+    };
+    return best;
+  }
+
+  // Indices of the items light enough to fit in the knapsack at all.
+  int[] feasible(int[] w, int W) {
+    int[] idx = new int[w.length];
+    int c = 0;
+    forall t in [0..w.length-1] : {
+      if (w[t] <= W) {
+        idx[c] = t;
+        c = c + 1;
+      };
+    };
+    return idx[0..c-1];
+  }
+
+  // The entries of a at the given indices, in index order.
+  int[] gather(int[] a, int[] idx) {
+    int[] out = new int[idx.length];
+    forall k in [0..idx.length-1] : out[k] = a[idx[k]];
+    return out;
+  }
+
+  // Profits scaled down by mu = eps*M/nf, which is what bounds the DP's
+  // profit axis by O(nf^2/eps).
+  int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int M) {
+    int[] out = new int[nf];
+    forall k in [0..nf-1] : out[k] = (fv[k] * nf * epsDen) / (epsNum * M);
+    return out;
   }
 }

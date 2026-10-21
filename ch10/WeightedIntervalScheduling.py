@@ -1,9 +1,17 @@
-"""Classical sequential weighted-interval-scheduling DP given p[]."""
+"""Classical sequential weighted-interval-scheduling DP. Intervals are
+presorted once by finish time, with index 0 a 0-weight sentinel, so p[j]
+-- the last interval that finishes no later than j starts -- is derived
+here rather than supplied: the largest such index, or the sentinel 0 when
+no earlier interval fits."""
 
-def schedule(s, f, w, p):
+
+def schedule(s, f, w):
     n = len(s)
     opt = [0] * n
-    G   = [0] * n
+    G = [0] * n
+    p = [0] * n
+    for j in range(1, n):
+        p[j] = max((i for i in range(1, j) if f[i] <= s[j]), default=0)
     # Phase 1: compute optimal values.
     for cur in range(1, n):
         if w[cur] + opt[p[cur]] >= opt[cur - 1]:
@@ -26,5 +34,4 @@ if __name__ == "__main__":
     s = [0, 1, 2, 4, 6, 5]
     f = [0, 3, 5, 6, 8, 9]
     w = [0, 4, 6, 5, 3, 7]
-    p = [0, 0, 0, 1, 3, 2]
-    print("selected:", schedule(s, f, w, p))
+    print("selected:", schedule(s, f, w))

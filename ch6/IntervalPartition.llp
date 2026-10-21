@@ -14,8 +14,7 @@ class IntervalPartition {
     int[] G = new int[n];
     heap<int> Q = new heap<int>();
     int numRooms = 0;
-    int j = 0;
-    while (j < n) {
+    forall j in [0..n-1] : {
       int r = 0 - 1;
       if (!Q.isEmpty() && Q.peekKey() <= s[j]) {
         r = Q.peekValue();
@@ -26,7 +25,6 @@ class IntervalPartition {
       };
       G[j] = r + 1;
       Q.push(f[j], r);
-      j = j + 1;
     };
     return G;
   }

@@ -17,29 +17,29 @@ public class ApproxSetCover {
     while (anyUncovered(covered, n)) {
       int bestIdx = 0;
       int bestCover = (0 - 1);
-      int s = 0;
-      while ((s < m)) {
-        int count = 0;
-        int e = 0;
-        while ((e < n)) {
-          if (((S[s][e] == 1) && (!covered[e]))) {
-            count = (count + 1);
+      for (int s = 0; s < m; s++) {
+        {
+          int count = 0;
+          int e = 0;
+          while ((e < n)) {
+            if (((S[s][e] == 1) && (!covered[e]))) {
+              count = (count + 1);
+            }
+            e = (e + 1);
           }
-          e = (e + 1);
+          if ((count > bestCover)) {
+            bestCover = count;
+            bestIdx = s;
+          }
         }
-        if ((count > bestCover)) {
-          bestCover = count;
-          bestIdx = s;
-        }
-        s = (s + 1);
       }
       C[bestIdx] = true;
-      int e = 0;
-      while ((e < n)) {
-        if ((S[bestIdx][e] == 1)) {
-          covered[e] = true;
+      for (int e = 0; e < n; e++) {
+        {
+          if ((S[bestIdx][e] == 1)) {
+            covered[e] = true;
+          }
         }
-        e = (e + 1);
       }
     }
     return C;

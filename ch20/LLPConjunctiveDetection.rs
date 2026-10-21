@@ -18,7 +18,7 @@ fn happened_before(j: usize, g: &[i32], vc: &[Vec<Vec<i32>>]) -> bool {
 
 // Returns the satisfying global state, or None if none exists (some
 // process would need to advance past its last retained state).
-fn conjunctive_algorithm(vc: &[Vec<Vec<i32>>], t: &[i32]) -> Option<Vec<i32>> {
+fn llp_conjunctive_detection(vc: &[Vec<Vec<i32>>], t: &[i32]) -> Option<Vec<i32>> {
     let n = t.len();
     let mut g = vec![1i32; n];
     let mut changed = true;
@@ -44,7 +44,7 @@ fn main() {
         vec![vec![0, 0, 0], vec![0, 0, 1], vec![0, 0, 2]],
     ];
     let t = [2i32, 2, 2];
-    match conjunctive_algorithm(&vc, &t) {
+    match llp_conjunctive_detection(&vc, &t) {
         Some(g) => println!("G: {:?}", g),
         None => println!("no satisfying global state"),
     }

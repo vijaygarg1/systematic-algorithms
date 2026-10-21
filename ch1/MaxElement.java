@@ -5,12 +5,12 @@ import java.util.*;
 public class MaxElement {
   public int MaxElement(int[] A) {
     int max = A[0];
-    int i = 1;
-    while ((i < A.length)) {
-      if ((A[i] > max)) {
-        max = A[i];
+    for (int i = 1; i < A.length; i++) {
+      {
+        if ((A[i] > max)) {
+          max = A[i];
+        }
       }
-      i = (i + 1);
     }
     return max;
   }

@@ -1,12 +1,20 @@
-// Classical sequential weighted-interval-scheduling DP given p[].
+// Classical sequential weighted-interval-scheduling DP. Intervals are
+// presorted once by finish time, with index 0 a 0-weight sentinel, so
+// p[j] -- the last interval that finishes no later than j starts -- is
+// derived here rather than supplied: it is the largest such index, or the
+// sentinel 0 when no earlier interval fits.
 
 import java.util.*;
 
 public class WeightedIntervalScheduling {
-  public int[] schedule(int[] s, int[] f, int[] w, int[] p) {
+  public int[] schedule(int[] s, int[] f, int[] w) {
     int n = s.length;
+    int[] p = new int[n];
     int[] opt = new int[n];
     int[] G = new int[n];
+    for (int j = 1; j < n; j++) {
+      p[j] = lastCompatible(j, s, f);
+    }
     opt[0] = 0;
     for (int cur = 1; cur < n; cur++) {
       opt[cur] = Math.max((w[cur] + opt[p[cur]]), opt[(cur - 1)]);
@@ -23,13 +31,24 @@ public class WeightedIntervalScheduling {
     return G;
   }
 
+  public int lastCompatible(int j, int[] s, int[] f) {
+    int best = 0;
+    for (int i = 1; i < j; i++) {
+      {
+        if ((f[i] <= s[j])) {
+          best = i;
+        }
+      }
+    }
+    return best;
+  }
+
   public static void main(String[] args) {
     int[] s = new int[] {0, 0, 1, 2};
     int[] f = new int[] {0, 0, 1, 1};
     int[] w = new int[] {0, 0, 0, 2};
-    int[] p = new int[] {0, 0, 2, 1};
     WeightedIntervalScheduling prog = new WeightedIntervalScheduling();
-    int[] result = prog.schedule(s, f, w, p);
+    int[] result = prog.schedule(s, f, w);
     System.out.println(Arrays.toString(result));
   }
 }

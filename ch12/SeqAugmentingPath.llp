@@ -30,8 +30,7 @@ class SeqAugmentingPath {
   // elsewhere and free k up for j.
   boolean alternatingPath(int j, int[][] adj, int[] S, boolean[] seen) {
     int m = adj[0].length;
-    int k = 0;
-    while (k < m) {
+    forall k in [0..m-1] : {
       if (adj[j][k] == 1 && !seen[k]) {
         seen[k] = true;
         if (S[k] == 0 - 1 || alternatingPath(S[k], adj, S, seen)) {
@@ -39,7 +38,6 @@ class SeqAugmentingPath {
           return true;
         }
       };
-      k = k + 1;
     };
     return false;
   }

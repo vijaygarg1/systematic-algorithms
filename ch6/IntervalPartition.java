@@ -16,19 +16,19 @@ public class IntervalPartition {
     int[] G = new int[n];
     java.util.PriorityQueue<int[]> Q = new java.util.PriorityQueue<int[]>((a, b) -> a[0] != b[0] ? Integer.compare(a[0], b[0]) : Integer.compare(a[1], b[1]));
     int numRooms = 0;
-    int j = 0;
-    while ((j < n)) {
-      int r = (0 - 1);
-      if (((!Q.isEmpty()) && (Q.peek()[0] <= s[j]))) {
-        r = Q.peek()[1];
-        Q.poll();
-      } else {
-        r = numRooms;
-        numRooms = (numRooms + 1);
+    for (int j = 0; j < n; j++) {
+      {
+        int r = (0 - 1);
+        if (((!Q.isEmpty()) && (Q.peek()[0] <= s[j]))) {
+          r = Q.peek()[1];
+          Q.poll();
+        } else {
+          r = numRooms;
+          numRooms = (numRooms + 1);
+        }
+        G[j] = (r + 1);
+        Q.add(new int[]{f[j], r});
       }
-      G[j] = (r + 1);
-      Q.add(new int[]{f[j], r});
-      j = (j + 1);
     }
     return G;
   }

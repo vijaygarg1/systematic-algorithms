@@ -55,12 +55,10 @@ class Johnson {
 
     // Step 4: Dijkstra from every source; undo the reweighting.
     int[][] D = new int[n][n];
-    int u = 0;
-    while (u < n) {
+    forall u in [0..n-1] : {
       int[] distPrime = Dijkstra(wPrime, u);
       forall v in [0..n-1] :
         D[u][v] = reweight(distPrime[v], price[u], price[v]);
-      u = u + 1;
     };
     return D;
   }

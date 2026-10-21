@@ -3,7 +3,7 @@
 
 import java.util.*;
 
-public class ConjunctiveDetection {
+public class LLPConjunctiveDetection {
   int n;
   private static final int[] _NO_EARLY_EXIT = new int[0];
   int[][][] vc;
@@ -25,7 +25,7 @@ public class ConjunctiveDetection {
     return _NO_EARLY_EXIT;
   }
 
-  public int[] ConjunctiveDetection(int[][][] vc, int[] T) {
+  public int[] LLPConjunctiveDetection(int[][][] vc, int[] T) {
     this.vc = vc;
     this.T = T;
     this.n = vc.length;
@@ -50,18 +50,18 @@ public class ConjunctiveDetection {
 
   public boolean happenedBefore(int j, int[] G, int[][][] vc) {
     int n = G.length;
-    int i = 0;
-    while ((i < n)) {
-      if (((i != j) && (vc[i][G[i]][j] >= G[j]))) {
-        return true;
+    for (int i = 0; i < n; i++) {
+      {
+        if (((i != j) && (vc[i][G[i]][j] >= G[j]))) {
+          return true;
+        }
       }
-      i = (i + 1);
     }
     return false;
   }
 
   public static void main(String[] args) {
-    // No runnable example: ConjunctiveDetection's parameters include a type
+    // No runnable example: LLPConjunctiveDetection's parameters include a type
     // this synthesizer cannot safely construct on its own (e.g. set<int>[],
     // a 3D+ array, or another unsupported shape) -- not a compile error, just
     // nothing to call here. See the .llp source for the real signature, and

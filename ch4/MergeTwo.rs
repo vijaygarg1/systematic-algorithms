@@ -4,7 +4,9 @@ fn merge_two(b: &[i32], c: &[i32]) -> Vec<i32> {
     let (mut i, mut j) = (0, 0);
     let mut d = Vec::with_capacity(b.len() + c.len());
     while i < b.len() && j < c.len() {
-        if b[i] < c[j] { d.push(b[i]); i += 1; } else { d.push(c[j]); j += 1; }
+        // <= , not < : on a tie take from the LEFT run, which is what makes
+        // the merge stable (and matches MergeTwo.llp and MergeTwo.py).
+        if b[i] <= c[j] { d.push(b[i]); i += 1; } else { d.push(c[j]); j += 1; }
     }
     d.extend_from_slice(&b[i..]);
     d.extend_from_slice(&c[j..]);

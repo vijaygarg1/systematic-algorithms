@@ -10,24 +10,24 @@ public class ApproxVertexCover {
     boolean done = false;
     while ((!done)) {
       done = true;
-      int u = 0;
-      while ((u < n)) {
-        if ((!removed[u])) {
-          int v = (u + 1);
-          while ((v < n)) {
-            if (((!removed[v]) && (adj[u][v] == 1))) {
-              C[u] = true;
-              C[v] = true;
-              removed[u] = true;
-              removed[v] = true;
-              done = false;
-              v = n;
-            } else {
-              v = (v + 1);
+      for (int u = 0; u < n; u++) {
+        {
+          if ((!removed[u])) {
+            int v = (u + 1);
+            while ((v < n)) {
+              if (((!removed[v]) && (adj[u][v] == 1))) {
+                C[u] = true;
+                C[v] = true;
+                removed[u] = true;
+                removed[v] = true;
+                done = false;
+                v = n;
+              } else {
+                v = (v + 1);
+              }
             }
           }
         }
-        u = (u + 1);
       }
     }
     return C;

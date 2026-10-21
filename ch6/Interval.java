@@ -9,13 +9,13 @@ public class Interval {
     if ((n > 0)) {
       G[0] = 1;
       int last = 0;
-      int i = 1;
-      while ((i < n)) {
-        if ((s[i] >= f[last])) {
-          G[i] = 1;
-          last = i;
+      for (int i = 1; i < n; i++) {
+        {
+          if ((s[i] >= f[last])) {
+            G[i] = 1;
+            last = i;
+          }
         }
-        i = (i + 1);
       }
     }
     return G;

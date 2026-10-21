@@ -4,19 +4,19 @@ import java.util.*;
 
 public class InsertionSort {
   public void sort(int[] A) {
-    int i = 1;
-    while ((i < A.length)) {
-      int j = (i - 1);
-      boolean done = false;
-      while (((j >= 0) && (!done))) {
-        if ((A[j] <= A[(j + 1)])) {
-          done = true;
-        } else {
-          { int tmp = A[j]; A[j] = A[(j + 1)]; A[(j + 1)] = tmp; }
-          j = (j - 1);
+    for (int i = 1; i < A.length; i++) {
+      {
+        int j = (i - 1);
+        boolean done = false;
+        while (((j >= 0) && (!done))) {
+          if ((A[j] <= A[(j + 1)])) {
+            done = true;
+          } else {
+            { int tmp = A[j]; A[j] = A[(j + 1)]; A[(j + 1)] = tmp; }
+            j = (j - 1);
+          }
         }
       }
-      i = (i + 1);
     }
   }
 

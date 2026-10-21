@@ -58,13 +58,13 @@ public class Johnson {
       }
     }
     int[][] D = new int[n][n];
-    int u = 0;
-    while ((u < n)) {
-      int[] distPrime = new Dijkstra().shortestPath(wPrime, u);
-      for (int v = 0; v < n; v++) {
-        D[u][v] = reweight(distPrime[v], price[u], price[v]);
+    for (int u = 0; u < n; u++) {
+      {
+        int[] distPrime = new Dijkstra().shortestPath(wPrime, u);
+        for (int v = 0; v < n; v++) {
+          D[u][v] = reweight(distPrime[v], price[u], price[v]);
+        }
       }
-      u = (u + 1);
     }
     return D;
   }

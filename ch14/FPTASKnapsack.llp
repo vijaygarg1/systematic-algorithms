@@ -1,44 +1,67 @@
-// FPTAS for Knapsack: discard items that cannot fit, then scale profits by
-// mu = eps*M/nf (M = max profit among feasible items) and run the standard 0/1 DP
-// profit-indexed as D[i][p] = min weight to reach scaled profit >= p.  The table is
-// O(nf * V') with V' = O(nf^2/eps).  Fully polynomial.
+// Classical FPTAS for 0/1 Knapsack: scale the profits down by
+// mu = eps*M/nf, then solve the scaled problem exactly by a profit-indexed
+// DP. Rounding loses at most eps*OPT, and the scaled profit range is
+// O(nf^2/eps), so the whole thing is polynomial in nf and 1/eps.
 //
-// The preprocessing is written with aggregate expressions -- filter, map, max,
-// sum -- to mirror Algorithm FPTAS-Knapsack in the book, which states it in
-// set-builder form: F := {i : w_i <= W}, M := max_{i in F} v_i, and
-// v'_i := floor(v_i / scale) for every i in F.  `orig` is exactly F, and it
-// carries the *original* item indices, which is what lets the backtrack map a
-// selection in the scaled instance back to an item of the input.
+// D[i][p] = least total weight of a subset of the first i feasible items
+// whose scaled profit is at least p, with D[i][0] = 0 and every other
+// cell starting at INF. The answer is the largest p with D[nf][p] <= W;
+// the traceback then walks the rows back, taking item i exactly when
+// including it is what made row i cheaper than row i-1.
 
 class FPTASKnapsack {
   boolean[] FPTASKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
-    boolean[] S  = new boolean[w.length];
-    int[] orig   = filter t in [0..w.length - 1] : w[t] <= W;
-    int   nf     = orig.length;
-    if (nf == 0) { return S; };   // no item fits: empty solution
-    int[] fw     = map k in [0..nf - 1] : w[orig[k]];
-    int[] fv     = map k in [0..nf - 1] : v[orig[k]];
-    int   M      = max k in [0..nf - 1] : fv[k];
-    int[] vPrime = map k in [0..nf - 1] : (fv[k] * nf * epsDen) / (epsNum * M);
-    int   Vp     = sum k in [0..nf - 1] : vPrime[k];
-    int   INF    = 1 + sum k in [0..nf - 1] : fw[k];
-    int[][] D    = initTable(nf, Vp, INF);
-    // Standard forward DP over the profit axis: skip item i, or take it.
-    int i = 1;
-    while (i <= nf) {
-      int p = 1;
-      while (p <= Vp) {
-        D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
-        p = p + 1;
+    boolean[] S = new boolean[w.length];
+
+    // Items too heavy to fit alone can never be used; orig[0..nf-1] lists
+    // the ones that can, as indices into the caller's arrays.
+    int[] orig = new int[w.length];
+    int nf = 0;
+    forall t in [0..w.length-1] : {
+      if (w[t] <= W) {
+        orig[nf] = t;
+        nf = nf + 1;
       };
-      i = i + 1;
     };
-    // p* = largest scaled profit achievable within capacity W.  Profit 0 is
-    // always reachable (D[nf][0] = 0), so this set is never empty.
-    int[] reach = filter q in [0..Vp] : D[nf][q] <= W;
-    int bp = reach[reach.length - 1];
-    // Backtrack over feasible items; map selections back to original indices.
-    i = nf;
+    if (nf == 0) { return S; };   // no item fits: empty solution
+
+    int[] fw = new int[nf];
+    int[] fv = new int[nf];
+    int k = 0;
+    while (k < nf) {
+      fw[k] = w[orig[k]];
+      fv[k] = v[orig[k]];
+      k = k + 1;
+    };
+
+    // Scale every profit by mu = eps*M/nf, accumulating the scaled total Vp
+    // (the DP's profit axis) and INF, one more than any reachable weight.
+    int M = max j in [0..nf - 1] : fv[j];
+    int[] vPrime = new int[nf];
+    int Vp = 0;
+    int INF = 1;
+    k = 0;
+    while (k < nf) {
+      vPrime[k] = (fv[k] * nf * epsDen) / (epsNum * M);
+      Vp = Vp + vPrime[k];
+      INF = INF + fw[k];
+      k = k + 1;
+    };
+
+    // D[a][0] stays 0 -- profit 0 needs no weight; every other cell starts
+    // unreachable, then each row is filled from the row above it.
+    int[][] D = new int[nf + 1][Vp + 1];
+    forall a in [0..nf] : forall b in [1..Vp] : D[a][b] = INF;
+    forall i in [1..nf] : forall p in [1..Vp] :
+      D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
+
+    // Best reachable scaled profit -- the last q whose least weight still
+    // fits -- then walk the rows back to recover the items that achieved it.
+    int bp = 0;
+    forall q in [0..Vp] : {
+      if (D[nf][q] <= W) { bp = q; };
+    };
+    int i = nf;
     while (i > 0) {
       if (D[i][bp] < D[i - 1][bp]) {
         S[orig[i - 1]] = true;
@@ -47,21 +70,5 @@ class FPTASKnapsack {
       i = i - 1;
     };
     return S;
-  }
-
-  // D[i][p] initialized to INF, except profit 0, which needs weight 0.
-  int[][] initTable(int nf, int Vp, int INF) {
-    int[][] D = new int[nf + 1][Vp + 1];
-    int i = 0;
-    while (i <= nf) {
-      int p = 0;
-      while (p <= Vp) {
-        D[i][p] = INF;
-        if (p == 0) { D[i][p] = 0; };
-        p = p + 1;
-      };
-      i = i + 1;
-    };
-    return D;
   }
 }

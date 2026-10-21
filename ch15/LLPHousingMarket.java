@@ -101,13 +101,13 @@ public class LLPHousingMarket {
   public boolean inSubmatching(int j, int[] G, int[][] pref) {
     int n = G.length;
     int cur = wish(j, G, pref);
-    int steps = 1;
-    while ((steps <= n)) {
-      if ((cur == j)) {
-        return true;
+    for (int steps = 1; steps <= n; steps++) {
+      {
+        if ((cur == j)) {
+          return true;
+        }
+        cur = wish(cur, G, pref);
       }
-      cur = wish(cur, G, pref);
-      steps = (steps + 1);
     }
     return false;
   }

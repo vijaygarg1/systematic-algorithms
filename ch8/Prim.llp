@@ -28,14 +28,12 @@ class Prim {
       if (!fixed[v]) {
         fixed[v] = true;
         count = count + 1;
-        int k = 0;
-        while (k < n) {
+        forall k in [0..n-1] : {
           if (!fixed[k] && w[v][k] != infinity && w[v][k] < d[k]) {
             d[k] = w[v][k];
             parent[k] = v;
             H.push(d[k], k);
           };
-          k = k + 1;
         }
       }
     };

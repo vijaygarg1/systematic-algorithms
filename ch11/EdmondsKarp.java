@@ -1,6 +1,14 @@
-// Edmonds-Karp max-flow: Ford-Fulkerson with BFS (shortest augmenting
-// paths) in place of DFS. Shares its outer loop verbatim with
-// FordFulkerson.llp -- the two differ only in findAugmentingPath.
+// Classical Edmonds-Karp maximum flow: Ford-Fulkerson with the augmenting
+// path chosen by BREADTH-first search, so each augmentation uses a path
+// with the fewest arcs. That single change is what bounds the number of
+// augmentations by O(VE) and makes the running time independent of the
+// capacities.
+//
+// f is the flow matrix; residual(u, v) = c[u][v] - f[u][v] is the spare
+// capacity of arc (u,v), and pushing b along (u,v) also subtracts b from
+// f[v][u], which is what lets a later path cancel earlier flow. The BFS
+// carries its own queue q with head/tail indices and leaves the path in
+// parent[], as a chain of predecessors running back from t to s.
 
 import java.util.*;
 
@@ -9,38 +17,32 @@ public class EdmondsKarp {
     int n = c.length;
     int[][] f = new int[n][n];
     int[] parent = new int[n];
-    boolean done = false;
-    while ((!done)) {
-      int found = findAugmentingPath(c, f, s, t, parent);
-      if ((found == 0)) {
-        done = true;
-      } else {
-        int bottleneck = Integer.MAX_VALUE;
-        int v = t;
-        while ((v != s)) {
-          int u = parent[v];
-          int r = residual(c, f, u, v);
-          if ((r < bottleneck)) {
-            bottleneck = r;
-          }
-          v = u;
-        }
-        v = t;
-        while ((v != s)) {
-          int u = parent[v];
-          f[u][v] = (f[u][v] + bottleneck);
-          f[v][u] = (f[v][u] - bottleneck);
-          v = u;
-        }
-      }
+    while ((findAugmentingPath(c, f, s, t, parent) == 1)) {
+      augment(f, s, t, parent, bottleneck(c, f, s, t, parent));
     }
     return f;
   }
 
+  public int bottleneck(int[][] c, int[][] f, int s, int v, int[] parent) {
+    if ((v == s)) {
+      return Integer.MAX_VALUE;
+    }
+    return Math.min(residual(c, f, parent[v], v), bottleneck(c, f, s, parent[v], parent));
+  }
+
+  public void augment(int[][] f, int s, int v, int[] parent, int b) {
+    if ((v == s)) {
+      return;
+    }
+    int u = parent[v];
+    f[u][v] = (f[u][v] + b);
+    f[v][u] = (f[v][u] - b);
+    augment(f, s, u, parent, b);
+  }
+
   public int findAugmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
-    int n = c.length;
-    boolean[] seen = new boolean[n];
-    int[] q = new int[n];
+    boolean[] seen = new boolean[c.length];
+    int[] q = new int[c.length];
     q[0] = s;
     seen[s] = true;
     parent[s] = s;
@@ -55,16 +57,15 @@ public class EdmondsKarp {
     if ((u == t)) {
       return 1;
     }
-    int n = c.length;
-    int v = 0;
-    while ((v < n)) {
-      if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
-        seen[v] = true;
-        parent[v] = u;
-        q[tail] = v;
-        tail = (tail + 1);
+    for (int v = 0; v < c.length; v++) {
+      {
+        if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
+          seen[v] = true;
+          parent[v] = u;
+          q[tail] = v;
+          tail = (tail + 1);
+        }
       }
-      v = (v + 1);
     }
     return bfs(c, f, t, parent, seen, q, (head + 1), tail);
   }

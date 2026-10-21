@@ -1,7 +1,7 @@
 // LLP Horn SAT, matching bxx-horn.tex Algorithm LLP-HornSAT. head[c] is
 // the consequent variable of clause c, or -1 if clause c is a pure
 // negative (goal) clause. The book's two rules are written here as two
-// forbidden/advance clauses joined by `&&`, so they share one fixpoint.
+// forbidden/advance clauses joined by &&, so they share one fixpoint.
 
 // Earlier version of this file (kept for reference, not used): had no
 // representation for a goal clause at all -- every clause was assumed
@@ -57,12 +57,12 @@ class LLPHornSAT {
   // Some definite clause has all antecedents true and consequent j false.
   boolean definiteImplied(int j) {
     return !G[j]
-        && (exists c in [0..body.length-1] where head[c] == j : allTrue(c));
+        && (exists c in [0..body.length-1] : (head[c] == j && allTrue(c)));
   }
 
   // Some pure negative clause has all its antecedents true.
   boolean goalFired() {
-    return exists c in [0..body.length-1] where head[c] == (0 - 1) : allTrue(c);
+    return exists c in [0..body.length-1] : (head[c] == (0 - 1) && allTrue(c));
   }
 
   // Every antecedent of clause c is true.

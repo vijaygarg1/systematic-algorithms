@@ -7,30 +7,50 @@
 // x's price by the smallest remaining budget among the sets containing
 // it, tightening at least one of them.
 //
-// The guard names its own range, `x in [0..u-1]`, because x ranges over
+// The guard names its own range, x in [0..u-1], because x ranges over
 // ELEMENTS while the bound the compiler would otherwise infer comes from
 // the first 1D array parameter (w.length, the number of SETS) -- a
 // different count whenever sets and elements aren't equinumerous.
 //
 // S, w and G are program fields, so the aux methods read them directly
-// rather than taking them as parameters; each predicate is the quantifier it
-// is defined as, and each reduction names its own range with `where`.
+// rather than taking them as parameters, and each predicate is the
+// quantifier it is defined as.
+//
+// PRECONDITION: every element must lie in at least one set, or no cover
+// exists at all. The guard enforces it rather than assuming it, because
+// an uncoverable element is slack forever -- it lies in no tight set, so
+// nothing can ever make it non-slack -- and the fixpoint marks a sweep
+// as progress whenever a rule fires, not when G actually moves. Without
+// the covered(x) conjunct below, one such element makes this program
+// raise its price forever and never terminate. With it, an uncoverable
+// element simply keeps price 0 and the sets returned cover everything
+// that can be covered.
 
 class LLPWeightedSetCover {
   boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
     int m = w.length;
     int u = S[0].length;
     double[] G = new double[u];
-    forbidden (x in [0..u-1]) : slackMin(x) =>
+    forbidden (x in [0..u-1]) : covered(x) && slackMin(x) =>
       advance : { G[x] = G[x] + minRemainingBudget(x); };
     boolean[] C = new boolean[m];
     forall s in [0..m-1] : C[s] = setTight(s);
     return C;
   }
 
+  // x belongs to at least one set, so raising its price can tighten
+  // something. See the PRECONDITION note above.
+  boolean covered(int x) {
+    return exists s in [0..m-1] : S[s][x] == 1;
+  }
+
   // Sum of the prices on the elements of s.
   double setPrice(int s) {
-    return sum e in [0..u-1] where S[s][e] == 1 : G[e];
+    double total = 0.0;
+    forall e in [0..u-1] : {
+      if (S[s][e] == 1) { total = total + G[e]; };
+    };
+    return total;
   }
 
   boolean setTight(int s) {
@@ -44,7 +64,14 @@ class LLPWeightedSetCover {
 
   // Smallest remaining budget among the sets containing element e.
   double minRemainingBudget(int e) {
-    return min s in [0..m-1] where S[s][e] == 1 : w[s] - setPrice(s);
+    double best = infinity;
+    forall s in [0..m-1] : {
+      if (S[s][e] == 1) {
+        double budget = w[s] - setPrice(s);
+        if (budget < best) { best = budget; };
+      };
+    };
+    return best;
   }
 
   // x is slack and lex-minimal among the slack elements sharing a set

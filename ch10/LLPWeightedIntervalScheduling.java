@@ -26,20 +26,27 @@ public class LLPWeightedIntervalScheduling {
     G[j] = Math.max(G[(j - 1)], (w[j] + G[p[j]]));
   }
 
+  private double priority(int j) {
+    return j;
+  }
+
   public int[] LLPWeightedIntervalScheduling(int[] w, int[] p) {
     this.w = w;
     this.p = p;
     this.n = w.length;
     this.G = new int[n];
+    java.util.List<int[]> _ord = new java.util.ArrayList<>();
+    for (int j = 1; j < n; j++) {
+      _ord.add(new int[]{j});
+    }
+    _ord.sort((_a, _b) -> Double.compare(priority(_a[0]), priority(_b[0])));
     {
       boolean changed = true;
       while (changed) {
         changed = false;
-        for (int j = 1; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
-            changed = true;
-          }
+        for (int[] _t : _ord) {
+          int j = _t[0];
+          if (forbidden(j)) { this.j = j; advance(); changed = true; }
         }
       }
     }

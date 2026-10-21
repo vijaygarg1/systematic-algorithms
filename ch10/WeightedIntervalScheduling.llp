@@ -1,10 +1,16 @@
-// Classical sequential weighted-interval-scheduling DP given p[].
+// Classical sequential weighted-interval-scheduling DP. Intervals are
+// presorted once by finish time, with index 0 a 0-weight sentinel, so
+// p[j] -- the last interval that finishes no later than j starts -- is
+// derived here rather than supplied: it is the largest such index, or the
+// sentinel 0 when no earlier interval fits.
 
 class WeightedIntervalScheduling {
-  int[] schedule(int[] s, int[] f, int[] w, int[] p) {
+  int[] schedule(int[] s, int[] f, int[] w) {
     int n = s.length;
+    int[] p = new int[n];
     int[] opt = new int[n];
     int[] G   = new int[n];
+    forall j in [1..n-1] : p[j] = lastCompatible(j, s, f);
     // Phase 1: compute optimal values.
     opt[0] = 0;
     forall cur in [1..n-1] :
@@ -20,5 +26,15 @@ class WeightedIntervalScheduling {
       }
     };
     return G;
+  }
+
+  // The largest i < j whose interval finishes no later than j starts, or 0
+  // when j overlaps every earlier interval.
+  int lastCompatible(int j, int[] s, int[] f) {
+    int best = 0;
+    forall i in [1..j-1] : {
+      if (f[i] <= s[j]) { best = i; };
+    };
+    return best;
   }
 }

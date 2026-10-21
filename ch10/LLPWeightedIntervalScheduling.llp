@@ -11,6 +11,7 @@
 class LLPWeightedIntervalScheduling {
   int[] LLPWeightedIntervalScheduling(int[] w, int[] p) {
     int[] G = 0;
+    setPriority(j, min);
     ensure (j in [1..n-1]) : G[j] >= max(G[j - 1], w[j] + G[p[j]]);
     return G;
   }

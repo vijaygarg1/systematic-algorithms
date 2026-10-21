@@ -4,12 +4,12 @@ import java.util.*;
 
 public class LinearSearch {
   public int LinearSearch(int[] A, int key) {
-    int i = 0;
-    while ((i < A.length)) {
-      if ((A[i] == key)) {
-        return i;
+    for (int i = 0; i < A.length; i++) {
+      {
+        if ((A[i] == key)) {
+          return i;
+        }
       }
-      i = (i + 1);
     }
     return (-1);
   }

@@ -29,13 +29,13 @@ public class Dijkstra {
       H.poll();
       if ((!fixed[j])) {
         fixed[j] = true;
-        int k = 0;
-        while ((k < n)) {
-          if ((((!fixed[k]) && (w[j][k] < INF)) && ((dist[j] + w[j][k]) < dist[k]))) {
-            dist[k] = (dist[j] + w[j][k]);
-            H.add(new int[]{dist[k], k});
+        for (int k = 0; k < n; k++) {
+          {
+            if ((((!fixed[k]) && (w[j][k] < INF)) && ((dist[j] + w[j][k]) < dist[k]))) {
+              dist[k] = (dist[j] + w[j][k]);
+              H.add(new int[]{dist[k], k});
+            }
           }
-          k = (k + 1);
         }
       }
     }

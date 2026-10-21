@@ -44,8 +44,7 @@ public class LLPLexMatchVertexCover {
     for (int x = 0; x < n; x++) {
       boolean t3 = false;
       for (int y = (x + 1); y < n; y++) {
-        if (!(((adj[x][y] == 1) && ((((x == i) || (x == j)) || (y == i)) || (y == j))))) continue;
-        if (((((!G[x]) && (!G[y])) && lexLess(x, y, i, j)) && (!((x == i) && (y == j))))) { t3 = true; break; }
+        if (((((((adj[x][y] == 1) && ((((x == i) || (x == j)) || (y == i)) || (y == j))) && (!G[x])) && (!G[y])) && lexLess(x, y, i, j)) && (!((x == i) && (y == j))))) { t3 = true; break; }
       }
       if (t3) { t2 = true; break; }
     }

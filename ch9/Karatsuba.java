@@ -22,10 +22,10 @@ public class Karatsuba {
 
   public int pow10(int k) {
     int r = 1;
-    int i = 0;
-    while ((i < k)) {
-      r = (r * 10);
-      i = (i + 1);
+    for (int i = 0; i < k; i++) {
+      {
+        r = (r * 10);
+      }
     }
     return r;
   }

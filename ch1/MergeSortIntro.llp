@@ -1,39 +1,34 @@
-// Recursive merge sort: split, sort halves, merge.
+// MergeSort as an example of recursion, matching bxx-introduction.tex
+// Algorithm MergeSort-Intro (algo:mergesort): split, sort each half, merge.
+// Merge copies the range into a scratch array B and then walks the two
+// halves back into A; its two leftover-copy loops are one line each, as
+// the book prints them.
 
-void MergeSortIntro(int[] A, int low, int high) {
-  if (low < high) {
-    int mid = (low + high) / 2;
-    MergeSortIntro(A, low, mid);
-    MergeSortIntro(A, mid + 1, high);
-    Merge(A, low, mid, high);
+class MergeSortIntro {
+  void MergeSortIntro(int[] A, int low, int high) {
+    if (low < high) {
+      int mid = (low + high) / 2;
+      MergeSortIntro(A, low, mid);
+      MergeSortIntro(A, mid + 1, high);
+      Merge(A, low, mid, high);
+    }
   }
-}
 
-// Auxiliary: in-place merge of A[low..mid] and A[mid+1..high].
-void Merge(int[] A, int low, int mid, int high) {
-  int[] B = new int[A.length];
-  forall k in [low..high] : B[k] = A[k];
-  int i = low;
-  int j = mid + 1;
-  int k = low;
-  while (i <= mid && j <= high) {
-    if (B[i] <= B[j]) {
-      A[k] = B[i];
-      i = i + 1;
-    } else {
-      A[k] = B[j];
-      j = j + 1;
+  void Merge(int[] A, int low, int mid, int high) {
+    int[] B = new int[A.length];
+    forall k in [low..high] : B[k] = A[k];
+    int i = low, j = mid + 1, k = low;
+    while (i <= mid && j <= high) {
+      if (B[i] <= B[j]) {
+        A[k] = B[i];
+        i = i + 1;
+      } else {
+        A[k] = B[j];
+        j = j + 1;
+      };
+      k = k + 1;
     };
-    k = k + 1;
-  };
-  while (i <= mid) {
-    A[k] = B[i];
-    i = i + 1;
-    k = k + 1;
-  };
-  while (j <= high) {
-    A[k] = B[j];
-    j = j + 1;
-    k = k + 1;
+    while (i <= mid)  { A[k] = B[i]; i = i + 1; k = k + 1; };   // leftover left half
+    while (j <= high) { A[k] = B[j]; j = j + 1; k = k + 1; }    // leftover right half
   }
 }

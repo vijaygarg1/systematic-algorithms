@@ -1,109 +1,73 @@
-// 2-SAT via implication graph and SCC detection (Kosaraju's algorithm).
+// Classical 2-SAT via Kosaraju's strongly-connected components.
 //
-// Both dfs methods stay, and the pair is not redundancy: Kosaraju's two passes
-// do different jobs. dfs1 walks the FORWARD graph and pushes each vertex onto
-// `order` as it finishes, building the finish-time ordering; dfs2 walks the
-// REVERSE graph in decreasing finish order and stamps every vertex it reaches
-// with one component id. They differ in which graph they follow, what marks a
-// vertex seen (visited[] vs comp[] >= 0) and what they record. Folding them
-// into one routine behind a mode flag would save about a dozen lines and hide
-// the two-phase structure that makes Kosaraju correct.
+// Each clause (a or b) contributes the two implications !a -> b and
+// !b -> a, giving a graph on 2n literals. The formula is satisfiable iff
+// no variable shares a component with its own negation, and setting x
+// true exactly when x's component is numbered after !x's is a satisfying
+// assignment -- Kosaraju numbers components in reverse topological order,
+// so the later component is the one implied.
 //
-// Literal x has index x; literal -x has index n + x. Clause (a or b) gives the
-// implications !a -> b and !b -> a.
+// Literal x maps to index x and !x to index n + x, which is what litIndex
+// computes. Each literal can source up to 2m implications, so the
+// adjacency rows are sized 2m + 1 rather than by the literal count.
 
 class TwoSAT {
   boolean[] TwoSAT(int[] clauseA, int[] clauseB) {
-    int m = clauseA.length;
-    // max(0, ...) covers the empty clause list, where the quantifier alone
-    // would yield -infinity.
-    int n = max(0, max i in [0..m-1] : max(abs(clauseA[i]), abs(clauseB[i])));
-    int sz = 2 * n + 2;
-    // Row width is the largest out-degree a literal can reach, not sz: each
-    // clause contributes two implications, and both can leave the SAME vertex
-    // (clause (a or a) gives !a -> a twice), so a literal can source up to 2m
-    // edges. Sizing the rows sz instead overflows whenever a literal is
-    // negated in more than 2n+2 clauses -- the common case for 2-SAT.
-    int cap = 2 * m + 1;
-    int[][] adjFwd = new int[sz][cap];
-    int[] degFwd = new int[sz];
-    int[][] adjRev = new int[sz][cap];
-    int[] degRev = new int[sz];
-
-    int i = 0;
-    while (i < m) {
-      addImplication(litIndex(0 - clauseA[i], n), litIndex(clauseB[i], n),
-                     adjFwd, degFwd, adjRev, degRev);
-      addImplication(litIndex(0 - clauseB[i], n), litIndex(clauseA[i], n),
-                     adjFwd, degFwd, adjRev, degRev);
-      i = i + 1;
+    int m = clauseA.length, n = max(0, max i in [0..m-1] : max(abs(clauseA[i]), abs(clauseB[i])));
+    int sz = 2 * n + 2, cap = 2 * m + 1;
+    int[][] adjFwd = new int[sz][cap], adjRev = new int[sz][cap];
+    int[] degFwd = new int[sz], degRev = new int[sz];
+    forall i in [0..m-1] : {
+      addImplication(litIndex(0 - clauseA[i], n), litIndex(clauseB[i], n), adjFwd, degFwd, adjRev, degRev);
+      addImplication(litIndex(0 - clauseB[i], n), litIndex(clauseA[i], n), adjFwd, degFwd, adjRev, degRev);
     };
 
-    // Pass 1: finish-time order on the forward graph.
+    // Pass 1: push every literal onto order after its descendants.
     int[] order = new int[sz];
-    int orderSize = 0;
+    int orderSize = 0, v = 0;
     boolean[] visited = new boolean[sz];
-    int v = 0;
     while (v < sz) {
-      if (!visited[v]) {
-        orderSize = dfs1(v, adjFwd, degFwd, visited, order, orderSize);
-      };
+      if (!visited[v]) { orderSize = dfs1(v, adjFwd, degFwd, visited, order, orderSize); };
       v = v + 1;
     };
 
-    // Pass 2: components on the reverse graph, in decreasing finish order.
+    // Pass 2: pop that order and flood the REVERSE graph; each flood is
+    // one strongly-connected component.
     int[] comp = new int[sz];
     forall k in [0..sz-1] : comp[k] = 0 - 1;
-    int numComp = 0;
-    int idx = orderSize - 1;
+    int numComp = 0, idx = orderSize - 1;
     while (idx >= 0) {
       if (comp[order[idx]] < 0) {
-        dfs2(order[idx], adjRev, degRev, comp, numComp);
-        numComp = numComp + 1;
+        dfs2(order[idx], adjRev, degRev, comp, numComp); numComp = numComp + 1;
       };
       idx = idx - 1;
     };
 
-    // x is true iff its positive literal lands in the later component.
     boolean[] result = new boolean[n + 1];
     forall x in [1..n] : result[x] = comp[x] > comp[n + x];
     return result;
   }
 
-  // Record one implication, in the forward graph and the reverse graph at once.
-  void addImplication(int from, int to, int[][] adjFwd, int[] degFwd,
-                      int[][] adjRev, int[] degRev) {
-    adjFwd[from][degFwd[from]] = to;
-    degFwd[from] = degFwd[from] + 1;
-    adjRev[to][degRev[to]] = from;
-    degRev[to] = degRev[to] + 1;
+  void addImplication(int from, int to, int[][] adjFwd, int[] degFwd, int[][] adjRev, int[] degRev) {
+    adjFwd[from][degFwd[from]] = to; degFwd[from] = degFwd[from] + 1;
+    adjRev[to][degRev[to]] = from; degRev[to] = degRev[to] + 1;
   }
 
-  // Forward pass: append u to `order` once every successor has finished.
   int dfs1(int u, int[][] adj, int[] deg, boolean[] visited, int[] order, int orderSize) {
     visited[u] = true;
-    int i = 0;
-    while (i < deg[u]) {
+    forall i in [0..deg[u]-1] : {
       int w = adj[u][i];
-      if (!visited[w]) {
-        orderSize = dfs1(w, adj, deg, visited, order, orderSize);
-      };
-      i = i + 1;
+      if (!visited[w]) { orderSize = dfs1(w, adj, deg, visited, order, orderSize); };
     };
     order[orderSize] = u;
     return orderSize + 1;
   }
 
-  // Reverse pass: stamp u and everything reachable from it with component c.
   void dfs2(int u, int[][] adj, int[] deg, int[] comp, int c) {
     comp[u] = c;
-    int i = 0;
-    while (i < deg[u]) {
+    forall i in [0..deg[u]-1] : {
       int w = adj[u][i];
-      if (comp[w] < 0) {
-        dfs2(w, adj, deg, comp, c);
-      };
-      i = i + 1;
+      if (comp[w] < 0) { dfs2(w, adj, deg, comp, c); };
     }
   }
 

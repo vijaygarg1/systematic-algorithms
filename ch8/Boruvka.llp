@@ -1,87 +1,65 @@
-// Classical Boruvka MST (bxx-mst.tex, algo:Boruvka-seq): repeatedly
-// attach every component to its cheapest outgoing edge until one
-// component remains. The book's own precondition is a connected graph
-// (\KwIn{undirected connected weighted graph}), which this is not relied
-// on alone: `progress` guards against a disconnected input (some
-// component never finding an outgoing edge) so the loop below cannot
-// spin forever waiting for a spanning tree that cannot exist.
+// Classical Boruvka minimum spanning tree: in each round every current
+// component picks its own cheapest outgoing edge and all those edges are
+// added at once, so the number of components at least halves per round
+// and O(log n) rounds suffice.
+//
+// T marks the chosen edges; cid[v] is the representative of v's component,
+// recomputed each round by flooding the edges already in T. A round that
+// adds no edge means the graph is disconnected, which is what progress
+// stops on -- otherwise the loop would spin forever below n-1 edges.
 
 class Boruvka {
   boolean[] mst(int n, int[] U, int[] V, int[] W) {
-    int m = U.length;
+    int m = U.length, treeEdges = 0;
     boolean[] T = new boolean[m];
     int[] cid = new int[n];
-    int treeEdges = 0;
     boolean progress = true;
     while (treeEdges < n - 1 && progress) {
       int roundStart = treeEdges;
-      // Component ids: BFS in (V, T) gives every vertex the
-      // least-numbered vertex in its component.
       components(n, U, V, T, cid);
 
+      // Cheapest edge leaving each component, ties going to the lower
+      // edge number: both endpoints' components see the same edge.
       int[] mwe = new int[n];
       double[] dist = new double[n];
       forall i in [0..n-1] : mwe[i] = -1;
       forall i in [0..n-1] : dist[i] = infinity;
-
-      int e = 0;
-      while (e < m) {
-        int i = U[e];
-        int j = V[e];
-        if (cid[i] != cid[j]) {
-          if (W[e] < dist[cid[i]]) {
-            dist[cid[i]] = W[e];
-            mwe[cid[i]] = e;
-          };
-          if (W[e] < dist[cid[j]]) {
-            dist[cid[j]] = W[e];
-            mwe[cid[j]] = e;
-          };
+      forall e in [0..m-1] :
+        if (cid[U[e]] != cid[V[e]]) {
+          relax(cid[U[e]], e, W, dist, mwe); relax(cid[V[e]], e, W, dist, mwe);
         };
-        e = e + 1;
-      };
 
       forall i in [0..n-1] :
-        if (cid[i] == i && mwe[i] != -1 && !T[mwe[i]]) {
-          T[mwe[i]] = true;
-          treeEdges = treeEdges + 1;
-        };
+        if (cid[i] == i && mwe[i] != -1 && !T[mwe[i]]) { T[mwe[i]] = true; treeEdges = treeEdges + 1; };
       progress = treeEdges > roundStart;
     };
     return T;
   }
 
-  // Aux: cid[v] := least-numbered vertex reachable from v in (V, T).
+  // Record e as the cheapest outgoing edge seen so far for component comp.
+  void relax(int comp, int e, int[] W, double[] dist, int[] mwe) {
+    if (W[e] < dist[comp]) { dist[comp] = W[e]; mwe[comp] = e; }
+  }
+
+  // Label every vertex with the root of its T-connected component.
   void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {
     boolean[] visited = new boolean[n];
-    forall i in [0..n-1] : visited[i] = false;
-    int i = 0;
-    while (i < n) {
-      if (!visited[i]) {
-        bfs(i, i, n, U, V, T, visited, cid);
-      };
-      i = i + 1;
+    forall i in [0..n-1] : {
+      if (!visited[i]) { bfs(i, i, U, V, T, visited, cid); };
     };
   }
 
-  // Aux: recursively visits v and every vertex reachable from it in
-  // (V, T), labelling each with the component's root.
-  void bfs(int v, int root, int n, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
-    visited[v] = true;
-    cid[v] = root;
-    int e = 0;
-    while (e < U.length) {
+  void bfs(int v, int root, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
+    visited[v] = true; cid[v] = root;
+    forall e in [0..U.length-1] : {
       if (T[e]) {
         int u = neighborIf(U[e], V[e], v);
-        if (u != -1 && !visited[u]) {
-          bfs(u, root, n, U, V, T, visited, cid);
-        };
+        if (u != -1 && !visited[u]) { bfs(u, root, U, V, T, visited, cid); };
       };
-      e = e + 1;
     };
   }
 
-  // Aux: if edge (a,b) touches v, return the other endpoint, else -1.
+  // The other endpoint of edge (a,b) when v is one of them, else -1.
   int neighborIf(int a, int b, int v) {
     if (a == v) { return b; };
     if (b == v) { return a; };

@@ -6,7 +6,7 @@
 //
 // S and G are program fields, so the aux methods read them directly
 // rather than threading them through every call, and the tie-break scan
-// is the single `exists ... where` it is defined as.
+// is the single exists it is defined as.
 
 import java.util.*;
 
@@ -51,8 +51,7 @@ public class LLPLexGreedySetCover {
   public boolean isLexMaxCov(int j) {
     boolean t1 = false;
     for (int k = 0; k < m; k++) {
-      if (!((((k != j) && (!G[k])) && shareUncovered(j, k)))) continue;
-      if (((coverage(k) > coverage(j)) || ((coverage(k) == coverage(j)) && (k < j)))) { t1 = true; break; }
+      if (((((k != j) && (!G[k])) && shareUncovered(j, k)) && ((coverage(k) > coverage(j)) || ((coverage(k) == coverage(j)) && (k < j))))) { t1 = true; break; }
     }
     return (((!G[j]) && (coverage(j) > 0)) && (!t1));
   }

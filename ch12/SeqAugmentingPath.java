@@ -33,16 +33,16 @@ public class SeqAugmentingPath {
 
   public boolean alternatingPath(int j, int[][] adj, int[] S, boolean[] seen) {
     int m = adj[0].length;
-    int k = 0;
-    while ((k < m)) {
-      if (((adj[j][k] == 1) && (!seen[k]))) {
-        seen[k] = true;
-        if (((S[k] == (0 - 1)) || alternatingPath(S[k], adj, S, seen))) {
-          S[k] = j;
-          return true;
+    for (int k = 0; k < m; k++) {
+      {
+        if (((adj[j][k] == 1) && (!seen[k]))) {
+          seen[k] = true;
+          if (((S[k] == (0 - 1)) || alternatingPath(S[k], adj, S, seen))) {
+            S[k] = j;
+            return true;
+          }
         }
       }
-      k = (k + 1);
     }
     return false;
   }

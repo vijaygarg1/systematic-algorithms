@@ -60,12 +60,15 @@ public class LLPWeightedVertexCover {
   }
 
   public double price(int v) {
-    double t1 = 0;
+    double total = 0.0;
     for (int u = 0; u < nv; u++) {
-      if (!((adj[u][v] == 1))) continue;
-      t1 += G[u][v];
+      {
+        if ((adj[u][v] == 1)) {
+          total = (total + G[u][v]);
+        }
+      }
     }
-    return t1;
+    return total;
   }
 
   public boolean tight(int v) {
@@ -77,16 +80,15 @@ public class LLPWeightedVertexCover {
   }
 
   public boolean slackMin(int u, int v) {
-    boolean t2 = false;
+    boolean t1 = false;
     for (int x = 0; x < nv; x++) {
-      boolean t3 = false;
+      boolean t2 = false;
       for (int y = (x + 1); y < nv; y++) {
-        if (!(((adj[x][y] == 1) && ((((x == u) || (x == v)) || (y == u)) || (y == v))))) continue;
-        if (((slack(x, y) && lexLess(x, y, u, v)) && (!((x == u) && (y == v))))) { t3 = true; break; }
+        if ((((((adj[x][y] == 1) && ((((x == u) || (x == v)) || (y == u)) || (y == v))) && slack(x, y)) && lexLess(x, y, u, v)) && (!((x == u) && (y == v))))) { t2 = true; break; }
       }
-      if (t3) { t2 = true; break; }
+      if (t2) { t1 = true; break; }
     }
-    return (((adj[u][v] == 1) && slack(u, v)) && (!t2));
+    return (((adj[u][v] == 1) && slack(u, v)) && (!t1));
   }
 
   public boolean lexLess(int a, int b, int c, int d) {

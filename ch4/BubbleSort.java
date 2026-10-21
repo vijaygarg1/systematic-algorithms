@@ -7,13 +7,13 @@ public class BubbleSort {
     boolean found = true;
     while (found) {
       found = false;
-      int j = 0;
-      while ((j < (A.length - 1))) {
-        if ((A[j] > A[(j + 1)])) {
-          found = true;
-          { int tmp = A[j]; A[j] = A[(j + 1)]; A[(j + 1)] = tmp; }
+      for (int j = 0; j < (A.length - 1); j++) {
+        {
+          if ((A[j] > A[(j + 1)])) {
+            found = true;
+            { int tmp = A[j]; A[j] = A[(j + 1)]; A[(j + 1)] = tmp; }
+          }
         }
-        j = (j + 1);
       }
     }
   }

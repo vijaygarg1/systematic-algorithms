@@ -1,7 +1,12 @@
-// Ford-Fulkerson max-flow: repeatedly find an augmenting path in the
-// residual graph via DFS, push its bottleneck capacity, until none
-// remains. Shares its outer loop verbatim with EdmondsKarp.llp, which
-// differs only in finding augmenting paths via BFS instead of DFS.
+// Classical Ford-Fulkerson maximum flow: repeatedly find an augmenting
+// path in the residual graph by depth-first search and push the largest
+// amount that fits along it, until no augmenting path remains.
+//
+// f is the flow matrix; residual(u, v) = c[u][v] - f[u][v] is the spare
+// capacity of arc (u,v), and pushing b along (u,v) also subtracts b from
+// f[v][u], which is what lets a later path cancel earlier flow.
+// findAugmentingPath leaves the path in parent[], as a chain of
+// predecessors running back from t to s.
 
 import java.util.*;
 
@@ -10,37 +15,31 @@ public class FordFulkerson {
     int n = c.length;
     int[][] f = new int[n][n];
     int[] parent = new int[n];
-    boolean done = false;
-    while ((!done)) {
-      int found = findAugmentingPath(c, f, s, t, parent);
-      if ((found == 0)) {
-        done = true;
-      } else {
-        int bottleneck = Integer.MAX_VALUE;
-        int v = t;
-        while ((v != s)) {
-          int u = parent[v];
-          int r = residual(c, f, u, v);
-          if ((r < bottleneck)) {
-            bottleneck = r;
-          }
-          v = u;
-        }
-        v = t;
-        while ((v != s)) {
-          int u = parent[v];
-          f[u][v] = (f[u][v] + bottleneck);
-          f[v][u] = (f[v][u] - bottleneck);
-          v = u;
-        }
-      }
+    while ((findAugmentingPath(c, f, s, t, parent) == 1)) {
+      augment(f, s, t, parent, bottleneck(c, f, s, t, parent));
     }
     return f;
   }
 
+  public int bottleneck(int[][] c, int[][] f, int s, int v, int[] parent) {
+    if ((v == s)) {
+      return Integer.MAX_VALUE;
+    }
+    return Math.min(residual(c, f, parent[v], v), bottleneck(c, f, s, parent[v], parent));
+  }
+
+  public void augment(int[][] f, int s, int v, int[] parent, int b) {
+    if ((v == s)) {
+      return;
+    }
+    int u = parent[v];
+    f[u][v] = (f[u][v] + b);
+    f[v][u] = (f[v][u] - b);
+    augment(f, s, u, parent, b);
+  }
+
   public int findAugmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
-    int n = c.length;
-    boolean[] seen = new boolean[n];
+    boolean[] seen = new boolean[c.length];
     seen[s] = true;
     parent[s] = s;
     return dfs(c, f, s, t, parent, seen);
@@ -50,17 +49,16 @@ public class FordFulkerson {
     if ((u == t)) {
       return 1;
     }
-    int n = c.length;
-    int v = 0;
-    while ((v < n)) {
-      if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
-        seen[v] = true;
-        parent[v] = u;
-        if ((dfs(c, f, v, t, parent, seen) == 1)) {
-          return 1;
+    for (int v = 0; v < c.length; v++) {
+      {
+        if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
+          seen[v] = true;
+          parent[v] = u;
+          if ((dfs(c, f, v, t, parent, seen) == 1)) {
+            return 1;
+          }
         }
       }
-      v = (v + 1);
     }
     return 0;
   }

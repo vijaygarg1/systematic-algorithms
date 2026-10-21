@@ -15,8 +15,7 @@ class ApproxSetCover {
     while (anyUncovered(covered, n)) {
       int bestIdx   = 0;
       int bestCover = 0 - 1;
-      int s = 0;
-      while (s < m) {
+      forall s in [0..m-1] : {
         int count = 0;
         int e = 0;
         while (e < n) {
@@ -29,15 +28,12 @@ class ApproxSetCover {
           bestCover = count;
           bestIdx   = s;
         };
-        s = s + 1;
       };
       C[bestIdx] = true;
-      int e = 0;
-      while (e < n) {
+      forall e in [0..n-1] : {
         if (S[bestIdx][e] == 1) {
           covered[e] = true;
         };
-        e = e + 1;
       }
     };
     return C;

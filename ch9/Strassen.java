@@ -1,21 +1,11 @@
-// Strassen's matrix multiplication: seven recursive products instead of eight.
+// Strassen's divide-and-conquer matrix multiplication over int[][].
+// Splitting each n x n operand into four n/2 quadrants, the product needs
+// only SEVEN recursive multiplications instead of the obvious eight, which
+// is what drops the exponent from 3 to log2(7) ~ 2.81. The saving comes
+// from M1..M7 below: each is one product of sums, and the four output
+// quadrants are recovered from them by addition alone.
 //
-// Matches bxx-divideConquer.tex Algorithm Strassen (algo:strassen), step for
-// step: the base case, the four quadrants of each operand, the seven products
-// M1..M7, the four blocks of C, and the reassembly.
-//
-// The book writes the quadrant arithmetic infix -- Strassen(A11 + A22,
-// B11 + B22) and C11 := M1 + M4 - M5 + M7 -- which needs a matrix type with
-// operators. LL has none, so a matrix is an int[][] and those sums nest
-// add()/sub() calls instead. That is the only departure; the arithmetic is
-// the book's, left to right.
-//
-// Size is read off the operand rather than passed: the book's \KwIn says
-// "A, B: n x n matrices" and leaves the recursive size implicit in "Each
-// n/2 x n/2", and A.length says exactly that. Indices are 0-based against
-// the book's C[1,1] := A[1,1] . B[1,1].
-//
-// n must be a power of 2, as the book requires.
+// Sizes are assumed to be powers of two, so every split is exact.
 
 import java.util.*;
 

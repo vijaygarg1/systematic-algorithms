@@ -9,18 +9,18 @@ public class BellmanFord {
       dist[i] = Integer.MAX_VALUE;
     }
     dist[s] = 0;
-    int k = 1;
-    while ((k < n)) {
-      int e = 0;
-      while ((e < U.length)) {
-        int u = U[e];
-        int v = V[e];
-        if (((dist[u] != Integer.MAX_VALUE) && ((dist[u] + W[e]) < dist[v]))) {
-          dist[v] = (dist[u] + W[e]);
+    for (int k = 1; k < n; k++) {
+      {
+        for (int e = 0; e < U.length; e++) {
+          {
+            int u = U[e];
+            int v = V[e];
+            if (((dist[u] != Integer.MAX_VALUE) && ((dist[u] + W[e]) < dist[v]))) {
+              dist[v] = (dist[u] + W[e]);
+            }
+          }
         }
-        e = (e + 1);
       }
-      k = (k + 1);
     }
     return dist;
   }

@@ -1,16 +1,15 @@
-// 2-SAT via implication graph and SCC detection (Kosaraju's algorithm).
+// Classical 2-SAT via Kosaraju's strongly-connected components.
 //
-// Both dfs methods stay, and the pair is not redundancy: Kosaraju's two passes
-// do different jobs. dfs1 walks the FORWARD graph and pushes each vertex onto
-// `order` as it finishes, building the finish-time ordering; dfs2 walks the
-// REVERSE graph in decreasing finish order and stamps every vertex it reaches
-// with one component id. They differ in which graph they follow, what marks a
-// vertex seen (visited[] vs comp[] >= 0) and what they record. Folding them
-// into one routine behind a mode flag would save about a dozen lines and hide
-// the two-phase structure that makes Kosaraju correct.
+// Each clause (a or b) contributes the two implications !a -> b and
+// !b -> a, giving a graph on 2n literals. The formula is satisfiable iff
+// no variable shares a component with its own negation, and setting x
+// true exactly when x's component is numbered after !x's is a satisfying
+// assignment -- Kosaraju numbers components in reverse topological order,
+// so the later component is the one implied.
 //
-// Literal x has index x; literal -x has index n + x. Clause (a or b) gives the
-// implications !a -> b and !b -> a.
+// Literal x maps to index x and !x to index n + x, which is what litIndex
+// computes. Each literal can source up to 2m implications, so the
+// adjacency rows are sized 2m + 1 rather than by the literal count.
 
 import java.util.*;
 
@@ -26,19 +25,19 @@ public class TwoSAT {
     int sz = ((2 * n) + 2);
     int cap = ((2 * m) + 1);
     int[][] adjFwd = new int[sz][cap];
-    int[] degFwd = new int[sz];
     int[][] adjRev = new int[sz][cap];
+    int[] degFwd = new int[sz];
     int[] degRev = new int[sz];
-    int i = 0;
-    while ((i < m)) {
-      addImplication(litIndex((0 - clauseA[i]), n), litIndex(clauseB[i], n), adjFwd, degFwd, adjRev, degRev);
-      addImplication(litIndex((0 - clauseB[i]), n), litIndex(clauseA[i], n), adjFwd, degFwd, adjRev, degRev);
-      i = (i + 1);
+    for (int i = 0; i < m; i++) {
+      {
+        addImplication(litIndex((0 - clauseA[i]), n), litIndex(clauseB[i], n), adjFwd, degFwd, adjRev, degRev);
+        addImplication(litIndex((0 - clauseB[i]), n), litIndex(clauseA[i], n), adjFwd, degFwd, adjRev, degRev);
+      }
     }
     int[] order = new int[sz];
     int orderSize = 0;
-    boolean[] visited = new boolean[sz];
     int v = 0;
+    boolean[] visited = new boolean[sz];
     while ((v < sz)) {
       if ((!visited[v])) {
         orderSize = dfs1(v, adjFwd, degFwd, visited, order, orderSize);
@@ -74,13 +73,13 @@ public class TwoSAT {
 
   public int dfs1(int u, int[][] adj, int[] deg, boolean[] visited, int[] order, int orderSize) {
     visited[u] = true;
-    int i = 0;
-    while ((i < deg[u])) {
-      int w = adj[u][i];
-      if ((!visited[w])) {
-        orderSize = dfs1(w, adj, deg, visited, order, orderSize);
+    for (int i = 0; i < deg[u]; i++) {
+      {
+        int w = adj[u][i];
+        if ((!visited[w])) {
+          orderSize = dfs1(w, adj, deg, visited, order, orderSize);
+        }
       }
-      i = (i + 1);
     }
     order[orderSize] = u;
     return (orderSize + 1);
@@ -88,13 +87,13 @@ public class TwoSAT {
 
   public void dfs2(int u, int[][] adj, int[] deg, int[] comp, int c) {
     comp[u] = c;
-    int i = 0;
-    while ((i < deg[u])) {
-      int w = adj[u][i];
-      if ((comp[w] < 0)) {
-        dfs2(w, adj, deg, comp, c);
+    for (int i = 0; i < deg[u]; i++) {
+      {
+        int w = adj[u][i];
+        if ((comp[w] < 0)) {
+          dfs2(w, adj, deg, comp, c);
+        }
       }
-      i = (i + 1);
     }
   }
 

@@ -26,7 +26,11 @@ class LLPWeightedVertexCover {
 
   // Total dual charged to v across its incident edges.
   double price(int v) {
-    return sum u in [0..nv-1] where adj[u][v] == 1 : G[u][v];
+    double total = 0.0;
+    forall u in [0..nv-1] : {
+      if (adj[u][v] == 1) { total = total + G[u][v]; };
+    };
+    return total;
   }
 
   boolean tight(int v) {
@@ -42,9 +46,10 @@ class LLPWeightedVertexCover {
   // lexicographically smaller.
   boolean slackMin(int u, int v) {
     return adj[u][v] == 1 && slack(u, v)
-        && !(exists x in [0..nv-1] : (exists y in [x+1..nv-1]
-               where adj[x][y] == 1 && (x == u || x == v || y == u || y == v) :
-               (slack(x, y) && lexLess(x, y, u, v) && !(x == u && y == v))));
+        && !(exists x in [0..nv-1] : (exists y in [x+1..nv-1] :
+               (adj[x][y] == 1 && (x == u || x == v || y == u || y == v)
+                && slack(x, y) && lexLess(x, y, u, v)
+                && !(x == u && y == v))));
   }
 
   // Edge (a, b) is lexicographically smaller than (c, d).

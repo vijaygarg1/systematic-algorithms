@@ -30,21 +30,28 @@ public class LLPLIS {
     G[j] = t2;
   }
 
+  private double priority(int j) {
+    return j;
+  }
+
   public int[] LLPLIS(int[] A, int[][] pre) {
     this.A = A;
     this.pre = pre;
     this.n = A.length;
     this.G = new int[n];
     for (int i = 0; i < n; i++) this.G[i] = 1;
+    java.util.List<int[]> _ord = new java.util.ArrayList<>();
+    for (int j = 0; j < n; j++) {
+      _ord.add(new int[]{j});
+    }
+    _ord.sort((_a, _b) -> Double.compare(priority(_a[0]), priority(_b[0])));
     {
       boolean changed = true;
       while (changed) {
         changed = false;
-        for (int j = 0; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
-            changed = true;
-          }
+        for (int[] _t : _ord) {
+          int j = _t[0];
+          if (forbidden(j)) { this.j = j; advance(); changed = true; }
         }
       }
     }

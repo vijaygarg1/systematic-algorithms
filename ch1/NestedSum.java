@@ -5,14 +5,14 @@ import java.util.*;
 public class NestedSum {
   public int NestedSum(int n) {
     int total = 0;
-    int i = 0;
-    while ((i < n)) {
-      int j = 0;
-      while ((j < n)) {
-        total = (total + (i * j));
-        j = (j + 1);
+    for (int i = 0; i < n; i++) {
+      {
+        for (int j = 0; j < n; j++) {
+          {
+            total = (total + (i * j));
+          }
+        }
       }
-      i = (i + 1);
     }
     return total;
   }

@@ -1,4 +1,8 @@
-// Recursive merge sort: split, sort halves, merge.
+// MergeSort as an example of recursion, matching bxx-introduction.tex
+// Algorithm MergeSort-Intro (algo:mergesort): split, sort each half, merge.
+// Merge copies the range into a scratch array B and then walks the two
+// halves back into A; its two leftover-copy loops are one line each, as
+// the book prints them.
 
 import java.util.*;
 

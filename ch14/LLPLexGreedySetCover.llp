@@ -6,7 +6,7 @@
 //
 // S and G are program fields, so the aux methods read them directly
 // rather than threading them through every call, and the tie-break scan
-// is the single `exists ... where` it is defined as.
+// is the single exists it is defined as.
 
 class LLPLexGreedySetCover {
   boolean[] LLPLexGreedySetCover(int[][] S) {
@@ -23,8 +23,9 @@ class LLPLexGreedySetCover {
   // smaller index.
   boolean isLexMaxCov(int j) {
     return !G[j] && coverage(j) > 0
-        && !(exists k in [0..m-1] where k != j && !G[k] && shareUncovered(j, k) :
-               coverage(k) > coverage(j) || (coverage(k) == coverage(j) && k < j));
+        && !(exists k in [0..m-1] : (k != j && !G[k] && shareUncovered(j, k)
+               && (coverage(k) > coverage(j)
+                   || (coverage(k) == coverage(j) && k < j))));
   }
 
   // |s_j ∩ R| where R is the set of currently uncovered elements.

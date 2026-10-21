@@ -1,4 +1,6 @@
-// Merge two sorted arrays B and C into a new sorted D.
+// MergeTwo: merge two sorted arrays into one, matching bxx-sort.tex
+// Algorithm MergeTwo (fig:mergetwo) line for line -- including the two
+// leftover-copy loops, which the book also prints as a single line each.
 
 import java.util.*;
 

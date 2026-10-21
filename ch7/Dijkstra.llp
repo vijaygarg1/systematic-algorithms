@@ -25,13 +25,11 @@ class Dijkstra {
       H.removeMin();
       if (!fixed[j]) {
         fixed[j] = true;
-        int k = 0;
-        while (k < n) {
+        forall k in [0..n-1] : {
           if (!fixed[k] && w[j][k] < INF && dist[j] + w[j][k] < dist[k]) {
             dist[k] = dist[j] + w[j][k];
             H.push(dist[k], k);
           };
-          k = k + 1;
         }
       }
     };

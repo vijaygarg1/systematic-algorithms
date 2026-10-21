@@ -1,27 +1,15 @@
-// LLP-Boruvka (bxx-mst-llp-boruvka.tex, algo:Boruvka-llp): the book's
-// recursive Boruvka(V,E) -- each level selects every active vertex's
-// minimum-weight edge (breaking a mutual-mwe tie toward the
-// smaller-numbered vertex), pointer-jumps to rooted stars via the LLP
-// kernel, records every active vertex's own mwe edge in T, keeps only
-// the roots active, and recurses until one component remains. The
-// book's tail recursion is written here as a `while` loop (the two are
-// semantically identical -- the recursive call is the last action at
-// each level, with T already accumulated) so the LLP kernel can stay a
-// genuine `forbidden`/`advance` guard, re-run to a fresh fixpoint once
-// per level by the surrounding loop. G and active[] persist across
-// levels rather than being relabeled into a smaller V'/E' each time (no
-// dynamic graph type in this language); find(v) walks G to a fixpoint
-// instead, resolving any edge -- even one between two long-since-
-// absorbed vertices -- to its current top-level components, the same
-// effect as the book's contraction without rebuilding the graph. The
-// book's own precondition is a connected graph with no self-loops
-// (bxx-mst-llp-boruvka.tex: "we assume that the input ... is a connected
-// graph without any self-loops"), so it never needs to handle a vertex
-// with no outgoing edge at all; `progress` guards against exactly that
-// case (a disconnected input, or a self-loop/isolated vertex in a
-// synthesized test instance) the same way classical Boruvka.llp's own
-// `progress` guard does, so the loop below cannot spin forever waiting
-// for a spanning tree that cannot exist.
+// LLP-Boruvka: Boruvka's minimum spanning tree with the component
+// contraction done by LLP pointer jumping instead of recursion.
+//
+// Each round every active component finds its cheapest outgoing edge,
+// points at the component on the other end, and then the guard below
+// jumps those pointers until each chain collapses to one representative:
+// forbidden when G[j] is not yet its own component's root, advance by
+// following one more link. Mutual choices are broken by keeping the lower
+// index as the root, which is what pointTo decides.
+//
+// A round that merges nothing means the graph is disconnected, which is
+// what progress stops on.
 
 import java.util.*;
 
@@ -31,8 +19,8 @@ public class LLPBoruvka {
   int[] V;
   int[] W;
   boolean[] T;
-  int[] G;
   boolean[] active;
+  int[] G;
   int[] mweEdge;
   double[] mweW;
   int j;
@@ -53,8 +41,8 @@ public class LLPBoruvka {
     this.V = V;
     this.W = W;
     this.T = new boolean[U.length];
-    this.G = new int[n];
     this.active = new boolean[n];
+    this.G = new int[n];
     this.mweEdge = new int[n];
     this.mweW = new double[n];
     for (int i = 0; i < n; i++) {
@@ -77,14 +65,8 @@ public class LLPBoruvka {
           int ru = find(U[e]);
           int rv = find(V[e]);
           if (((active[ru] && active[rv]) && (ru != rv))) {
-            if ((W[e] < mweW[ru])) {
-              mweW[ru] = W[e];
-              mweEdge[ru] = e;
-            }
-            if ((W[e] < mweW[rv])) {
-              mweW[rv] = W[e];
-              mweEdge[rv] = e;
-            }
+            relax(ru, e, W);
+            relax(rv, e, W);
           }
         }
       }
@@ -118,6 +100,13 @@ public class LLPBoruvka {
       progress = (countActive() < before);
     }
     return T;
+  }
+
+  public void relax(int comp, int e, int[] W) {
+    if ((W[e] < mweW[comp])) {
+      mweW[comp] = W[e];
+      mweEdge[comp] = e;
+    }
   }
 
   public int pointTo(int i) {

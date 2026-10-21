@@ -35,14 +35,14 @@ public class Prim {
       if ((!fixed[v])) {
         fixed[v] = true;
         count = (count + 1);
-        int k = 0;
-        while ((k < n)) {
-          if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
-            d[k] = w[v][k];
-            parent[k] = v;
-            H.add(new int[]{d[k], k});
+        for (int k = 0; k < n; k++) {
+          {
+            if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
+              d[k] = w[v][k];
+              parent[k] = v;
+              H.add(new int[]{d[k], k});
+            }
           }
-          k = (k + 1);
         }
       }
     }

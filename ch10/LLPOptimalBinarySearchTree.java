@@ -1,4 +1,20 @@
 // LLP-OptimalBinarySearchTree: ensure G[i][j] >= optimal cost over interval [i..j].
+//
+// setPriority, not setContainer: the key j-i is fixed, every index the
+// scheduler offers is already forbidden, and the advance only ever raises
+// G[i][j] to a value it must reach anyway -- so the answer is the same in
+// any order. Shortest intervals first merely reaches the fixpoint in one
+// sweep instead of several.
+//
+// PRECONDITION on the index pair: G[i][j] is the cost of the key range
+// [i..j], which only names a range when i <= j. The guard says so
+// explicitly, because the fixpoint scans the full (i, j) square: without
+// the i <= j conjunct it also fired on the empty ranges below the
+// diagonal, where optCost's forall over k in [i..j] iterates zero times and
+// returns its seed, writing that seed into G[i][j] as though it were a
+// cost. Those cells are never read -- every reference to G is guarded by
+// k > i or k < j -- so the answers above the diagonal were right either
+// way, but the lower triangle came back full of sentinel values.
 
 import java.util.*;
 
@@ -8,9 +24,9 @@ public class LLPOptimalBinarySearchTree {
   double[][] G;
   int i;
   int j;
-  PriorityQueue<int[]> forbiddenHeap;
 
   private boolean forbidden(int i, int j) {
+    if (!((i <= j))) return false;
     if (!((G[i][j] < optCost(p, G, i, j)))) return false;
     return true;
   }
@@ -27,19 +43,28 @@ public class LLPOptimalBinarySearchTree {
     this.p = p;
     this.G = G;
     this.n = p.length;
-    forbiddenHeap = new PriorityQueue<>(
-      (a, b) -> Double.compare(priority(a[0], a[1]), priority(b[0], b[1])));
-    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) forbiddenHeap.add(new int[]{i, j});
-    while (!forbiddenHeap.isEmpty()) {
-      int[] _idx = forbiddenHeap.poll();
-      int i = _idx[0];
-      int j = _idx[1];
-      if (forbidden(i, j)) { this.i = i; this.j = j; advance(); }
+    java.util.List<int[]> _ord = new java.util.ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        _ord.add(new int[]{i, j});
+      }
+    }
+    _ord.sort((_a, _b) -> Double.compare(priority(_a[0], _a[1]), priority(_b[0], _b[1])));
+    {
+      boolean changed = true;
+      while (changed) {
+        changed = false;
+        for (int[] _t : _ord) {
+          int i = _t[0];
+          int j = _t[1];
+          if (forbidden(i, j)) { this.i = i; this.j = j; advance(); changed = true; }
+        }
+      }
     }
   }
 
   public double optCost(double[] p, double[][] G, int i, int j) {
-    double best = Integer.MAX_VALUE;
+    double best = Double.POSITIVE_INFINITY;
     for (int k = i; k <= j; k++) {
       {
         double s = 0.0;

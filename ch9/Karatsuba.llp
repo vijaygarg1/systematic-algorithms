@@ -21,10 +21,8 @@ class Karatsuba {
   // Aux: 10^k by repeated multiplication.
   int pow10(int k) {
     int r = 1;
-    int i = 0;
-    while (i < k) {
+    forall i in [0..k-1] : {
       r = r * 10;
-      i = i + 1;
     };
     return r;
   }

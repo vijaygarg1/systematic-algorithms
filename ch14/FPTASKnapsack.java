@@ -1,87 +1,76 @@
-// FPTAS for Knapsack: discard items that cannot fit, then scale profits by
-// mu = eps*M/nf (M = max profit among feasible items) and run the standard 0/1 DP
-// profit-indexed as D[i][p] = min weight to reach scaled profit >= p.  The table is
-// O(nf * V') with V' = O(nf^2/eps).  Fully polynomial.
+// Classical FPTAS for 0/1 Knapsack: scale the profits down by
+// mu = eps*M/nf, then solve the scaled problem exactly by a profit-indexed
+// DP. Rounding loses at most eps*OPT, and the scaled profit range is
+// O(nf^2/eps), so the whole thing is polynomial in nf and 1/eps.
 //
-// The preprocessing is written with aggregate expressions -- filter, map, max,
-// sum -- to mirror Algorithm FPTAS-Knapsack in the book, which states it in
-// set-builder form: F := {i : w_i <= W}, M := max_{i in F} v_i, and
-// v'_i := floor(v_i / scale) for every i in F.  `orig` is exactly F, and it
-// carries the *original* item indices, which is what lets the backtrack map a
-// selection in the scaled instance back to an item of the input.
+// D[i][p] = least total weight of a subset of the first i feasible items
+// whose scaled profit is at least p, with D[i][0] = 0 and every other
+// cell starting at INF. The answer is the largest p with D[nf][p] <= W;
+// the traceback then walks the rows back, taking item i exactly when
+// including it is what made row i cheaper than row i-1.
 
 import java.util.*;
 
 public class FPTASKnapsack {
   public boolean[] FPTASKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
     boolean[] S = new boolean[w.length];
-    java.util.ArrayList<Integer> t1_acc = new java.util.ArrayList<>();
+    int[] orig = new int[w.length];
+    int nf = 0;
     for (int t = 0; t < w.length; t++) {
-      if ((w[t] <= W)) t1_acc.add(t);
+      {
+        if ((w[t] <= W)) {
+          orig[nf] = t;
+          nf = (nf + 1);
+        }
+      }
     }
-    int[] t1 = new int[t1_acc.size()];
-    for (int _i = 0; _i < t1.length; _i++) t1[_i] = t1_acc.get(_i);
-    int[] orig = t1;
-    int nf = orig.length;
     if ((nf == 0)) {
       return S;
     }
-    java.util.ArrayList<Integer> t2_acc = new java.util.ArrayList<>();
-    for (int k = 0; k < nf; k++) {
-      t2_acc.add(w[orig[k]]);
+    int[] fw = new int[nf];
+    int[] fv = new int[nf];
+    int k = 0;
+    while ((k < nf)) {
+      fw[k] = w[orig[k]];
+      fv[k] = v[orig[k]];
+      k = (k + 1);
     }
-    int[] t2 = new int[t2_acc.size()];
-    for (int _i = 0; _i < t2.length; _i++) t2[_i] = t2_acc.get(_i);
-    int[] fw = t2;
-    java.util.ArrayList<Integer> t3_acc = new java.util.ArrayList<>();
-    for (int k = 0; k < nf; k++) {
-      t3_acc.add(v[orig[k]]);
+    int t1 = Integer.MIN_VALUE;
+    for (int j = 0; j < nf; j++) {
+      int _v = fv[j];
+      if (_v > t1) t1 = _v;
     }
-    int[] t3 = new int[t3_acc.size()];
-    for (int _i = 0; _i < t3.length; _i++) t3[_i] = t3_acc.get(_i);
-    int[] fv = t3;
-    int t4 = Integer.MIN_VALUE;
-    for (int k = 0; k < nf; k++) {
-      int _v = fv[k];
-      if (_v > t4) t4 = _v;
+    int M = t1;
+    int[] vPrime = new int[nf];
+    int Vp = 0;
+    int INF = 1;
+    k = 0;
+    while ((k < nf)) {
+      vPrime[k] = (((fv[k] * nf) * epsDen) / (epsNum * M));
+      Vp = (Vp + vPrime[k]);
+      INF = (INF + fw[k]);
+      k = (k + 1);
     }
-    int M = t4;
-    java.util.ArrayList<Integer> t5_acc = new java.util.ArrayList<>();
-    for (int k = 0; k < nf; k++) {
-      t5_acc.add((((fv[k] * nf) * epsDen) / (epsNum * M)));
-    }
-    int[] t5 = new int[t5_acc.size()];
-    for (int _i = 0; _i < t5.length; _i++) t5[_i] = t5_acc.get(_i);
-    int[] vPrime = t5;
-    int t6 = 0;
-    for (int k = 0; k < nf; k++) {
-      t6 += vPrime[k];
-    }
-    int Vp = t6;
-    int t7 = 0;
-    for (int k = 0; k < nf; k++) {
-      t7 += fw[k];
-    }
-    int INF = (1 + t7);
-    int[][] D = initTable(nf, Vp, INF);
-    int i = 1;
-    while ((i <= nf)) {
-      int p = 1;
-      while ((p <= Vp)) {
-        D[i][p] = Math.min(D[(i - 1)][p], (fw[(i - 1)] + D[(i - 1)][Math.max(0, (p - vPrime[(i - 1)]))]));
-        p = (p + 1);
+    int[][] D = new int[(nf + 1)][(Vp + 1)];
+    for (int a = 0; a <= nf; a++) {
+      for (int b = 1; b <= Vp; b++) {
+        D[a][b] = INF;
       }
-      i = (i + 1);
     }
-    java.util.ArrayList<Integer> t8_acc = new java.util.ArrayList<>();
+    for (int i = 1; i <= nf; i++) {
+      for (int p = 1; p <= Vp; p++) {
+        D[i][p] = Math.min(D[(i - 1)][p], (fw[(i - 1)] + D[(i - 1)][Math.max(0, (p - vPrime[(i - 1)]))]));
+      }
+    }
+    int bp = 0;
     for (int q = 0; q <= Vp; q++) {
-      if ((D[nf][q] <= W)) t8_acc.add(q);
+      {
+        if ((D[nf][q] <= W)) {
+          bp = q;
+        }
+      }
     }
-    int[] t8 = new int[t8_acc.size()];
-    for (int _i = 0; _i < t8.length; _i++) t8[_i] = t8_acc.get(_i);
-    int[] reach = t8;
-    int bp = reach[(reach.length - 1)];
-    i = nf;
+    int i = nf;
     while ((i > 0)) {
       if ((D[i][bp] < D[(i - 1)][bp])) {
         S[orig[(i - 1)]] = true;
@@ -90,23 +79,6 @@ public class FPTASKnapsack {
       i = (i - 1);
     }
     return S;
-  }
-
-  public int[][] initTable(int nf, int Vp, int INF) {
-    int[][] D = new int[(nf + 1)][(Vp + 1)];
-    int i = 0;
-    while ((i <= nf)) {
-      int p = 0;
-      while ((p <= Vp)) {
-        D[i][p] = INF;
-        if ((p == 0)) {
-          D[i][p] = 0;
-        }
-        p = (p + 1);
-      }
-      i = (i + 1);
-    }
-    return D;
   }
 
   public static void main(String[] args) {

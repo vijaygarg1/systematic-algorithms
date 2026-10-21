@@ -1,14 +1,22 @@
-// LLP-Prim: each non-root vertex advances when the global cross-cut is its lightest edge.
+// LLP-Prim: each non-root vertex advances when the global cross-cut is its
+// lightest edge.
 //
-// setBase(1): every aux method here (minCrossCut, argMinCrossCut,
-// globalMinCrossCut, propagateFixed) loops `i = 1; while (i <= n)`,
-// a 1-indexed convention (index 0 reserved/unused) that was never
-// declared -- without it, this.n = parent.length (0-indexed), so the
-// very same loops read/write parent[n], one past the end of a
-// length-n array. Declaring the 1-indexed base makes this.n =
-// parent.length - 1, matching the loops as written (confirmed: this
-// is the same setBase(1) convention LLP_StableMarriage uses for its
-// own 1-indexed aux methods).
+// setBase(1) because every aux method here loops i = 1; while (i <= n),
+// a 1-indexed convention with index 0 unused. Declaring it makes
+// this.n = parent.length - 1; without it this.n = parent.length and those
+// same loops read parent[n], one past the end.
+//
+// PRECONDITION the caller must establish, which this program cannot check:
+// on entry fixed[v] means "following the chosen edges from v reaches the
+// root" (the book's derived definition, bxx-mst-llp-prim.tex). fixed,
+// parent and C all arrive as parameters and propagateFixed() runs only
+// inside the advance, so nothing here establishes that meaning. Either the
+// book's initialization (lightest-edge parents, then propagate fixed from
+// the root BEFORE the first advance) or the demo's (parent[v] := v,
+// fixed := {root}, C[v] := 0, which degenerates to classical Prim) works,
+// and both reach the same C. Lightest-edge parents WITHOUT that initial
+// propagation do not: vertices that should already be fixed look free, and
+// roughly a quarter of random graphs come out wrong.
 
 import java.util.*;
 
@@ -23,7 +31,7 @@ public class LLPPrim {
 
   private boolean forbidden(int j) {
     if (fixed[j]) return false;
-    if (!((minCrossCut(j) < Integer.MAX_VALUE))) return false;
+    if (!((minCrossCut(j) < Double.POSITIVE_INFINITY))) return false;
     if (!((minCrossCut(j) <= globalMinCrossCut()))) return false;
     if (!((C[j] < minCrossCut(j)))) return false;
     return true;
@@ -59,35 +67,39 @@ public class LLPPrim {
   }
 
   public double minCrossCut(int j) {
-    double t1 = Double.POSITIVE_INFINITY;
+    double best = Double.POSITIVE_INFINITY;
     for (int i = 1; i <= n; i++) {
-      if (!(fixed[i])) continue;
-      double _v = W[i][j];
-      if (_v < t1) t1 = _v;
+      {
+        if ((fixed[i] && (W[i][j] < best))) {
+          best = W[i][j];
+        }
+      }
     }
-    return t1;
+    return best;
   }
 
   public double globalMinCrossCut() {
-    double t2 = Double.POSITIVE_INFINITY;
+    double best = Double.POSITIVE_INFINITY;
     for (int t = 1; t <= n; t++) {
-      if (!((!fixed[t]))) continue;
-      double _v = minCrossCut(t);
-      if (_v < t2) t2 = _v;
+      {
+        if (((!fixed[t]) && (minCrossCut(t) < best))) {
+          best = minCrossCut(t);
+        }
+      }
     }
-    return t2;
+    return best;
   }
 
   public int argMinCrossCut(int j) {
     int besti = (0 - 1);
-    double best = Integer.MAX_VALUE;
-    int i = 1;
-    while ((i <= n)) {
-      if ((fixed[i] && (W[i][j] < best))) {
-        best = W[i][j];
-        besti = i;
+    double best = Double.POSITIVE_INFINITY;
+    for (int i = 1; i <= n; i++) {
+      {
+        if ((fixed[i] && (W[i][j] < best))) {
+          best = W[i][j];
+          besti = i;
+        }
       }
-      i = (i + 1);
     }
     return besti;
   }

@@ -12,6 +12,10 @@
 class LLPLayering {
   int[] LLPLayering(set<int>[] pre) {
     int[] G = 0;
+    // Matching the box: priority(j) := max{G[i]+1 : i in pre(j)}, the value
+    // the advance would install, so vertices settle in layer order. Any
+    // order reaches the same G; this one reaches it in fewer sweeps.
+    setPriority(max i in pre[j] : G[i] + 1, min);
     forbidden (j) :
       exists i in pre[j] : G[j] <= G[i]
     =>

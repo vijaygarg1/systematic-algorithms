@@ -1,17 +1,17 @@
 // LLP-Assignment (bxx-assignment.tex, algo:llp-assignment): forbidden when
-// item j belongs to an inclusion-minimal overdemanded set J (found via
-// alternating-path reachability from an unmatched bidder, the standard witness
-// for a violated Hall's condition); advance raises EVERY item in J by one
-// shared slack-jump delta := min over bidders demanding into J of [best
-// surplus - best surplus using an item outside J] -- the book's
+// item j belongs to an inclusion-minimal overdemanded set J -- found by
+// alternating-path reachability from an unmatched bidder, the standard
+// witness for a violated Hall condition. Advance raises EVERY item in J by
+// one shared slack jump, delta := min over bidders demanding into J of
+// [best surplus - best surplus using an item outside J]: the book's
 // "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
 //
-// J depends only on G, so it is computed ONCE per value of G and held in the
-// fields itemInJ/bidderInB: the forbidden test refreshes it when stale and
+// J depends only on G, so it is built ONCE per value of G and held in the
+// fields itemInJ/bidderInB; the forbidden test refreshes it when stale and
 // then just reads itemInJ[j], and the advance consumes the same arrays and
-// marks them stale. The previous version recomputed the whole matching and
-// reachability inside every forbidden(j) call -- n times per sweep -- and
-// once more inside the advance.
+// marks them stale.
+//
+// Assumes the number of bidders equals the number of items.
 
 import java.util.*;
 
@@ -20,9 +20,9 @@ public class LLPAssignment {
   int[][] v;
   int m;
   int[] G;
+  int[] partner;
   boolean[] itemInJ;
   boolean[] bidderInB;
-  int[] partner;
   boolean fresh;
   int j;
 
@@ -40,9 +40,9 @@ public class LLPAssignment {
     this.n = v[0].length;
     this.m = v.length;
     this.G = new int[n];
+    this.partner = new int[n];
     this.itemInJ = new boolean[n];
     this.bidderInB = new boolean[m];
-    this.partner = new int[n];
     this.fresh = false;
     {
       boolean changed = true;
@@ -65,38 +65,40 @@ public class LLPAssignment {
   }
 
   public void refresh() {
-    if ((!fresh)) {
-      for (int i = 0; i < n; i++) {
-        {
-          itemInJ[i] = false;
-          partner[i] = (0 - 1);
-        }
-      }
-      for (int b = 0; b < m; b++) {
-        bidderInB[b] = false;
-      }
-      for (int b = 0; b < m; b++) {
-        {
-          boolean[] seen = new boolean[n];
-          tryMatch(b, seen);
-        }
-      }
-      int u = firstUnmatched();
-      if ((u >= 0)) {
-        reach(u);
-      }
-      fresh = true;
+    if (fresh) {
+      return;
     }
+    for (int i = 0; i < n; i++) {
+      {
+        itemInJ[i] = false;
+        partner[i] = (0 - 1);
+      }
+    }
+    for (int b = 0; b < m; b++) {
+      bidderInB[b] = false;
+    }
+    for (int b = 0; b < m; b++) {
+      tryMatch(b, new boolean[n]);
+    }
+    int u = firstUnmatched();
+    if ((u < m)) {
+      reach(u);
+    }
+    fresh = true;
   }
 
   public void raiseJ() {
-    int t1 = Integer.MAX_VALUE;
+    int delta = Integer.MAX_VALUE;
     for (int b = 0; b < m; b++) {
-      if (!(bidderInB[b])) continue;
-      int _v = (bestSurplus(b) - bestOutside(b));
-      if (_v < t1) t1 = _v;
+      {
+        if (bidderInB[b]) {
+          int drop = (bestSurplus(b) - bestOutside(b));
+          if ((drop < delta)) {
+            delta = drop;
+          }
+        }
+      }
     }
-    int delta = t1;
     for (int i = 0; i < n; i++) {
       if (itemInJ[i]) {
         G[i] = (G[i] + delta);
@@ -106,45 +108,48 @@ public class LLPAssignment {
   }
 
   public int firstUnmatched() {
-    int b = 0;
-    while ((b < m)) {
-      if ((!_q2(b))) {
-        return b;
+    for (int b = 0; b < m; b++) {
+      {
+        if ((!_q1(b))) {
+          return b;
+        }
       }
-      b = (b + 1);
     }
-    return (0 - 1);
+    return m;
   }
 
   public int bestSurplus(int b) {
-    int t3 = Integer.MIN_VALUE;
+    int t2 = Integer.MIN_VALUE;
     for (int i = 0; i < n; i++) {
       int _v = (v[b][i] - G[i]);
-      if (_v > t3) t3 = _v;
+      if (_v > t2) t2 = _v;
     }
-    return t3;
+    return t2;
   }
 
   public int bestOutside(int b) {
-    int t4 = Integer.MIN_VALUE;
+    int best = (0 - Integer.MAX_VALUE);
     for (int i = 0; i < n; i++) {
-      if (!((!itemInJ[i]))) continue;
-      int _v = (v[b][i] - G[i]);
-      if (_v > t4) t4 = _v;
+      {
+        if (((!itemInJ[i]) && ((v[b][i] - G[i]) > best))) {
+          best = (v[b][i] - G[i]);
+        }
+      }
     }
-    return t4;
+    return best;
   }
 
   public void reach(int b) {
-    if ((!bidderInB[b])) {
-      bidderInB[b] = true;
-      int best = bestSurplus(b);
-      for (int i = 0; i < n; i++) {
-        if ((((v[b][i] - G[i]) == best) && (!itemInJ[i]))) {
-          itemInJ[i] = true;
-          if ((partner[i] != (0 - 1))) {
-            reach(partner[i]);
-          }
+    if (bidderInB[b]) {
+      return;
+    }
+    bidderInB[b] = true;
+    int best = bestSurplus(b);
+    for (int i = 0; i < n; i++) {
+      if ((((v[b][i] - G[i]) == best) && (!itemInJ[i]))) {
+        itemInJ[i] = true;
+        if ((partner[i] != (0 - 1))) {
+          reach(partner[i]);
         }
       }
     }
@@ -166,7 +171,7 @@ public class LLPAssignment {
     return false;
   }
 
-  private boolean _q2(int b) {
+  private boolean _q1(int b) {
     for (int i = 0; i < n; i++) {
       if ((partner[i] == b)) return true;
     }

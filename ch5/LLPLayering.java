@@ -31,23 +31,36 @@ public class LLPLayering {
     G[j] = t2;
   }
 
+  private double priority(int j) {
+    return _q3(j);
+  }
+
   public int[] LLPLayering(int[][] pre) {
     this.pre = pre;
     this.n = pre.length;
     this.G = new int[n];
-    {
-      boolean changed = true;
-      while (changed) {
-        changed = false;
-        for (int j = 0; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
-            changed = true;
-          }
-        }
+    while (true) {
+      int _best = -1;
+      double _bestKey = 0;
+      for (int j = 0; j < n; j++) {
+        if (!forbidden(j)) continue;
+        double _k = priority(j);
+        if (_best < 0 || _k < _bestKey) { _best = j; _bestKey = _k; }
       }
+      if (_best < 0) break;
+      int j = _best;
+      this.j = j; advance();
     }
     return G;
+  }
+
+  private int _q3(int j) {
+    int _acc = Integer.MIN_VALUE;
+    for (int i : pre[j]) {
+      int _v = (G[i] + 1);
+      if (_v > _acc) _acc = _v;
+    }
+    return _acc;
   }
 
   public static void main(String[] args) {

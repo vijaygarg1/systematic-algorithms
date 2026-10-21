@@ -40,16 +40,16 @@ public class LLPNearestNeighbor {
   }
 
   public double nearestDist(double[] px, double[] py, int j) {
-    double best = Integer.MAX_VALUE;
-    int k = 0;
-    while ((k < px.length)) {
-      if ((k != j)) {
-        double d = dist(px, py, j, k);
-        if ((d < best)) {
-          best = d;
+    double best = Double.POSITIVE_INFINITY;
+    for (int k = 0; k < px.length; k++) {
+      {
+        if ((k != j)) {
+          double d = dist(px, py, j, k);
+          if ((d < best)) {
+            best = d;
+          }
         }
       }
-      k = (k + 1);
     }
     return best;
   }

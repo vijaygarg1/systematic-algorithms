@@ -37,12 +37,12 @@ public class LLPCountInversions {
 
   public int countLeft(int[] A, int j) {
     int count = 0;
-    int i = 0;
-    while ((i < j)) {
-      if ((A[i] > A[j])) {
-        count = (count + 1);
+    for (int i = 0; i < j; i++) {
+      {
+        if ((A[i] > A[j])) {
+          count = (count + 1);
+        }
       }
-      i = (i + 1);
     }
     return count;
   }

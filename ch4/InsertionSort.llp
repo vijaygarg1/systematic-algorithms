@@ -2,8 +2,7 @@
 
 class InsertionSort {
   void sort(int[] A) {
-    int i = 1;
-    while (i < A.length) {
+    forall i in [1..A.length-1] : {
       int j = i - 1;
       boolean done = false;
       while (j >= 0 && !done) {
@@ -14,7 +13,6 @@ class InsertionSort {
           j = j - 1;
         }
       };
-      i = i + 1;
     }
   }
 }

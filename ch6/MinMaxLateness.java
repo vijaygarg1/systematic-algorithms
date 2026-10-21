@@ -7,11 +7,11 @@ public class MinMaxLateness {
     int n = t.length;
     int[] G = new int[n];
     int last = 0;
-    int i = 0;
-    while ((i < n)) {
-      G[i] = last;
-      last = (last + t[i]);
-      i = (i + 1);
+    for (int i = 0; i < n; i++) {
+      {
+        G[i] = last;
+        last = (last + t[i]);
+      }
     }
     return G;
   }

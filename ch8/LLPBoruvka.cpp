@@ -18,9 +18,15 @@ static int find(int v, std::vector<int>& g) {
     return v;
 }
 
+// x is a component ROOT, so the endpoints must be compared as roots too.
+// Comparing u[e] against a root succeeds only when that vertex happens to
+// be its own root; otherwise this returned an endpoint inside x's own
+// component, the root was pointed back at itself, and the components
+// failed to merge -- O(n) phases instead of O(log n).
 static int otherEndpoint(int e, const std::vector<int>& u,
-                          const std::vector<int>& v, int x) {
-    return u[e] == x ? v[e] : u[e];
+                          const std::vector<int>& v, int x,
+                          std::vector<int>& g) {
+    return find(u[e], g) == x ? find(v[e], g) : find(u[e], g);
 }
 
 std::vector<bool> llpBoruvka(int n, std::vector<int> u, std::vector<int> v,
@@ -55,9 +61,9 @@ std::vector<bool> llpBoruvka(int n, std::vector<int> u, std::vector<int> v,
                 if (mweEdge[i] == -1) {
                     g[i] = i;
                 } else {
-                    int nb = otherEndpoint(mweEdge[i], u, v, i);
+                    int nb = otherEndpoint(mweEdge[i], u, v, i, g);
                     int nbEdge = mweEdge[nb];
-                    if (nbEdge != -1 && otherEndpoint(nbEdge, u, v, nb) == i
+                    if (nbEdge != -1 && otherEndpoint(nbEdge, u, v, nb, g) == i
                             && i < nb) {
                         g[i] = i;
                     } else {

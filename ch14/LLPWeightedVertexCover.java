@@ -4,10 +4,18 @@
 // {u,v}; a vertex v is tight when its incident prices saturate w[v]; an
 // edge is slack when neither endpoint is tight; slackMin(u,v) further
 // requires {u,v} to be lex-minimal among every slack edge sharing an
-// endpoint with it -- the same lex-minimality check as
-// LLPLexMatchVertexCover, just over slack edges instead of
-// uncovered ones. Advancing raises the edge's price by the smaller of
+// endpoint with it. Advancing raises the edge's price by the smaller of
 // its two endpoints' remaining budgets, tightening at least one.
+//
+// Two things keep the predicate cheap. First, price[] is maintained by the
+// advance instead of being re-summed on every call, so tight() is O(1)
+// rather than an O(nv) sum. Second, the lex-minimality test does not scan
+// all edge pairs: the lex-least slack edge at a vertex u is always
+// {u, minSlack[u]} where minSlack[u] is u's smallest non-tight neighbour
+// (a neighbour y < u contributes the key (y,u) and y > u the key (u,y), so
+// the smallest index wins either way), hence {u,v} is lex-minimal among the
+// slack edges touching it exactly when it is the lex-least at both ends.
+// minSlack[] is rebuilt only after an advance has moved a price.
 
 import java.util.*;
 
@@ -17,6 +25,9 @@ public class LLPWeightedVertexCover {
   double[] w;
   int nv;
   double[][] G;
+  double[] price;
+  int[] minSlack;
+  boolean fresh;
   int u;
   int v;
 
@@ -27,9 +38,12 @@ public class LLPWeightedVertexCover {
   }
 
   private void _advance0() {
-    double step = Math.min((w[u] - price(u)), (w[v] - price(v)));
+    double step = Math.min((w[u] - price[u]), (w[v] - price[v]));
     G[u][v] = (G[u][v] + step);
     G[v][u] = G[u][v];
+    price[u] = (price[u] + step);
+    price[v] = (price[v] + step);
+    fresh = false;
   }
 
   public boolean[] LLPWeightedVertexCover(int[][] adj, double[] w) {
@@ -38,6 +52,9 @@ public class LLPWeightedVertexCover {
     this.n = w.length;
     this.nv = w.length;
     this.G = new double[nv][nv];
+    this.price = new double[nv];
+    this.minSlack = new int[nv];
+    this.fresh = false;
     {
       boolean changed = true;
       while (changed) {
@@ -59,46 +76,39 @@ public class LLPWeightedVertexCover {
     return C;
   }
 
-  public double price(int v) {
-    double total = 0.0;
-    for (int u = 0; u < nv; u++) {
-      {
-        if ((adj[u][v] == 1)) {
-          total = (total + G[u][v]);
-        }
-      }
-    }
-    return total;
-  }
-
   public boolean tight(int v) {
-    return (price(v) >= w[v]);
+    return (price[v] >= w[v]);
   }
 
-  public boolean slack(int u, int v) {
-    return ((!tight(u)) && (!tight(v)));
+  public void refresh() {
+    if ((!fresh)) {
+      for (int u = 0; u < nv; u++) {
+        minSlack[u] = firstSlackNbr(u);
+      }
+      fresh = true;
+    }
+  }
+
+  public int firstSlackNbr(int u) {
+    int y = 0;
+    while ((y < nv)) {
+      if (((adj[u][y] == 1) && (!tight(y)))) {
+        return y;
+      }
+      y = (y + 1);
+    }
+    return (0 - 1);
   }
 
   public boolean slackMin(int u, int v) {
-    boolean t1 = false;
-    for (int x = 0; x < nv; x++) {
-      boolean t2 = false;
-      for (int y = (x + 1); y < nv; y++) {
-        if ((((((adj[x][y] == 1) && ((((x == u) || (x == v)) || (y == u)) || (y == v))) && slack(x, y)) && lexLess(x, y, u, v)) && (!((x == u) && (y == v))))) { t2 = true; break; }
-      }
-      if (t2) { t1 = true; break; }
-    }
-    return (((adj[u][v] == 1) && slack(u, v)) && (!t1));
-  }
-
-  public boolean lexLess(int a, int b, int c, int d) {
-    if ((a < c)) {
-      return true;
-    }
-    if ((a > c)) {
+    if ((adj[u][v] != 1)) {
       return false;
     }
-    return (b < d);
+    refresh();
+    if ((tight(u) || tight(v))) {
+      return false;
+    }
+    return ((minSlack[u] == v) && (minSlack[v] == u));
   }
 
   public static void main(String[] args) {

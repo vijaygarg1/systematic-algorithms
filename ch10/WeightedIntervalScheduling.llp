@@ -30,10 +30,19 @@ class WeightedIntervalScheduling {
 
   // The largest i < j whose interval finishes no later than j starts, or 0
   // when j overlaps every earlier interval.
+  // Binary search, not a scan: the intervals are already sorted by finish
+  // time, so the largest i < j with f[i] <= s[j] is found in O(log n).
+  // Scanning [1..j-1] for every j made deriving p an O(n^2) step on its
+  // own, against the O(n log n) the book states for it (Section 10.3,
+  // "computing p takes O(n log n) by binary search on the sorted finish
+  // times") -- and swamped the O(n) dynamic program it feeds.
   int lastCompatible(int j, int[] s, int[] f) {
+    int lo = 1;
+    int hi = j - 1;
     int best = 0;
-    forall i in [1..j-1] : {
-      if (f[i] <= s[j]) { best = i; };
+    while (lo <= hi) {
+      int mid = (lo + hi) / 2;
+      if (f[mid] <= s[j]) { best = mid; lo = mid + 1; } else { hi = mid - 1; };
     };
     return best;
   }

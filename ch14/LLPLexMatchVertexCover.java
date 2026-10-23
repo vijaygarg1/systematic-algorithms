@@ -1,4 +1,14 @@
 // LLP parallel 2-approximation for Vertex Cover: pick every endpoint of a lex-minimal uncovered edge.
+//
+// Edges are ordered by (min(u,v), max(u,v)), and the lex-least uncovered edge
+// incident to a vertex u is always {u, minNbr(u)}, where minNbr(u) is u's
+// smallest uncovered neighbour: a neighbour y < u contributes the key (y, u)
+// and a neighbour y > u the key (u, y), so in both cases the smallest index
+// wins. An edge is therefore lex-minimal among the edges touching it exactly
+// when it is the lex-least edge at BOTH of its endpoints, which is what
+// isLexMin below tests with two O(n) scans. Testing it directly -- "no smaller
+// uncovered edge touches i or j" -- costs an O(n^2) scan over all edge pairs
+// per candidate, so the predicate alone dominated the whole run.
 
 import java.util.*;
 
@@ -9,15 +19,14 @@ public class LLPLexMatchVertexCover {
   int j;
 
   private boolean forbidden(int j) {
-    boolean t1 = false;
-    for (int i = 0; i < n; i++) {
-      if (isLexMinIncident(i, j)) { t1 = true; break; }
-    }
-    return t1;
+    if (!(isLexMin(j))) return false;
+    return true;
   }
 
   private void advance() {
+    int i = minNbr(j);
     G[j] = true;
+    G[i] = true;
   }
 
   public boolean[] LLPLexMatchVertexCover(int[][] adj) {
@@ -39,38 +48,26 @@ public class LLPLexMatchVertexCover {
     return G;
   }
 
-  public boolean isLexMinIncident(int i, int j) {
-    boolean t2 = false;
-    for (int x = 0; x < n; x++) {
-      boolean t3 = false;
-      for (int y = (x + 1); y < n; y++) {
-        if (((((((adj[x][y] == 1) && ((((x == i) || (x == j)) || (y == i)) || (y == j))) && (!G[x])) && (!G[y])) && lexLess(x, y, i, j)) && (!((x == i) && (y == j))))) { t3 = true; break; }
-      }
-      if (t3) { t2 = true; break; }
-    }
-    return ((((adj[i][j] == 1) && (!G[i])) && (!G[j])) && (!t2));
-  }
-
-  public boolean lexLess(int a, int b, int c, int d) {
-    int amin = a;
-    int amax = b;
-    if ((b < a)) {
-      amin = b;
-      amax = a;
-    }
-    int cmin = c;
-    int cmax = d;
-    if ((d < c)) {
-      cmin = d;
-      cmax = c;
-    }
-    if ((amin < cmin)) {
-      return true;
-    }
-    if ((amin > cmin)) {
+  public boolean isLexMin(int j) {
+    if (G[j]) {
       return false;
     }
-    return (amax < cmax);
+    int i = minNbr(j);
+    if ((i < 0)) {
+      return false;
+    }
+    return (minNbr(i) == j);
+  }
+
+  public int minNbr(int u) {
+    int y = 0;
+    while ((y < n)) {
+      if (((adj[u][y] == 1) && (!G[y]))) {
+        return y;
+      }
+      y = (y + 1);
+    }
+    return (0 - 1);
   }
 
   public static void main(String[] args) {

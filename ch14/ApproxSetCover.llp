@@ -6,41 +6,49 @@
 // loop guard is the book's `R != empty`, not a weaker "some set still
 // covers something new" test -- on an infeasible instance it would not
 // terminate, exactly as the book's algorithm would not.
+//
+// The uncovered counts cnt[s] = |s ∩ R| are maintained instead of being
+// recomputed each round: covering an element decrements the count of every
+// set containing it, so the total number of updates over the whole run is
+// one per (set, element) incidence. Recomputing all m counts in each of the
+// up-to min(m,n) rounds costs a factor min(m,n) more.
 
 class ApproxSetCover {
   boolean[] ApproxSetCover(int[][] S, int n) {
     int m = S.length;
     boolean[] C        = new boolean[m];
     boolean[] covered  = new boolean[n];
-    while (anyUncovered(covered, n)) {
+    int[] cnt          = new int[m];
+    int remaining      = n;
+    forall s in [0..m-1] : cnt[s] = count e in [0..n-1] : S[s][e] == 1;
+    while (remaining > 0) {
+      // Pick the set with the largest current coverage, lowest index on ties.
       int bestIdx   = 0;
       int bestCover = 0 - 1;
-      forall s in [0..m-1] : {
-        int count = 0;
-        int e = 0;
-        while (e < n) {
-          if (S[s][e] == 1 && !covered[e]) {
-            count = count + 1;
-          };
-          e = e + 1;
-        };
-        if (count > bestCover) {
-          bestCover = count;
+      int s = 0;
+      while (s < m) {
+        if (cnt[s] > bestCover) {
+          bestCover = cnt[s];
           bestIdx   = s;
         };
+        s = s + 1;
       };
       C[bestIdx] = true;
-      forall e in [0..n-1] : {
-        if (S[bestIdx][e] == 1) {
+      // Cover its elements and charge the decrements to their incidences.
+      int e = 0;
+      while (e < n) {
+        if (S[bestIdx][e] == 1 && !covered[e]) {
           covered[e] = true;
+          remaining  = remaining - 1;
+          int t = 0;
+          while (t < m) {
+            if (S[t][e] == 1) { cnt[t] = cnt[t] - 1; };
+            t = t + 1;
+          };
         };
+        e = e + 1;
       }
     };
     return C;
-  }
-
-  // R != empty, where R is the set of still-uncovered elements.
-  boolean anyUncovered(boolean[] covered, int n) {
-    return exists e in [0..n - 1] : !covered[e];
   }
 }

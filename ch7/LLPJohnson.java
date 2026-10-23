@@ -14,11 +14,12 @@ public class LLPJohnson {
     for (int i : pre[j]) {
       if ((G[j] < (G[i] - w[i][j]))) { t1 = true; break; }
     }
-    return t1;
+    if (!(t1)) return false;
+    return true;
   }
 
   private void advance() {
-    for (int k = 0; k <= n; k++) {
+    for (int k = 0; k < n; k++) {
       int t2 = G[k];
       for (int i : pre[k]) t2 = Math.max(t2, (G[i] - w[i][k]));
       G[k] = t2;

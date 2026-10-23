@@ -16,7 +16,8 @@ public class VertexImplications {
     for (int v = 0; v < n; v++) {
       if ((((I[v][w] == 1) && G[v]) && (!G[w]))) { t1 = true; break; }
     }
-    return t1;
+    if (!(t1)) return false;
+    return true;
   }
 
   private void advance() {

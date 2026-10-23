@@ -2,12 +2,17 @@
 // The forbidden predicate is the negation of B_layer restricted to j's
 // incoming edges, so no index is forbidden exactly when B_layer holds.
 // A vertex with no predecessors is never forbidden and keeps its initial
-// label 0.  Advancing j only once all of its predecessors have reached
-// their final values -- priority(j) = max{G[i]+1 | i in pre(j)}, the
-// schedule of Section 2.9 -- advances each vertex exactly once; that
-// schedule is what the boolean `fixed` array implements in the
-// hand-written ports, and it is an efficiency choice, not part of the
-// predicate.
+// label 0.
+//
+// Layering is defined only on a directed ACYCLIC graph -- a cycle has no
+// longest path -- so `setAcyclic(pre)` states that as a condition on valid
+// input.  It is the precondition that makes the schedule available: on an
+// acyclic graph every index can be settled once, in topological order, so
+// that when j is advanced all of its predecessors already hold their final
+// values.  That is the schedule the boolean `fixed` array implements in the
+// hand-written ports, and it is what gives the O(n+m) of Section 5.5.
+// Without the promise the program can only relax to a fixpoint, revisiting
+// a vertex every time a predecessor deepens, which costs O(n*m).
 
 import java.util.*;
 
@@ -22,7 +27,8 @@ public class LLPLayering {
     for (int i : pre[j]) {
       if ((G[j] <= G[i])) { t1 = true; break; }
     }
-    return t1;
+    if (!(t1)) return false;
+    return true;
   }
 
   private void advance() {
@@ -31,36 +37,37 @@ public class LLPLayering {
     G[j] = t2;
   }
 
-  private double priority(int j) {
-    return _q3(j);
-  }
-
   public int[] LLPLayering(int[][] pre) {
     this.pre = pre;
     this.n = pre.length;
     this.G = new int[n];
-    while (true) {
-      int _best = -1;
-      double _bestKey = 0;
-      for (int j = 0; j < n; j++) {
-        if (!forbidden(j)) continue;
-        double _k = priority(j);
-        if (_best < 0 || _k < _bestKey) { _best = j; _bestKey = _k; }
+    {
+      // topological order over pre, declared acyclic
+      int[] _indeg = new int[n];
+      int[] _sc = new int[n];
+      for (int _k = 0; _k < n; _k++) {
+        for (int _i : pre[_k]) if (_i >= 0 && _i < n) { _indeg[_k]++; _sc[_i]++; }
       }
-      if (_best < 0) break;
-      int j = _best;
-      this.j = j; advance();
+      int[][] _succ = new int[n][];
+      for (int _i = 0; _i < n; _i++) _succ[_i] = new int[_sc[_i]];
+      int[] _sf = new int[n];
+      for (int _k = 0; _k < n; _k++) {
+        for (int _i : pre[_k]) if (_i >= 0 && _i < n) _succ[_i][_sf[_i]++] = _k;
+      }
+      int[] _q = new int[n];
+      int _qh = 0, _qt = 0, _seen = 0, _total = 0;
+      for (int _k = 0; _k < n; _k++) {
+        _total++; if (_indeg[_k] == 0) _q[_qt++] = _k;
+      }
+      while (_qh != _qt) {
+        int j = _q[_qh++]; _seen++;
+        if (forbidden(j)) { this.j = j; advance(); }
+        for (int _x : _succ[j]) if (--_indeg[_x] == 0) _q[_qt++] = _x;
+      }
+      if (_seen != _total) throw new IllegalArgumentException(
+          "pre has a cycle; setAcyclic promises it does not");
     }
     return G;
-  }
-
-  private int _q3(int j) {
-    int _acc = Integer.MIN_VALUE;
-    for (int i : pre[j]) {
-      int _v = (G[i] + 1);
-      if (_v > _acc) _acc = _v;
-    }
-    return _acc;
   }
 
   public static void main(String[] args) {

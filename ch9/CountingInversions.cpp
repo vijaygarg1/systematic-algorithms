@@ -4,14 +4,23 @@
 #include <vector>
 
 int mergeAndCount(std::vector<int>& A, int low, int mid, int high) {
-    std::vector<int> B(A);
+    // Sized to the sub-range. Copying all of A on every one of the
+    // Theta(n) merge calls costs Theta(n^2) by itself, swamping the
+    // O(n log n) the merging achieves.
+    std::vector<int> B(A.begin() + low, A.begin() + high + 1);
     int i = low, j = mid + 1, k = low, inv = 0;
     while (i <= mid && j <= high) {
-        if (B[i] <= B[j]) A[k++] = B[i++];
-        else { A[k++] = B[j++]; inv += (mid - i + 1); }
+        if (B[i - low] <= B[j - low]) {
+            A[k++] = B[i - low];
+            ++i;
+        } else {
+            A[k++] = B[j - low];
+            ++j;
+            inv += (mid - i + 1);   // B[j] precedes all of B[i..mid]
+        }
     }
-    while (i <= mid)  A[k++] = B[i++];
-    while (j <= high) A[k++] = B[j++];
+    while (i <= mid)  { A[k++] = B[i - low]; ++i; }
+    while (j <= high) { A[k++] = B[j - low]; ++j; }
     return inv;
 }
 

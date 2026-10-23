@@ -18,7 +18,8 @@ public class LLP_JobScheduling_Upon {
       int _v = (G[i] + t[j]);
       if (_v > t1) t1 = _v;
     }
-    return (G[j] < t1);
+    if (!((G[j] < t1))) return false;
+    return true;
   }
 
   private void advance() {
@@ -33,16 +34,30 @@ public class LLP_JobScheduling_Upon {
     this.n = t.length;
     this.G = t.clone();
     {
-      boolean changed = true;
-      while (changed) {
-        changed = false;
-        for (int j = 0; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
-            changed = true;
-          }
-        }
+      // topological order over pre, declared acyclic
+      int[] _indeg = new int[n];
+      int[] _sc = new int[n];
+      for (int _k = 0; _k < n; _k++) {
+        for (int _i : pre[_k]) if (_i >= 0 && _i < n) { _indeg[_k]++; _sc[_i]++; }
       }
+      int[][] _succ = new int[n][];
+      for (int _i = 0; _i < n; _i++) _succ[_i] = new int[_sc[_i]];
+      int[] _sf = new int[n];
+      for (int _k = 0; _k < n; _k++) {
+        for (int _i : pre[_k]) if (_i >= 0 && _i < n) _succ[_i][_sf[_i]++] = _k;
+      }
+      int[] _q = new int[n];
+      int _qh = 0, _qt = 0, _seen = 0, _total = 0;
+      for (int _k = 0; _k < n; _k++) {
+        _total++; if (_indeg[_k] == 0) _q[_qt++] = _k;
+      }
+      while (_qh != _qt) {
+        int j = _q[_qh++]; _seen++;
+        if (forbidden(j)) { this.j = j; advance(); }
+        for (int _x : _succ[j]) if (--_indeg[_x] == 0) _q[_qt++] = _x;
+      }
+      if (_seen != _total) throw new IllegalArgumentException(
+          "pre has a cycle; setAcyclic promises it does not");
     }
     return G;
   }

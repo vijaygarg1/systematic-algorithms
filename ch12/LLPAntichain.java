@@ -11,11 +11,13 @@ public class LLPAntichain {
   int j;
 
   private boolean forbidden(int j) {
+    if (!((G[j] < len[j]))) return false;
     boolean t1 = false;
     for (int k = 0; k < n; k++) {
       if (((k != j) && leq[chains[j][G[j]]][chains[k][G[k]]])) { t1 = true; break; }
     }
-    return ((G[j] < len[j]) && t1);
+    if (!(t1)) return false;
+    return true;
   }
 
   private void advance() {

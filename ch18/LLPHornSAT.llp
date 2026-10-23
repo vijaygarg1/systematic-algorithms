@@ -46,22 +46,42 @@
 class LLPHornSAT {
   boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
     boolean[] G = new boolean[n];
+    // Clauses indexed by consequent, built once.  definiteImplied(j) used
+    // to scan every clause looking for head[c] == j, so one sweep cost
+    // O(n * c); now each j looks only at its own clauses and a sweep costs
+    // O(c) in total.
+    int[] hcount = new int[n];
+    int[][] byHead = new int[n][];
+    int[] hfill = new int[n];
+    forall c in [0..body.length-1] :
+      if (head[c] >= 0) { hcount[head[c]] = hcount[head[c]] + 1; };
+    forall v in [0..n-1] : byHead[v] = new int[hcount[v]];
+    forall c in [0..body.length-1] :
+      if (head[c] >= 0) {
+        byHead[head[c]][hfill[head[c]]] = c;
+        hfill[head[c]] = hfill[head[c]] + 1;
+      };
     forbidden (j) : definiteImplied(j) =>
-      advance : { G[j] = true; }
-    &&
-    forbidden (j) : goalFired() =>
-      advance : { return null; };
+      advance : { G[j] = true; };
+    // The goal clauses are checked once, after the least model is reached,
+    // rather than inside the fixpoint.  G only grows and allTrue is
+    // monotone in G, so a goal clause that fires at any point during the
+    // fixpoint is still firing at the end: one check at the end gives the
+    // same answer.  As a rule of the fixpoint it was evaluated once per
+    // index per sweep -- n times the work for a value that does not depend
+    // on the index at all.
+    if (goalFired(body, head)) { return null; };
     return G;
   }
 
   // Some definite clause has all antecedents true and consequent j false.
   boolean definiteImplied(int j) {
     return !G[j]
-        && (exists c in [0..body.length-1] : (head[c] == j && allTrue(c)));
+        && (exists t in [0..byHead[j].length-1] : allTrue(byHead[j][t]));
   }
 
   // Some pure negative clause has all its antecedents true.
-  boolean goalFired() {
+  boolean goalFired(int[][] body, int[] head) {
     return exists c in [0..body.length-1] : (head[c] == (0 - 1) && allTrue(c));
   }
 

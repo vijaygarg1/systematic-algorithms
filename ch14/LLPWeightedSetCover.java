@@ -13,8 +13,15 @@
 // different count whenever sets and elements aren't equinumerous.
 //
 // S, w and G are program fields, so the aux methods read them directly
-// rather than taking them as parameters, and each predicate is the
-// quantifier it is defined as.
+// rather than taking them as parameters.
+//
+// Three cached quantities keep the predicate off the critical path. The set
+// prices sp[] are maintained by the advance, so setTight is O(1) instead of
+// an O(u) sum; slack[] records which elements lie in no tight set; and
+// minSlackIn[s] is the smallest slack element of s, which turns "no slack
+// element below x shares a set with x" into a scan of the sets containing x
+// rather than a scan over all smaller elements, each re-deciding slackness.
+// All three are rebuilt only after an advance has moved a price.
 //
 // PRECONDITION: every element must lie in at least one set, or no cover
 // exists at all. The guard enforces it rather than assuming it, because
@@ -35,6 +42,10 @@ public class LLPWeightedSetCover {
   int m;
   int u;
   double[] G;
+  double[] sp;
+  boolean[] slack;
+  int[] minSlackIn;
+  boolean fresh;
   int x;
 
   private boolean _forbidden0(int x) {
@@ -44,7 +55,16 @@ public class LLPWeightedSetCover {
   }
 
   private void _advance0() {
-    G[x] = (G[x] + minRemainingBudget(x));
+    double step = minRemainingBudget(x);
+    G[x] = (G[x] + step);
+    int s = 0;
+    while ((s < m)) {
+      if ((S[s][x] == 1)) {
+        sp[s] = (sp[s] + step);
+      }
+      s = (s + 1);
+    }
+    fresh = false;
   }
 
   public boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
@@ -54,6 +74,10 @@ public class LLPWeightedSetCover {
     this.m = w.length;
     this.u = S[0].length;
     this.G = new double[u];
+    this.sp = new double[m];
+    this.slack = new boolean[u];
+    this.minSlackIn = new int[m];
+    this.fresh = false;
     {
       boolean changed = true;
       while (changed) {
@@ -81,20 +105,31 @@ public class LLPWeightedSetCover {
     return t1;
   }
 
-  public double setPrice(int s) {
-    double total = 0.0;
-    for (int e = 0; e < u; e++) {
-      {
-        if ((S[s][e] == 1)) {
-          total = (total + G[e]);
-        }
-      }
-    }
-    return total;
+  public boolean setTight(int s) {
+    return (sp[s] >= w[s]);
   }
 
-  public boolean setTight(int s) {
-    return (setPrice(s) >= w[s]);
+  public void refresh() {
+    if ((!fresh)) {
+      for (int e = 0; e < u; e++) {
+        slack[e] = isSlack(e);
+      }
+      for (int s = 0; s < m; s++) {
+        minSlackIn[s] = firstSlackOf(s);
+      }
+      fresh = true;
+    }
+  }
+
+  public int firstSlackOf(int s) {
+    int e = 0;
+    while ((e < u)) {
+      if (((S[s][e] == 1) && slack[e])) {
+        return e;
+      }
+      e = (e + 1);
+    }
+    return u;
   }
 
   public boolean isSlack(int e) {
@@ -110,7 +145,7 @@ public class LLPWeightedSetCover {
     for (int s = 0; s < m; s++) {
       {
         if ((S[s][e] == 1)) {
-          double budget = (w[s] - setPrice(s));
+          double budget = (w[s] - sp[s]);
           if ((budget < best)) {
             best = budget;
           }
@@ -121,19 +156,18 @@ public class LLPWeightedSetCover {
   }
 
   public boolean slackMin(int x) {
-    boolean t3 = false;
-    for (int y = 0; y < x; y++) {
-      if ((isSlack(y) && shareSet(x, y))) { t3 = true; break; }
+    refresh();
+    if ((!slack[x])) {
+      return false;
     }
-    return (isSlack(x) && (!t3));
-  }
-
-  public boolean shareSet(int x, int y) {
-    boolean t4 = false;
-    for (int s = 0; s < m; s++) {
-      if (((S[s][x] == 1) && (S[s][y] == 1))) { t4 = true; break; }
+    int s = 0;
+    while ((s < m)) {
+      if (((S[s][x] == 1) && (minSlackIn[s] < x))) {
+        return false;
+      }
+      s = (s + 1);
     }
-    return t4;
+    return true;
   }
 
   public static void main(String[] args) {

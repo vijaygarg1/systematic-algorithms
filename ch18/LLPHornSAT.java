@@ -7,10 +7,12 @@ import java.util.*;
 
 public class LLPHornSAT {
   int n;
-  private static final boolean[] _NO_EARLY_EXIT = new boolean[0];
   int[][] body;
   int[] head;
   boolean[] G;
+  int[] hcount;
+  int[][] byHead;
+  int[] hfill;
   int j;
 
   private boolean _forbidden0(int j) {
@@ -22,20 +24,28 @@ public class LLPHornSAT {
     G[j] = true;
   }
 
-  private boolean _forbidden1(int j) {
-    if (!(goalFired())) return false;
-    return true;
-  }
-
-  private boolean[] _advance1() {
-    return null;
-  }
-
   public boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
     this.body = body;
     this.head = head;
     this.n = n;
     this.G = new boolean[n];
+    this.hcount = new int[n];
+    this.byHead = new int[n][];
+    this.hfill = new int[n];
+    for (int c = 0; c < body.length; c++) {
+      if ((head[c] >= 0)) {
+        hcount[head[c]] = (hcount[head[c]] + 1);
+      }
+    }
+    for (int v = 0; v < n; v++) {
+      byHead[v] = new int[hcount[v]];
+    }
+    for (int c = 0; c < body.length; c++) {
+      if ((head[c] >= 0)) {
+        byHead[head[c]][hfill[head[c]]] = c;
+        hfill[head[c]] = (hfill[head[c]] + 1);
+      }
+    }
     {
       boolean changed = true;
       while (changed) {
@@ -45,25 +55,24 @@ public class LLPHornSAT {
             this.j = j; _advance0();
             changed = true;
           }
-          if (_forbidden1(j)) {
-            this.j = j; boolean[] _r = _advance1(); if (_r != _NO_EARLY_EXIT) return _r;
-            changed = true;
-          }
         }
       }
+    }
+    if (goalFired(body, head)) {
+      return null;
     }
     return G;
   }
 
   public boolean definiteImplied(int j) {
     boolean t1 = false;
-    for (int c = 0; c < body.length; c++) {
-      if (((head[c] == j) && allTrue(c))) { t1 = true; break; }
+    for (int t = 0; t < byHead[j].length; t++) {
+      if (allTrue(byHead[j][t])) { t1 = true; break; }
     }
     return ((!G[j]) && t1);
   }
 
-  public boolean goalFired() {
+  public boolean goalFired(int[][] body, int[] head) {
     boolean t2 = false;
     for (int c = 0; c < body.length; c++) {
       if (((head[c] == (0 - 1)) && allTrue(c))) { t2 = true; break; }

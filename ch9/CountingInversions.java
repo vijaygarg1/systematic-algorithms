@@ -22,32 +22,32 @@ public class CountingInversions {
   }
 
   public int mergeAndCount(int[] A, int low, int mid, int high) {
-    int[] B = new int[A.length];
+    int[] B = new int[((high - low) + 1)];
     for (int k = low; k <= high; k++) {
-      B[k] = A[k];
+      B[(k - low)] = A[k];
     }
     int i = low;
     int j = (mid + 1);
     int k = low;
     int inv = 0;
     while (((i <= mid) && (j <= high))) {
-      if ((B[i] <= B[j])) {
-        A[k] = B[i];
+      if ((B[(i - low)] <= B[(j - low)])) {
+        A[k] = B[(i - low)];
         i = (i + 1);
       } else {
-        A[k] = B[j];
+        A[k] = B[(j - low)];
         j = (j + 1);
         inv = (inv + ((mid - i) + 1));
       }
       k = (k + 1);
     }
     while ((i <= mid)) {
-      A[k] = B[i];
+      A[k] = B[(i - low)];
       i = (i + 1);
       k = (k + 1);
     }
     while ((j <= high)) {
-      A[k] = B[j];
+      A[k] = B[(j - low)];
       j = (j + 1);
       k = (k + 1);
     }

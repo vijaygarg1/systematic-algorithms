@@ -1,7 +1,16 @@
 // Classical FPTAS for 0/1 Knapsack: scale the profits down by
-// mu = eps*M/nf, then solve the scaled problem exactly by a profit-indexed
-// DP. Rounding loses at most eps*OPT, and the scaled profit range is
-// O(nf^2/eps), so the whole thing is polynomial in nf and 1/eps.
+// mu = eps*L/nf, then solve the scaled problem exactly by a profit-indexed
+// DP. Rounding loses at most eps*OPT, so the whole thing is polynomial in
+// nf and 1/eps.
+//
+// L is a 2-approximation lower bound on OPT -- the better of a density-greedy
+// solution and the most profitable single item -- rather than the maximum
+// profit M. Two consequences: scaling by L still loses only nf*mu = eps*L
+// <= eps*OPT, and since OPT <= 2L no feasible solution can have scaled
+// profit above 2*nf/eps, so the profit axis is capped there. That axis is
+// O(nf/eps) wide instead of the O(nf^2/eps) that scaling by M forces, which
+// is what takes the table (and the running time) from O(nf^3/eps) to
+// O(nf^2/eps).
 //
 // D[i][p] = least total weight of a subset of the first i feasible items
 // whose scaled profit is at least p, with D[i][0] = 0 and every other
@@ -41,15 +50,51 @@ public class FPTASKnapsack {
       if (_v > t1) t1 = _v;
     }
     int M = t1;
+    boolean[] used = new boolean[nf];
+    int room = W;
+    int gval = 0;
+    int picks = 0;
+    while ((picks < nf)) {
+      int cand = (0 - 1);
+      int t = 0;
+      while ((t < nf)) {
+        if (((!used[t]) && (fw[t] <= room))) {
+          if ((cand < 0)) {
+            cand = t;
+          } else {
+            if (((fv[t] * fw[cand]) > (fv[cand] * fw[t]))) {
+              cand = t;
+            }
+          }
+        }
+        t = (t + 1);
+      }
+      if ((cand < 0)) {
+        picks = nf;
+      } else {
+        used[cand] = true;
+        gval = (gval + fv[cand]);
+        room = (room - fw[cand]);
+        picks = (picks + 1);
+      }
+    }
+    int L = gval;
+    if ((M > L)) {
+      L = M;
+    }
     int[] vPrime = new int[nf];
-    int Vp = 0;
+    int total = 0;
     int INF = 1;
     k = 0;
     while ((k < nf)) {
-      vPrime[k] = (((fv[k] * nf) * epsDen) / (epsNum * M));
-      Vp = (Vp + vPrime[k]);
+      vPrime[k] = (((fv[k] * nf) * epsDen) / (epsNum * L));
+      total = (total + vPrime[k]);
       INF = (INF + fw[k]);
       k = (k + 1);
+    }
+    int Vp = ((((2 * nf) * epsDen) / epsNum) + 1);
+    if ((total < Vp)) {
+      Vp = total;
     }
     int[][] D = new int[(nf + 1)][(Vp + 1)];
     for (int a = 0; a <= nf; a++) {

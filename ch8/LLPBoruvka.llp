@@ -56,5 +56,16 @@ class LLPBoruvka {
 
   int countActive() { return count i in [0..n-1] : active[i]; }
 
-  int otherEndpoint(int e, int v) { if (U[e] == v) { return V[e]; }; return U[e]; }
+  // v is a component ROOT, not a raw vertex, so the endpoints have to be
+  // compared as roots too.  Comparing U[e] against a root succeeds only
+  // when that vertex happens to be its own root; otherwise this returned
+  // an endpoint inside v's OWN component, the root was pointed back at
+  // itself, and the components failed to merge.  Borovka then needed
+  // O(n) phases instead of O(log n) -- the answer stayed correct (the
+  // marked edges are still minimum-weight edges leaving a component, so
+  // still MST edges by the cut property), it just took far longer.
+  int otherEndpoint(int e, int v) {
+    if (find(U[e]) == v) { return find(V[e]); };
+    return find(U[e]);
+  }
 }

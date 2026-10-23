@@ -1,42 +1,40 @@
-// 2-approximation vertex cover: greedily pick both endpoints of an uncovered edge.
+// 2-approximation vertex cover: greedily pick both endpoints of an
+// uncovered edge, matching bxx-approximate.tex Algorithm
+// ApproxVertexCover. The book's input is the edge set E, and the loop
+// walks it once, which is what makes the algorithm O(|E|).
+//
+// The book's "remove all edges incident to u or v from E'" needs no
+// bookkeeping: an edge is still in E' exactly when neither of its
+// endpoints has been taken into C, so the test below is that membership
+// test. Taking the edge set rather than an n x n adjacency matrix is
+// what keeps this O(|E|) -- a matrix forces every pass to scan all n^2
+// cells no matter how few edges exist, and reading the input alone would
+// already be Theta(n^2).
 
 import java.util.*;
 
 public class ApproxVertexCover {
-  public boolean[] ApproxVertexCover(int[][] adj) {
-    int n = adj.length;
+  public boolean[] ApproxVertexCover(int[] eu, int[] ev, int n) {
     boolean[] C = new boolean[n];
-    boolean[] removed = new boolean[n];
-    boolean done = false;
-    while ((!done)) {
-      done = true;
-      for (int u = 0; u < n; u++) {
-        {
-          if ((!removed[u])) {
-            int v = (u + 1);
-            while ((v < n)) {
-              if (((!removed[v]) && (adj[u][v] == 1))) {
-                C[u] = true;
-                C[v] = true;
-                removed[u] = true;
-                removed[v] = true;
-                done = false;
-                v = n;
-              } else {
-                v = (v + 1);
-              }
-            }
-          }
-        }
+    int m = eu.length;
+    int e = 0;
+    while ((e < m)) {
+      int u = eu[e];
+      int v = ev[e];
+      if (((!C[u]) && (!C[v]))) {
+        C[u] = true;
+        C[v] = true;
       }
+      e = (e + 1);
     }
     return C;
   }
 
   public static void main(String[] args) {
-    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[] eu = new int[] {0, 0, 1, 2};
+    int[] ev = new int[] {0, 0, 1, 1};
     ApproxVertexCover prog = new ApproxVertexCover();
-    boolean[] result = prog.ApproxVertexCover(adj);
+    boolean[] result = prog.ApproxVertexCover(eu, ev, eu.length);
     System.out.println(Arrays.toString(result));
   }
 }

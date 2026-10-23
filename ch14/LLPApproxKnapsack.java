@@ -1,8 +1,16 @@
 // LLP FPTAS for Knapsack, matching bxx-approximate.tex Algorithm
 // LLP-ApproxKnapsack (fig:llp-approxknapsack): discard items that cannot
 // fit, then run a profit-indexed min-weight DP D[i][p] on a lattice of
-// size (nf+1) x (V'+1), V' = O(nf^2/eps), where nf is the number of
+// size (nf+1) x (V'+1), V' = O(nf/eps), where nf is the number of
 // feasible items. Fully polynomial.
+//
+// The profits are scaled by mu = eps*L/nf against a 2-approximation lower
+// bound L on OPT (the better of a density-greedy solution and the most
+// profitable single item), not against the maximum profit M. Scaling by L
+// still loses only nf*mu = eps*L <= eps*OPT, and because OPT <= 2L no
+// feasible solution reaches scaled profit beyond 2*nf/eps, so the axis is
+// capped there: O(nf/eps) columns instead of O(nf^2/eps), taking the lattice
+// from O(nf^3/eps) to O(nf^2/eps).
 // D[i][p] = minimum total weight of a subset of the first i feasible
 // items with scaled profit >= p; the answer is max { p : D[nf][p] <= W },
 // profit mu * p.
@@ -40,6 +48,7 @@ public class LLPApproxKnapsack {
   int[] fw;
   int[] fv;
   int M;
+  int L;
   int[] vPrime;
   int Vp;
   int INF;
@@ -72,9 +81,10 @@ public class LLPApproxKnapsack {
     this.fw = gather(w, feas);
     this.fv = gather(v, feas);
     this.M = _q1(i, p);
-    this.vPrime = scaled(fv, nf, epsNum, epsDen, M);
-    this.Vp = _q2(i, p);
-    this.INF = (1 + _q3(i, p));
+    this.L = lowerBound(fw, fv, nf, W, M);
+    this.vPrime = scaled(fv, nf, epsNum, epsDen, L);
+    this.Vp = cappedAxis(vPrime, nf, epsNum, epsDen);
+    this.INF = (1 + _q2(i, p));
     this.D = new int[(nf + 1)][(Vp + 1)];
     for (int a = 0; a <= nf; a++) {
       for (int b = 1; b <= Vp; b++) {
@@ -133,12 +143,60 @@ public class LLPApproxKnapsack {
     return out;
   }
 
-  public int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int M) {
+  public int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int L) {
     int[] out = new int[nf];
     for (int k = 0; k < nf; k++) {
-      out[k] = (((fv[k] * nf) * epsDen) / (epsNum * M));
+      out[k] = (((fv[k] * nf) * epsDen) / (epsNum * L));
     }
     return out;
+  }
+
+  public int lowerBound(int[] fw, int[] fv, int nf, int W, int M) {
+    boolean[] used = new boolean[nf];
+    int room = W;
+    int gval = 0;
+    int picks = 0;
+    while ((picks < nf)) {
+      int cand = (0 - 1);
+      int t = 0;
+      while ((t < nf)) {
+        if (((!used[t]) && (fw[t] <= room))) {
+          if ((cand < 0)) {
+            cand = t;
+          } else {
+            if (((fv[t] * fw[cand]) > (fv[cand] * fw[t]))) {
+              cand = t;
+            }
+          }
+        }
+        t = (t + 1);
+      }
+      if ((cand < 0)) {
+        picks = nf;
+      } else {
+        used[cand] = true;
+        gval = (gval + fv[cand]);
+        room = (room - fw[cand]);
+        picks = (picks + 1);
+      }
+    }
+    if ((M > gval)) {
+      return M;
+    }
+    return gval;
+  }
+
+  public int cappedAxis(int[] vPrime, int nf, int epsNum, int epsDen) {
+    int t3 = 0;
+    for (int k = 0; k < nf; k++) {
+      t3 += vPrime[k];
+    }
+    int total = t3;
+    int capv = ((((2 * nf) * epsDen) / epsNum) + 1);
+    if ((total < capv)) {
+      return total;
+    }
+    return capv;
   }
 
   private int _q1(int i, int p) {
@@ -151,14 +209,6 @@ public class LLPApproxKnapsack {
   }
 
   private int _q2(int i, int p) {
-    int _acc = 0;
-    for (int k = 0; k < nf; k++) {
-      _acc += vPrime[k];
-    }
-    return _acc;
-  }
-
-  private int _q3(int i, int p) {
     int _acc = 0;
     for (int k = 0; k < nf; k++) {
       _acc += fw[k];

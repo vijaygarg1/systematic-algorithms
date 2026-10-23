@@ -137,10 +137,10 @@ public class LLPBoruvka {
   }
 
   public int otherEndpoint(int e, int v) {
-    if ((U[e] == v)) {
-      return V[e];
+    if ((find(U[e]) == v)) {
+      return find(V[e]);
     }
-    return U[e];
+    return find(U[e]);
   }
 
   public static void main(String[] args) {

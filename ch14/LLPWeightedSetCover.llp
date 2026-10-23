@@ -13,8 +13,15 @@
 // different count whenever sets and elements aren't equinumerous.
 //
 // S, w and G are program fields, so the aux methods read them directly
-// rather than taking them as parameters, and each predicate is the
-// quantifier it is defined as.
+// rather than taking them as parameters.
+//
+// Three cached quantities keep the predicate off the critical path. The set
+// prices sp[] are maintained by the advance, so setTight is O(1) instead of
+// an O(u) sum; slack[] records which elements lie in no tight set; and
+// minSlackIn[s] is the smallest slack element of s, which turns "no slack
+// element below x shares a set with x" into a scan of the sets containing x
+// rather than a scan over all smaller elements, each re-deciding slackness.
+// All three are rebuilt only after an advance has moved a price.
 //
 // PRECONDITION: every element must lie in at least one set, or no cover
 // exists at all. The guard enforces it rather than assuming it, because
@@ -31,8 +38,21 @@ class LLPWeightedSetCover {
     int m = w.length;
     int u = S[0].length;
     double[] G = new double[u];
+    double[] sp = new double[m];
+    boolean[] slack = new boolean[u];
+    int[] minSlackIn = new int[m];
+    boolean fresh = false;
     forbidden (x in [0..u-1]) : covered(x) && slackMin(x) =>
-      advance : { G[x] = G[x] + minRemainingBudget(x); };
+      advance : {
+        double step = minRemainingBudget(x);
+        G[x] = G[x] + step;
+        int s = 0;
+        while (s < m) {
+          if (S[s][x] == 1) { sp[s] = sp[s] + step; };
+          s = s + 1;
+        };
+        fresh = false;
+      };
     boolean[] C = new boolean[m];
     forall s in [0..m-1] : C[s] = setTight(s);
     return C;
@@ -44,17 +64,29 @@ class LLPWeightedSetCover {
     return exists s in [0..m-1] : S[s][x] == 1;
   }
 
-  // Sum of the prices on the elements of s.
-  double setPrice(int s) {
-    double total = 0.0;
-    forall e in [0..u-1] : {
-      if (S[s][e] == 1) { total = total + G[e]; };
-    };
-    return total;
+  // sp[s] is the sum of the prices on the elements of s, maintained by the
+  // advance rather than re-summed on every call.
+  boolean setTight(int s) {
+    return sp[s] >= w[s];
   }
 
-  boolean setTight(int s) {
-    return setPrice(s) >= w[s];
+  // Rebuild the slack flags and each set's smallest slack element.
+  void refresh() {
+    if (!fresh) {
+      forall e in [0..u-1] : slack[e] = isSlack(e);
+      forall s in [0..m-1] : minSlackIn[s] = firstSlackOf(s);
+      fresh = true;
+    }
+  }
+
+  // The smallest slack element of s, or u when it has none.
+  int firstSlackOf(int s) {
+    int e = 0;
+    while (e < u) {
+      if (S[s][e] == 1 && slack[e]) { return e; };
+      e = e + 1;
+    };
+    return u;
   }
 
   // e lies in no tight set.
@@ -67,7 +99,7 @@ class LLPWeightedSetCover {
     double best = infinity;
     forall s in [0..m-1] : {
       if (S[s][e] == 1) {
-        double budget = w[s] - setPrice(s);
+        double budget = w[s] - sp[s];
         if (budget < best) { best = budget; };
       };
     };
@@ -77,12 +109,13 @@ class LLPWeightedSetCover {
   // x is slack and lex-minimal among the slack elements sharing a set
   // with it -- i.e. no slack element below x shares a set with x.
   boolean slackMin(int x) {
-    return isSlack(x)
-        && !(exists y in [0..x-1] : (isSlack(y) && shareSet(x, y)));
-  }
-
-  // x and y both belong to some common set.
-  boolean shareSet(int x, int y) {
-    return exists s in [0..m-1] : (S[s][x] == 1 && S[s][y] == 1);
+    refresh();
+    if (!slack[x]) { return false; };
+    int s = 0;
+    while (s < m) {
+      if (S[s][x] == 1 && minSlackIn[s] < x) { return false; };
+      s = s + 1;
+    };
+    return true;
   }
 }

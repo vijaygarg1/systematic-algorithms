@@ -54,25 +54,47 @@ public class Boruvka {
 
   public void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {
     boolean[] visited = new boolean[n];
+    int[] deg = new int[n];
+    int[] fill = new int[n];
+    int[][] tadj = new int[n][];
+    for (int e = 0; e < U.length; e++) {
+      {
+        if (T[e]) {
+          deg[U[e]] = (deg[U[e]] + 1);
+          deg[V[e]] = (deg[V[e]] + 1);
+        }
+      }
+    }
+    for (int i = 0; i < n; i++) {
+      tadj[i] = new int[deg[i]];
+    }
+    for (int e = 0; e < U.length; e++) {
+      {
+        if (T[e]) {
+          tadj[U[e]][fill[U[e]]] = V[e];
+          fill[U[e]] = (fill[U[e]] + 1);
+          tadj[V[e]][fill[V[e]]] = U[e];
+          fill[V[e]] = (fill[V[e]] + 1);
+        }
+      }
+    }
     for (int i = 0; i < n; i++) {
       {
         if ((!visited[i])) {
-          bfs(i, i, U, V, T, visited, cid);
+          bfs(i, i, visited, cid, tadj);
         }
       }
     }
   }
 
-  public void bfs(int v, int root, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
+  public void bfs(int v, int root, boolean[] visited, int[] cid, int[][] tadj) {
     visited[v] = true;
     cid[v] = root;
-    for (int e = 0; e < U.length; e++) {
+    for (int q = 0; q < tadj[v].length; q++) {
       {
-        if (T[e]) {
-          int u = neighborIf(U[e], V[e], v);
-          if (((u != (-1)) && (!visited[u]))) {
-            bfs(u, root, U, V, T, visited, cid);
-          }
+        int u = tadj[v][q];
+        if ((!visited[u])) {
+          bfs(u, root, visited, cid, tadj);
         }
       }
     }

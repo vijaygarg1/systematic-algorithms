@@ -1,8 +1,16 @@
 // LLP FPTAS for Knapsack, matching bxx-approximate.tex Algorithm
 // LLP-ApproxKnapsack (fig:llp-approxknapsack): discard items that cannot
 // fit, then run a profit-indexed min-weight DP D[i][p] on a lattice of
-// size (nf+1) x (V'+1), V' = O(nf^2/eps), where nf is the number of
+// size (nf+1) x (V'+1), V' = O(nf/eps), where nf is the number of
 // feasible items. Fully polynomial.
+//
+// The profits are scaled by mu = eps*L/nf against a 2-approximation lower
+// bound L on OPT (the better of a density-greedy solution and the most
+// profitable single item), not against the maximum profit M. Scaling by L
+// still loses only nf*mu = eps*L <= eps*OPT, and because OPT <= 2L no
+// feasible solution reaches scaled profit beyond 2*nf/eps, so the axis is
+// capped there: O(nf/eps) columns instead of O(nf^2/eps), taking the lattice
+// from O(nf^3/eps) to O(nf^2/eps).
 // D[i][p] = minimum total weight of a subset of the first i feasible
 // items with scaled profit >= p; the answer is max { p : D[nf][p] <= W },
 // profit mu * p.
@@ -33,8 +41,9 @@ class LLPApproxKnapsack {
     int[] fw     = gather(w, feas);
     int[] fv     = gather(v, feas);
     int   M      = max k in [0..nf - 1] : fv[k];
-    int[] vPrime = scaled(fv, nf, epsNum, epsDen, M);
-    int   Vp     = sum k in [0..nf - 1] : vPrime[k];
+    int   L      = lowerBound(fw, fv, nf, W, M);
+    int[] vPrime = scaled(fv, nf, epsNum, epsDen, L);
+    int   Vp     = cappedAxis(vPrime, nf, epsNum, epsDen);
     int   INF    = 1 + sum k in [0..nf - 1] : fw[k];
     int[][] D    = new int[nf + 1][Vp + 1];
     // D[a][0] = 0: profit 0 needs weight 0. Every other cell starts at INF.
@@ -77,11 +86,48 @@ class LLPApproxKnapsack {
     return out;
   }
 
-  // Profits scaled down by mu = eps*M/nf, which is what bounds the DP's
-  // profit axis by O(nf^2/eps).
-  int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int M) {
+  // Profits scaled down by mu = eps*L/nf.
+  int[] scaled(int[] fv, int nf, int epsNum, int epsDen, int L) {
     int[] out = new int[nf];
-    forall k in [0..nf-1] : out[k] = (fv[k] * nf * epsDen) / (epsNum * M);
+    forall k in [0..nf-1] : out[k] = (fv[k] * nf * epsDen) / (epsNum * L);
     return out;
+  }
+
+  // A lower bound L on OPT with OPT <= 2L: items taken in non-increasing
+  // density order while they fit (selection, so no sort is needed), or the
+  // most profitable single item, whichever is larger.
+  int lowerBound(int[] fw, int[] fv, int nf, int W, int M) {
+    boolean[] used = new boolean[nf];
+    int room  = W;
+    int gval  = 0;
+    int picks = 0;
+    while (picks < nf) {
+      int cand = 0 - 1;
+      int t = 0;
+      while (t < nf) {
+        if (!used[t] && fw[t] <= room) {
+          if (cand < 0) { cand = t; }
+          else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
+        };
+        t = t + 1;
+      };
+      if (cand < 0) { picks = nf; } else {
+        used[cand] = true;
+        gval  = gval + fv[cand];
+        room  = room - fw[cand];
+        picks = picks + 1;
+      }
+    };
+    if (M > gval) { return M; };
+    return gval;
+  }
+
+  // The profit axis: the scaled total, capped at the largest scaled profit
+  // any feasible solution can reach, 2*nf/eps.
+  int cappedAxis(int[] vPrime, int nf, int epsNum, int epsDen) {
+    int total = sum k in [0..nf - 1] : vPrime[k];
+    int capv  = (2 * nf * epsDen) / epsNum + 1;
+    if (total < capv) { return total; };
+    return capv;
   }
 }

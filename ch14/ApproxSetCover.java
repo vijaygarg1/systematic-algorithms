@@ -6,6 +6,12 @@
 // loop guard is the book's `R != empty`, not a weaker "some set still
 // covers something new" test -- on an infeasible instance it would not
 // terminate, exactly as the book's algorithm would not.
+//
+// The uncovered counts cnt[s] = |s ∩ R| are maintained instead of being
+// recomputed each round: covering an element decrements the count of every
+// set containing it, so the total number of updates over the whole run is
+// one per (set, element) incidence. Recomputing all m counts in each of the
+// up-to min(m,n) rounds costs a factor min(m,n) more.
 
 import java.util.*;
 
@@ -14,43 +20,44 @@ public class ApproxSetCover {
     int m = S.length;
     boolean[] C = new boolean[m];
     boolean[] covered = new boolean[n];
-    while (anyUncovered(covered, n)) {
+    int[] cnt = new int[m];
+    int remaining = n;
+    for (int s = 0; s < m; s++) {
+      int t1 = 0;
+      for (int e = 0; e < n; e++) {
+        if ((S[s][e] == 1)) t1++;
+      }
+      cnt[s] = t1;
+    }
+    while ((remaining > 0)) {
       int bestIdx = 0;
       int bestCover = (0 - 1);
-      for (int s = 0; s < m; s++) {
-        {
-          int count = 0;
-          int e = 0;
-          while ((e < n)) {
-            if (((S[s][e] == 1) && (!covered[e]))) {
-              count = (count + 1);
-            }
-            e = (e + 1);
-          }
-          if ((count > bestCover)) {
-            bestCover = count;
-            bestIdx = s;
-          }
+      int s = 0;
+      while ((s < m)) {
+        if ((cnt[s] > bestCover)) {
+          bestCover = cnt[s];
+          bestIdx = s;
         }
+        s = (s + 1);
       }
       C[bestIdx] = true;
-      for (int e = 0; e < n; e++) {
-        {
-          if ((S[bestIdx][e] == 1)) {
-            covered[e] = true;
+      int e = 0;
+      while ((e < n)) {
+        if (((S[bestIdx][e] == 1) && (!covered[e]))) {
+          covered[e] = true;
+          remaining = (remaining - 1);
+          int t = 0;
+          while ((t < m)) {
+            if ((S[t][e] == 1)) {
+              cnt[t] = (cnt[t] - 1);
+            }
+            t = (t + 1);
           }
         }
+        e = (e + 1);
       }
     }
     return C;
-  }
-
-  public boolean anyUncovered(boolean[] covered, int n) {
-    boolean t1 = false;
-    for (int e = 0; e < n; e++) {
-      if ((!covered[e])) { t1 = true; break; }
-    }
-    return t1;
   }
 
   public static void main(String[] args) {

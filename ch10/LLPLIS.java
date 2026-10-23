@@ -21,7 +21,8 @@ public class LLPLIS {
       int _v = (G[i] + 1);
       if (_v > t1) t1 = _v;
     }
-    return (!(G[j] >= Math.max(1, t1)));
+    if (!((!(G[j] >= Math.max(1, t1))))) return false;
+    return true;
   }
 
   private void advance() {

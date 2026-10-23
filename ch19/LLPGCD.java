@@ -1,23 +1,34 @@
-// LLP-GCD: descending GCD via Euclidean reduction.
-// Forbidden when G[j] > G[i]; advance reduces G[j] by mod.
+// LLP-GCD: greatest common divisor of two numbers via Euclidean
+// reduction, matching bxx-numberTheory.tex Algorithm LLP-GCD. G is the
+// two-element vector (a, b); forbidden picks any entry strictly larger
+// than another, and advance replaces it by its remainder mod the smaller
+// (or by the smaller itself when it divides exactly, so entries stay at
+// least 1). At termination G[0] = G[1] = gcd(a, b).
+//
+// Each advance replaces G[j] by G[j] mod G[i] < G[i] <= G[j], which at
+// least halves it, so the algorithm performs O(log(min(a,b))) advances --
+// the bound the chapter states. `n` has to be set explicitly, as in
+// LLPExtGCD: it is normally inferred from an array *parameter*'s length,
+// but G is locally allocated rather than passed in.
 
 import java.util.*;
 
 public class LLPGCD {
   int n;
-  int[] A;
+  int a;
+  int b;
   int[] G;
   int j;
   int picked_i;
 
-  private boolean forbidden(int j) {
-    for (int i = 0; i < n; i++) {
+  private boolean _forbidden0(int j) {
+    for (int i = 0; i <= 1; i++) {
       if ((G[j] > G[i])) { this.picked_i = i; return true; }
     }
     return false;
   }
 
-  private void advance() {
+  private void _advance0() {
     int i = picked_i;
     if (((G[j] % G[i]) == 0)) {
       G[j] = G[i];
@@ -26,29 +37,33 @@ public class LLPGCD {
     }
   }
 
-  public int[] LLPGCD(int[] A) {
-    this.A = A;
-    this.n = A.length;
-    this.G = A.clone();
+  public int LLPGCD(int a, int b) {
+    this.a = a;
+    this.b = b;
+    this.G = new int[2];
+    n = 2;
+    G[0] = a;
+    G[1] = b;
     {
       boolean changed = true;
       while (changed) {
         changed = false;
         for (int j = 0; j < n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
+          if (_forbidden0(j)) {
+            this.j = j; _advance0();
             changed = true;
           }
         }
       }
     }
-    return G;
+    return G[0];
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
+    int a = 0;
+    int b = 0;
     LLPGCD prog = new LLPGCD();
-    int[] result = prog.LLPGCD(A);
-    System.out.println(Arrays.toString(result));
+    int result = prog.LLPGCD(a, b);
+    System.out.println(result);
   }
 }

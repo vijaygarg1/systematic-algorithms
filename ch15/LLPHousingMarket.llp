@@ -7,6 +7,15 @@
 // agent j is not itself in S(G) but wishes for a house held by an agent
 // who is; advance moves j to its next preference.
 //
+// S(G) is built for the whole market at once, which is what makes the
+// round cost O(n) and the algorithm O(n^2), as the chapter states: every
+// agent wishes for exactly one house, so the wish graph is functional
+// and its cycles are precisely what survives repeatedly discarding the
+// agents nobody wishes for. Asking the question one agent at a time
+// instead -- following wishes from j until they return to j -- answers
+// it in O(n) per agent and so costs O(n^2) per round, a full factor of n
+// too much. inS[] is rebuilt only after an advance has moved a wish.
+//
 // Earlier version of this file (kept for reference, not used): treated
 // an agent as "in the submatching" whenever no other agent currently
 // wished for the same house -- i.e. current-wish uniqueness -- rather
@@ -58,9 +67,16 @@ class LLPHousingMarket {
   int[] LLPHousingMarket(int[][] pref) {
     int n = pref.length;
     int[] G = new int[n];
+    boolean[] inS = new boolean[n];
+    int[] indeg = new int[n];
+    int[] q = new int[n];
+    boolean fresh = false;
     forall k in [0..n-1] : G[k] = 0;
     forbidden (j) : !inSubmatching(j, G, pref) && inSubmatching(wish(j, G, pref), G, pref) =>
-      advance : G[j] = G[j] + 1;
+      advance : {
+        G[j] = G[j] + 1;
+        fresh = false;
+      };
     return G;
   }
 
@@ -69,15 +85,34 @@ class LLPHousingMarket {
   }
 
   // True iff agent j lies on a cycle of the wish functional graph
-  // (i -> wish(i)), i.e. j belongs to S(G), the largest submatching:
-  // following wishes from j returns to j within n steps.
+  // (i -> wish(i)), i.e. j belongs to S(G), the largest submatching.
   boolean inSubmatching(int j, int[] G, int[][] pref) {
-    int n = G.length;
-    int cur = wish(j, G, pref);
-    forall steps in [1..n] : {
-      if (cur == j) { return true; };
-      cur = wish(cur, G, pref);
+    refresh(G, pref);
+    return inS[j];
+  }
+
+  // Rebuild S(G) once after a wish has moved. An agent nobody wishes for
+  // cannot lie on a cycle; discarding it may leave its own wish with no
+  // one wishing for it, so the discards cascade. What remains is exactly
+  // the union of the cycles. Each agent enters the queue at most once,
+  // so this is O(n) for the whole market.
+  void refresh(int[] G, int[][] pref) {
+    if (fresh) { return; };
+    forall i in [0..n-1] : { inS[i] = true; indeg[i] = 0; };
+    forall i in [0..n-1] : indeg[wish(i, G, pref)] = indeg[wish(i, G, pref)] + 1;
+    int qt = 0;
+    forall i in [0..n-1] : {
+      if (indeg[i] == 0) { q[qt] = i; qt = qt + 1; };
     };
-    return false;
+    int qh = 0;
+    while (qh < qt) {
+      int x = q[qh];
+      qh = qh + 1;
+      inS[x] = false;
+      int y = wish(x, G, pref);
+      indeg[y] = indeg[y] - 1;
+      if (indeg[y] == 0) { q[qt] = y; qt = qt + 1; };
+    };
+    fresh = true;
   }
 }

@@ -42,20 +42,36 @@ class Boruvka {
   }
 
   // Label every vertex with the root of its T-connected component.
+  // The tree edges are gathered into adjacency lists once per call, so the
+  // walk below costs O(n + |T|).  Scanning all m edges for every vertex it
+  // visited made this O(n*m) per phase, and with O(log n) phases that is
+  // O(n*m log n) -- far above the O(m log n) Boruvka is meant to achieve,
+  // and the single reason this program measured n^2.55.
   void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {
     boolean[] visited = new boolean[n];
+    int[] deg = new int[n];
+    int[] fill = new int[n];
+    int[][] tadj = new int[n][];
+    forall e in [0..U.length-1] : {
+      if (T[e]) { deg[U[e]] = deg[U[e]] + 1; deg[V[e]] = deg[V[e]] + 1; };
+    };
+    forall i in [0..n-1] : tadj[i] = new int[deg[i]];
+    forall e in [0..U.length-1] : {
+      if (T[e]) {
+        tadj[U[e]][fill[U[e]]] = V[e]; fill[U[e]] = fill[U[e]] + 1;
+        tadj[V[e]][fill[V[e]]] = U[e]; fill[V[e]] = fill[V[e]] + 1;
+      };
+    };
     forall i in [0..n-1] : {
-      if (!visited[i]) { bfs(i, i, U, V, T, visited, cid); };
+      if (!visited[i]) { bfs(i, i, visited, cid, tadj); };
     };
   }
 
-  void bfs(int v, int root, int[] U, int[] V, boolean[] T, boolean[] visited, int[] cid) {
+  void bfs(int v, int root, boolean[] visited, int[] cid, int[][] tadj) {
     visited[v] = true; cid[v] = root;
-    forall e in [0..U.length-1] : {
-      if (T[e]) {
-        int u = neighborIf(U[e], V[e], v);
-        if (u != -1 && !visited[u]) { bfs(u, root, U, V, T, visited, cid); };
-      };
+    forall q in [0..tadj[v].length-1] : {
+      int u = tadj[v][q];
+      if (!visited[u]) { bfs(u, root, visited, cid, tadj); };
     };
   }
 

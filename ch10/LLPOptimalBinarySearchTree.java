@@ -65,12 +65,12 @@ public class LLPOptimalBinarySearchTree {
 
   public double optCost(double[] p, double[][] G, int i, int j) {
     double best = Double.POSITIVE_INFINITY;
+    double s = 0.0;
+    for (int l = i; l <= j; l++) {
+      s = (s + p[l]);
+    }
     for (int k = i; k <= j; k++) {
       {
-        double s = 0.0;
-        for (int l = i; l <= j; l++) {
-          s = (s + p[l]);
-        }
         double leftCost = 0.0;
         if ((k > i)) {
           leftCost = G[i][(k - 1)];

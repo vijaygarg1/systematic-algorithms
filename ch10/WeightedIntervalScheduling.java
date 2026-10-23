@@ -32,12 +32,16 @@ public class WeightedIntervalScheduling {
   }
 
   public int lastCompatible(int j, int[] s, int[] f) {
+    int lo = 1;
+    int hi = (j - 1);
     int best = 0;
-    for (int i = 1; i < j; i++) {
-      {
-        if ((f[i] <= s[j])) {
-          best = i;
-        }
+    while ((lo <= hi)) {
+      int mid = ((lo + hi) / 2);
+      if ((f[mid] <= s[j])) {
+        best = mid;
+        lo = (mid + 1);
+      } else {
+        hi = (mid - 1);
       }
     }
     return best;

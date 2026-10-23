@@ -1,0 +1,23 @@
+// LLP-StableMarriage-Spec: a specification of Gale-Shapley, not yet an
+// efficient algorithm (bxx-stableMatching.tex, Algorithm
+// LLP-StableMarriage-Spec). Its forbidden condition rescans every man's
+// whole proposal history to find out who currently holds a given
+// woman -- O(n) per guard, O(n^4) total -- because an arbitrary initial
+// G gives no cheaper way to tell. It exists only as a correctness
+// stepping stone toward LLPStableMarriage.llp, which caches that
+// information instead; do not measure or recommend this version on its
+// own (see v3performance.txt).
+class LLPStableMarriageSpec {
+  int[] LLPStableMarriageSpec(int[][] mpref, int[][] rank, int[]   I) {
+    int[]   G = 0;
+    forall k in [0..n-1] : G[k] = I[k];
+    forbidden (j) :
+      exists i in [0..n-1] :
+        exists k in [0..G[i]] :
+          mpref[j][G[j]] == mpref[i][k]
+          && rank[mpref[j][G[j]]][i] < rank[mpref[j][G[j]]][j]
+    =>
+      advance : G[j] = G[j] + 1;
+    return G;
+  }
+}

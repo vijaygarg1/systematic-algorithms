@@ -5,13 +5,20 @@
 // alternating path..." step, plus its "assign S[] along the path"
 // follow-up, are both realized here by the alternatingPath(...) DFS --
 // the standard way of implementing that check.
+//
+// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
+// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
+// some R-vertex has no incident edge. A dense |L| x |R| matrix would make
+// every DFS step scan all of R however few edges exist -- and reading such
+// a matrix is Theta(|L| * |R|) before the algorithm starts, so no bound in
+// |E| is reachable from it at all.
 
 import java.util.*;
 
 public class SeqAugmentingPath {
-  public int[] SeqAugmentingPath(int[][] adj) {
+  public int[] SeqAugmentingPath(int[][] adj, int nr) {
     int n = adj.length;
-    int m = adj[0].length;
+    int m = nr;
     int[] G = new int[n];
     int[] S = new int[m];
     for (int j = 0; j < n; j++) {
@@ -32,17 +39,17 @@ public class SeqAugmentingPath {
   }
 
   public boolean alternatingPath(int j, int[][] adj, int[] S, boolean[] seen) {
-    int m = adj[0].length;
-    for (int k = 0; k < m; k++) {
-      {
-        if (((adj[j][k] == 1) && (!seen[k]))) {
-          seen[k] = true;
-          if (((S[k] == (0 - 1)) || alternatingPath(S[k], adj, S, seen))) {
-            S[k] = j;
-            return true;
-          }
+    int t = 0;
+    while ((t < adj[j].length)) {
+      int k = adj[j][t];
+      if ((!seen[k])) {
+        seen[k] = true;
+        if (((S[k] == (0 - 1)) || alternatingPath(S[k], adj, S, seen))) {
+          S[k] = j;
+          return true;
         }
       }
+      t = (t + 1);
     }
     return false;
   }
@@ -50,7 +57,7 @@ public class SeqAugmentingPath {
   public static void main(String[] args) {
     int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     SeqAugmentingPath prog = new SeqAugmentingPath();
-    int[] result = prog.SeqAugmentingPath(adj);
+    int[] result = prog.SeqAugmentingPath(adj, adj.length);
     System.out.println(Arrays.toString(result));
   }
 }

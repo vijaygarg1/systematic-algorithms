@@ -1,18 +1,26 @@
-"""Bubble sort: repeated adjacent compare-and-swap until a clean pass."""
+"""Bubble sort: repeated adjacent compare-and-swap until a clean pass.
 
-def sort(A):
-    found = True
-    while found:
-        found = False
-        j = 0
-        while j < len(A) - 1:
-            if A[j] > A[j + 1]:
-                found = True
-                A[j], A[j + 1] = A[j + 1], A[j]
-            j += 1
+Auto-generated from BubbleSort.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    A = [5, 2, 4, 6, 1, 3]
-    sort(A)
+class BubbleSort:
+    def sort(self, A):
+        self.A = A
+        self.n = len(self.A)
+        self.found = True
+        while self.found:
+            self.found = False
+            for j in range(0, (((len(self.A) - 1) - 1)) + 1):
+                if (self.A[j] > self.A[(j + 1)]):
+                    self.found = True
+                    self.A[j], self.A[(j + 1)] = self.A[(j + 1)], self.A[j]
+
+
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = BubbleSort()
+    prog.sort(A)
     print(A)
+

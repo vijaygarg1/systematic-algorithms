@@ -1,31 +1,39 @@
-"""Optimal BST: O(n³) DP over interval [i, j] picking the root r."""
+"""Optimal BST: O(n³) DP over interval [i, j] picking the root r.
 
-import math
-
-
-def solve(prob):
-    n = len(prob)
-    dp = [[0.0] * n for _ in range(n)]
-    s  = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        dp[i][i] = prob[i]
-        s[i][i]  = prob[i]
-    for length in range(1, n):
-        for lo in range(n - length):
-            hi = lo + length
-            s[lo][hi] = s[lo][hi - 1] + prob[hi]
-            best = math.inf
-            for r in range(lo, hi + 1):
-                left  = dp[lo][r - 1] if r > lo else 0.0
-                right = dp[r + 1][hi] if r < hi else 0.0
-                cost  = s[lo][hi] + left + right
-                if cost < best:
-                    best = cost
-            dp[lo][hi] = best
-    return dp
+Auto-generated from OptimalBinarySearchTree.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    prob = [0.25, 0.20, 0.30, 0.25]
-    dp = solve(prob)
-    print(f"optimum BST cost = {dp[0][len(prob) - 1]:.3f}")
+class OptimalBinarySearchTree:
+    def solve(self, prob):
+        self.prob = prob
+        self.n = len(self.prob)
+        self.dp = [[0.0] * (self.n) for _ in range(self.n)]
+        self.s = [[0.0] * (self.n) for _ in range(self.n)]
+        for i in range(0, ((self.n - 1)) + 1):
+            self.dp[i][i] = self.prob[i]
+            self.s[i][i] = self.prob[i]
+        for len_ in range(1, ((self.n - 1)) + 1):
+            for lo in range(0, (((self.n - 1) - len_)) + 1):
+                hi = (lo + len_)
+                self.s[lo][hi] = (self.s[lo][(hi - 1)] + self.prob[hi])
+                self.dp[lo][hi] = float('inf')
+                for r in range(lo, (hi) + 1):
+                    left = 0.0
+                    right = 0.0
+                    if (r > lo):
+                        left = self.dp[lo][(r - 1)]
+                    if (r < hi):
+                        right = self.dp[(r + 1)][hi]
+                    cost = ((self.s[lo][hi] + left) + right)
+                    self.dp[lo][hi] = min(self.dp[lo][hi], cost)
+        return self.dp
+
+
+if __name__ == '__main__':
+    prob = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+    prog = OptimalBinarySearchTree()
+    result = prog.solve(prob)
+    print(result)
+

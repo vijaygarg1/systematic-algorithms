@@ -1,41 +1,22 @@
-"""LLP-BFS: forbidden when G[j] > min_{i in pre[j]} G[i] + 1."""
+"""LLP-BFS: forbidden when G[j] > min_{i in pre[j]} G[i] + 1.
+style: fixpoint
 
-import math
-
-
-def forbidden(j, G, pre):
-    if not pre[j]:
-        return False
-    return G[j] > min(G[i] + 1 for i in pre[j])
+Auto-generated from LLPBFS.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def advance(j, G, pre):
-    G[j] = min(G[i] + 1 for i in pre[j])
+class LLPBFS:
+    def LLPBFS(self, pre, G):
+        self.pre = pre
+        self.G = G
+        self.n = len(self.pre)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if (self.G[j] > min(((self.G[i] + 1) for i in self.pre[j]), default=2147483647)):
+                    self.G[j] = min(((self.G[i] + 1) for i in self.pre[j]), default=2147483647)
+                    _changed = True
 
 
-def llp_bfs(pre, G):
-    n = len(G)
-    changed = True
-    while changed:
-        changed = False
-        for j in range(n):
-            if forbidden(j, G, pre):
-                advance(j, G, pre)
-                changed = True
-    return G
-
-
-if __name__ == "__main__":
-    # Predecessor lists for the same graph as in BFS.py.
-    pre = [
-        [],          # 0 is the source
-        [0],
-        [0],
-        [1, 2],
-        [2],
-        [3, 4],
-    ]
-    n = len(pre)
-    G = [math.inf] * n
-    G[0] = 0
-    print("BFS distances:", llp_bfs(pre, G))

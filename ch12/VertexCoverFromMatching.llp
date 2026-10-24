@@ -8,11 +8,18 @@
 // j (or -1 if unmatched), with matchR (the same matching read from the
 // R side -- the only direction the book's "partner[w]" needs, since w is
 // always an R-vertex at that point in the algorithm) derived from it.
+//
+// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
+// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
+// some R-vertex has no incident edge. Following "every (w,v) in E \ M"
+// over a dense |L| x |R| matrix would scan all of R for every dequeued
+// L-vertex however few edges exist, and reading such a matrix is already
+// Theta(|L| * |R|).
 
 class VertexCoverFromMatching {
-  boolean[] VertexCoverFromMatching(int[][] adj, int[] matchL) {
+  boolean[] VertexCoverFromMatching(int[][] adj, int nr, int[] matchL) {
     int L = adj.length;
-    int R = adj[0].length;
+    int R = nr;
     int[] matchR = new int[R];
     forall v in [0..R-1] : matchR[v] = 0 - 1;
     forall j in [0..L-1] : if (matchL[j] != 0 - 1) { matchR[matchL[j]] = j; };
@@ -34,14 +41,15 @@ class VertexCoverFromMatching {
       head = head + 1;
       if (w < L) {
         // w in L: follow every (w, v) in E \ M with v not in Z.
-        int v = 0;
-        while (v < R) {
-          if (adj[w][v] == 1 && matchL[w] != v && !inZ[L + v]) {
+        int t = 0;
+        while (t < adj[w].length) {
+          int v = adj[w][t];
+          if (matchL[w] != v && !inZ[L + v]) {
             inZ[L + v] = true;
             Q[tail] = L + v;
             tail = tail + 1;
           };
-          v = v + 1;
+          t = t + 1;
         };
       } else {
         // w in R: if w is matched and partner[w] not in Z, add it.

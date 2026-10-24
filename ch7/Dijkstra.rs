@@ -2,14 +2,23 @@
 // lazy deletion -- a vertex may be pushed more than once as its
 // distance improves; stale entries are skipped on removal via the
 // fixed[] check.
+//
+// The graph is a weighted adjacency list: adj[j] holds the out-neighbours
+// of j and the parallel aw[j] their edge weights, so the weight of
+// (j, adj[j][t]) is aw[j][t].  No n x n matrix is involved; the whole
+// structure is O(n + m).
+//
+// The relaxation loop walks adj[j], which is the book's "forall k: not
+// fixed[k] and (j,k) in E". That is what makes the algorithm O(m log n):
+// each edge is relaxed once and contributes at most one heap push.
 
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
 const INF: i32 = i32::MAX / 2;
 
-fn shortest_path(w: &[Vec<i32>], s: usize) -> Vec<i32> {
-    let n = w.len();
+fn shortest_path(adj: &[Vec<usize>], aw: &[Vec<i32>], s: usize) -> Vec<i32> {
+    let n = adj.len();
     let mut dist = vec![INF; n];
     let mut fixed = vec![false; n];
     dist[s] = 0;
@@ -18,10 +27,10 @@ fn shortest_path(w: &[Vec<i32>], s: usize) -> Vec<i32> {
     while let Some(Reverse((_c, j))) = heap.pop() {
         if fixed[j] { continue; }
         fixed[j] = true;
-        for k in 0..n {
-            if fixed[k] || w[j][k] >= INF { continue; }
-            if dist[j] + w[j][k] < dist[k] {
-                dist[k] = dist[j] + w[j][k];
+        for (t, &k) in adj[j].iter().enumerate() {
+            if fixed[k] { continue; }
+            if dist[j] + aw[j][t] < dist[k] {
+                dist[k] = dist[j] + aw[j][t];
                 heap.push(Reverse((dist[k], k)));
             }
         }
@@ -30,9 +39,7 @@ fn shortest_path(w: &[Vec<i32>], s: usize) -> Vec<i32> {
 }
 
 fn main() {
-    let n = 5;
-    let mut w = vec![vec![INF; n]; n];
-    w[0][1] = 4;  w[0][2] = 1;  w[1][2] = 2;  w[1][3] = 5;
-    w[2][3] = 8;  w[2][4] = 10; w[3][4] = 2;
-    println!("dist: {:?}", shortest_path(&w, 0));
+    let adj: Vec<Vec<usize>> = vec![vec![1, 2], vec![2, 3], vec![3, 4], vec![4], vec![]];
+    let aw:  Vec<Vec<i32>>   = vec![vec![4, 1], vec![2, 5], vec![8, 10], vec![2], vec![]];
+    println!("dist: {:?}", shortest_path(&adj, &aw, 0));
 }

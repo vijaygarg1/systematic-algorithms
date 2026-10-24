@@ -1,21 +1,27 @@
-"""Min-max-lateness scheduling: greedy by earliest deadline."""
+"""Min-max-lateness scheduling: greedy by earliest deadline.
 
-def schedule(t, d):
-    n = len(t)
-    G = [0] * n
-    last = 0
-    max_lateness = 0
-    for i in range(n):
-        G[i] = last
-        last += t[i]
-        max_lateness = max(max_lateness, last - d[i])
-    return G, max_lateness
+Auto-generated from MinMaxLateness.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    # Jobs sorted by deadline.
-    t = [3, 2, 1, 4, 3, 2]
-    d = [6, 8, 9, 9, 14, 15]
-    starts, mx = schedule(t, d)
-    print("start times:", starts)
-    print("max lateness:", mx)
+class MinMaxLateness:
+    def schedule(self, t, d):
+        self.t = t
+        self.d = d
+        self.n = len(self.t)
+        self.G = [0] * (self.n)
+        self.last = 0
+        for i in range(0, ((self.n - 1)) + 1):
+            self.G[i] = self.last
+            self.last = (self.last + self.t[i])
+        return self.G
+
+
+if __name__ == '__main__':
+    t = [0, 0, 1, 2]
+    d = [0, 0, 1, 1]
+    prog = MinMaxLateness()
+    result = prog.schedule(t, d)
+    print(result)
+

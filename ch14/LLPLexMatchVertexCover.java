@@ -60,12 +60,12 @@ public class LLPLexMatchVertexCover {
   }
 
   public int minNbr(int u) {
-    int y = 0;
-    while ((y < n)) {
-      if (((adj[u][y] == 1) && (!G[y]))) {
-        return y;
+    int k = 0;
+    while ((k < adj[u].length)) {
+      if ((!G[adj[u][k]])) {
+        return adj[u][k];
       }
-      y = (y + 1);
+      k = (k + 1);
     }
     return (0 - 1);
   }

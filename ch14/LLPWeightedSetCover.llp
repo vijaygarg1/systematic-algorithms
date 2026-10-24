@@ -34,9 +34,9 @@
 // that can be covered.
 
 class LLPWeightedSetCover {
-  boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
+  boolean[] LLPWeightedSetCover(int[][] mem, int[][] inc, double[] w) {
     int m = w.length;
-    int u = S[0].length;
+    int u = inc.length;
     double[] G = new double[u];
     double[] sp = new double[m];
     boolean[] slack = new boolean[u];
@@ -46,10 +46,10 @@ class LLPWeightedSetCover {
       advance : {
         double step = minRemainingBudget(x);
         G[x] = G[x] + step;
-        int s = 0;
-        while (s < m) {
-          if (S[s][x] == 1) { sp[s] = sp[s] + step; };
-          s = s + 1;
+        int t = 0;
+        while (t < inc[x].length) {
+          sp[inc[x][t]] = sp[inc[x][t]] + step;
+          t = t + 1;
         };
         fresh = false;
       };
@@ -61,7 +61,7 @@ class LLPWeightedSetCover {
   // x belongs to at least one set, so raising its price can tighten
   // something. See the PRECONDITION note above.
   boolean covered(int x) {
-    return exists s in [0..m-1] : S[s][x] == 1;
+    return inc[x].length > 0;
   }
 
   // sp[s] is the sum of the prices on the elements of s, maintained by the
@@ -78,30 +78,31 @@ class LLPWeightedSetCover {
       fresh = true;
     }
   }
+  // Each element consults only the sets containing it and each set only
+  // its own elements, so a whole rebuild is O(N), the number of
+  // incidences -- not O(m*u).
 
   // The smallest slack element of s, or u when it has none.
   int firstSlackOf(int s) {
-    int e = 0;
-    while (e < u) {
-      if (S[s][e] == 1 && slack[e]) { return e; };
-      e = e + 1;
+    int k = 0;
+    while (k < mem[s].length) {
+      if (slack[mem[s][k]]) { return mem[s][k]; };
+      k = k + 1;
     };
     return u;
   }
 
   // e lies in no tight set.
   boolean isSlack(int e) {
-    return !(exists s in [0..m-1] : (S[s][e] == 1 && setTight(s)));
+    return !(exists s in inc[e] : setTight(s));
   }
 
   // Smallest remaining budget among the sets containing element e.
   double minRemainingBudget(int e) {
     double best = infinity;
-    forall s in [0..m-1] : {
-      if (S[s][e] == 1) {
-        double budget = w[s] - sp[s];
-        if (budget < best) { best = budget; };
-      };
+    forall s in inc[e] : {
+      double budget = w[s] - sp[s];
+      if (budget < best) { best = budget; };
     };
     return best;
   }
@@ -111,10 +112,10 @@ class LLPWeightedSetCover {
   boolean slackMin(int x) {
     refresh();
     if (!slack[x]) { return false; };
-    int s = 0;
-    while (s < m) {
-      if (S[s][x] == 1 && minSlackIn[s] < x) { return false; };
-      s = s + 1;
+    int k = 0;
+    while (k < inc[x].length) {
+      if (minSlackIn[inc[x][k]] < x) { return false; };
+      k = k + 1;
     };
     return true;
   }

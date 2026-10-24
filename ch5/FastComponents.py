@@ -1,45 +1,34 @@
-"""Fast connected components: SlowComponents accelerated by pointer
-jumping.
+"""Fast connected components: SlowComponents accelerated by a
+pointer-jumping clause G[j] >= G[G[j]], which doubles the effective
+reach of the label-propagation step at each round and brings the
+number of rounds down from O(diameter) to O(log diameter).
 
-The pointer-jumping clause G[j] >= G[G[j]] lets each round double the
-reach of label propagation, reducing the number of rounds from
-O(diameter) to O(log diameter).
-
-  ensure(j) : G[j] >= G[G[j]]
-  ensure(j) : G[j] >= max { G[i] | i in adj[j] }
+Auto-generated from FastComponents.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
 """
 
 
-def fast_components(adj):
-    n = len(adj)
-    G = list(range(n))
-    changed = True
-    while changed:
-        changed = False
-        # Pointer-jump pass: each j follows its current label to the
-        # label's label.
-        for j in range(n):
-            if G[j] < G[G[j]]:
-                G[j] = G[G[j]]
-                changed = True
-        # Neighbour-max pass: every j adopts the largest label among
-        # its neighbours, breaking out of local minima.
-        for j in range(n):
-            if adj[j]:
-                m = max(G[i] for i in adj[j])
-                if G[j] < m:
-                    G[j] = m
-                    changed = True
-    return G
+class FastComponents:
+    def FastComponents(self, adj):
+        self.adj = adj
+        self.n = len(self.adj)
+        self.G = [0] * (self.n)
+        for _ix in range(0, (self.n - 1) + 1):
+            self.G[_ix] = _ix
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if (not (self.G[j] >= self.G[self.G[j]])):
+                    self.G[j] = self.G[self.G[j]]
+                    _changed = True
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if (not (self.G[j] >= max((self.G[i] for i in self.adj[j]), default=-2147483647))):
+                    self.G[j] = max((self.G[i] for i in self.adj[j]), default=-2147483647)
+                    _changed = True
+        return self.G
 
 
-if __name__ == "__main__":
-    # Two components: {0, 1, 2} and {3, 4}.
-    adj = [
-        [1, 2],     # 0
-        [0, 2],     # 1
-        [0, 1],     # 2
-        [4],        # 3
-        [3],        # 4
-    ]
-    print("labels:", fast_components(adj))

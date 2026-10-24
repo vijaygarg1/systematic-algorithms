@@ -43,10 +43,10 @@ class LLPLexMatchVertexCover {
 
   // The smallest uncovered neighbour of u, or -1 when u has none.
   int minNbr(int u) {
-    int y = 0;
-    while (y < n) {
-      if (adj[u][y] == 1 && !G[y]) { return y; };
-      y = y + 1;
+    int k = 0;
+    while (k < adj[u].length) {
+      if (!G[adj[u][k]]) { return adj[u][k]; };
+      k = k + 1;
     };
     return 0 - 1;
   }

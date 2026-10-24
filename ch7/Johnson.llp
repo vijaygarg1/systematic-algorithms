@@ -2,8 +2,8 @@
 // non-negative price vector that reweights edges, then Dijkstra runs from
 // every source on the reweighted graph. Returns null on negative cycle.
 //
-// Calls the sibling Dijkstra program (`Dijkstra(wPrime, u)`, compiling to
-// `new Dijkstra().shortestPath(wPrime, u)`) instead of keeping its own
+// Calls the sibling Dijkstra program (`Dijkstra(adj, wPrime, u)`, compiling
+// to `new Dijkstra().shortestPath(adj, wPrime, u)`) instead of keeping its own
 // copy of the single-source relaxation loop -- confirmed correct against
 // the standard CLRS Johnson's-algorithm worked example. This makes
 // Johnson.java a multi-file program: it requires Dijkstra.java alongside
@@ -19,10 +19,26 @@
 // no extra pass and no way to report a negative cycle. Johnson needs
 // exactly that report, so calling it would drop the check the book names
 // explicitly.
+//
+// The graph is a weighted adjacency list: adj[i] holds the out-neighbours
+// of i and the parallel aw[i] their edge weights, so the weight of
+// (i, adj[i][t]) is aw[i][t]. The reweighted graph is stored the same way,
+// in awPrime, which shares adj since reweighting changes no edge -- so the
+// only Theta(n^2) object left is the all-pairs output D itself, which is
+// Theta(n^2) by definition.
+//
+// Both relaxation loops walk adj[i] rather than all n candidate heads.
+// That is what gives the book's O(nm log n): step 1 is n-1 passes over m
+// edges, and step 4 is n Dijkstra runs of O(m log n) each. Scanning all
+// pairs instead makes step 1 Theta(n^3) on its own, which already exceeds
+// the bound on any sparse graph.
+//
+// No edge weight is ever INF here: every pair in adj is a real edge, so
+// the "w[i][j] < INF" guards the matrix version needed are gone.
 
 class Johnson {
-  int[][] allPairs(int[][] w) {
-    int n = w.length;
+  int[][] allPairs(int[][] adj, int[][] aw) {
+    int n = adj.length;
     int INF = infinity;
 
     // Step 1: BellmanFord from an auxiliary source with a 0-weight edge to
@@ -32,31 +48,50 @@ class Johnson {
     int k = 0;
     while (k < n - 1) {
       boolean changed = false;
-      forall i in [0..n-1] : forall j in [0..n-1] :
-        if (w[i][j] < INF && dist[i] + w[i][j] < dist[j]) {
-          dist[j] = dist[i] + w[i][j];
-          changed = true;
+      forall i in [0..n-1] : {
+        int t = 0;
+        while (t < adj[i].length) {
+          int j = adj[i][t];
+          if (dist[i] + aw[i][t] < dist[j]) {
+            dist[j] = dist[i] + aw[i][t];
+            changed = true;
+          };
+          t = t + 1;
         };
+      };
       if (changed) { k = k + 1; } else { k = n; }
     };
 
     // One more pass: any further relaxation means a negative cycle.
-    if (exists i in [0..n-1] : (exists j in [0..n-1] :
-          (w[i][j] < INF && dist[i] + w[i][j] < dist[j]))) {
+    boolean negCycle = false;
+    forall i in [0..n-1] : {
+      int t = 0;
+      while (t < adj[i].length) {
+        if (dist[i] + aw[i][t] < dist[adj[i][t]]) { negCycle = true; };
+        t = t + 1;
+      };
+    };
+    if (negCycle) {
       return null;
     };
 
     // Steps 2 and 3: price[v] = -dist[v], then reweight every edge.
     int[] price = new int[n];
     forall v in [0..n-1] : price[v] = 0 - dist[v];
-    int[][] wPrime = new int[n][n];
-    forall i in [0..n-1] : forall j in [0..n-1] :
-      wPrime[i][j] = reweight(w[i][j], price[j], price[i]);
+    int[][] awPrime = new int[n][];
+    forall i in [0..n-1] : awPrime[i] = new int[adj[i].length];
+    forall i in [0..n-1] : {
+      int t = 0;
+      while (t < adj[i].length) {
+        awPrime[i][t] = reweight(aw[i][t], price[adj[i][t]], price[i]);
+        t = t + 1;
+      };
+    };
 
     // Step 4: Dijkstra from every source; undo the reweighting.
     int[][] D = new int[n][n];
     forall u in [0..n-1] : {
-      int[] distPrime = Dijkstra(wPrime, u);
+      int[] distPrime = Dijkstra(adj, awPrime, u);
       forall v in [0..n-1] :
         D[u][v] = reweight(distPrime[v], price[u], price[v]);
     };

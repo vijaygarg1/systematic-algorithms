@@ -1,80 +1,93 @@
 // LLP-WeightedVertexCover: the primal-dual 2-approximation as a
-// lattice-linear predicate. G[u][v] is the dual charged to edge (u, v);
-// an edge is forbidden when both endpoints are slack and it is
+// lattice-linear predicate. The lattice is indexed by EDGES, as the book's
+// "G: array[E] of real" and "Forbidden(e)" say: G[e] is the dual charged to
+// edge e. An edge is forbidden when both endpoints are slack and it is
 // lex-minimal among the slack edges touching either endpoint. A vertex
 // joins the cover once its incident duals reach its weight.
+//
+// The graph arrives as an edge list -- eu[e], ev[e] are the endpoints of
+// edge e, with the edges in lex order -- which is the book's
+// "E: set of edges". inc[v] lists the edges incident to v, built once from
+// that list in O(n + m). No n x n structure appears anywhere: the earlier
+// version indexed both the lattice (G[u][v]) and the graph (adj[u][v]) by
+// vertex PAIRS, which cost Theta(n^2) in memory and made the sweep
+// enumerate all n^2 pairs however few edges the graph had.
 //
 // Two things keep the predicate cheap. First, price[] is maintained
 // incrementally by the advance instead of being re-summed on every call,
 // so tight() is O(1) rather than an O(n) sum. Second, the lex-minimality
-// test does not scan all edge pairs: the lex-least slack edge at a vertex
-// u is always {u, minSlack[u]}, where minSlack[u] is u's smallest
-// non-tight neighbour (a neighbour y < u contributes the key (y,u) and
-// y > u the key (u,y), so the smallest index wins either way), so {u,v}
-// is lex-minimal among the slack edges touching it exactly when it is the
-// lex-least at both ends. minSlack[] is a lazily-refreshed cache, rebuilt
-// only once after an advance has moved a price, not once per candidate.
+// test does not scan all edge pairs: with the edges in lex order the
+// lex-least slack edge at a vertex is simply the first slack one in
+// inc[v], so e is lex-minimal among the slack edges touching it exactly
+// when it is first at both ends. minSlackEdge[] is a lazily-refreshed
+// cache, rebuilt once after an advance has moved a price, and a rebuild
+// consults each vertex's own incident edges only, so it is O(m).
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 struct WeightedVertexCover {
-    const std::vector<std::vector<int>>& adj;
+    const std::vector<int>& eu;
+    const std::vector<int>& ev;
     const std::vector<double>& w;
-    std::vector<std::vector<double>> G;
+    std::vector<double> G;
     std::vector<double> price;
-    std::vector<int> minSlack;
+    std::vector<int> minSlackEdge;
+    std::vector<std::vector<int>> inc;   // inc[v]: edges incident to v
     bool fresh;
-    int nv;
+    int nv, m;
 
-    WeightedVertexCover(const std::vector<std::vector<int>>& a,
+    WeightedVertexCover(const std::vector<int>& eus, const std::vector<int>& evs,
                         const std::vector<double>& ws)
-        : adj(a), w(ws), nv((int) ws.size()) {
-        G.assign(nv, std::vector<double>(nv, 0.0));
+        : eu(eus), ev(evs), w(ws), nv((int) ws.size()), m((int) eus.size()) {
+        G.assign(m, 0.0);
         price.assign(nv, 0.0);
-        minSlack.assign(nv, -1);
+        minSlackEdge.assign(nv, -1);
+        inc.assign(nv, {});
+        for (int e = 0; e < m; ++e) { inc[eu[e]].push_back(e); inc[ev[e]].push_back(e); }
         fresh = false;
     }
 
     bool tight(int v) const { return price[v] >= w[v]; }
 
-    // The smallest non-tight neighbour of u, or -1 when u has none.
-    int firstSlackNbr(int u) const {
-        for (int y = 0; y < nv; ++y)
-            if (adj[u][y] == 1 && !tight(y)) return y;
+    // Neither endpoint of e is tight, so e's price can still be raised.
+    bool slack(int e) const { return !tight(eu[e]) && !tight(ev[e]); }
+
+    // The first slack edge in inc[v], or -1 when v has none. Because the
+    // edges are in lex order, "first" is the same as "lex-least".
+    int firstSlackEdge(int v) const {
+        for (int e : inc[v])
+            if (slack(e)) return e;
         return -1;
     }
 
     void refresh() {
         if (!fresh) {
-            for (int u = 0; u < nv; ++u) minSlack[u] = firstSlackNbr(u);
+            for (int v = 0; v < nv; ++v) minSlackEdge[v] = firstSlackEdge(v);
             fresh = true;
         }
     }
 
-    bool slackMin(int u, int v) {
-        if (adj[u][v] != 1) return false;
+    bool slackMin(int e) {
         refresh();
-        if (tight(u) || tight(v)) return false;
-        return minSlack[u] == v && minSlack[v] == u;
+        if (!slack(e)) return false;
+        return minSlackEdge[eu[e]] == e && minSlackEdge[ev[e]] == e;
     }
 
     std::vector<bool> run() {
         bool changed = true;
         while (changed) {
             changed = false;
-            for (int u = 0; u < nv; ++u) {
-                for (int v = 0; v < nv; ++v) {
-                    if (u < v && slackMin(u, v)) {
-                        double step = std::min(w[u] - price[u], w[v] - price[v]);
-                        G[u][v] += step;
-                        G[v][u] = G[u][v];
-                        price[u] += step;
-                        price[v] += step;
-                        fresh = false;
-                        changed = true;
-                    }
+            for (int e = 0; e < m; ++e) {
+                if (slackMin(e)) {
+                    double step = std::min(w[eu[e]] - price[eu[e]],
+                                          w[ev[e]] - price[ev[e]]);
+                    G[e] += step;
+                    price[eu[e]] += step;
+                    price[ev[e]] += step;
+                    fresh = false;
+                    changed = true;
                 }
             }
         }
@@ -84,19 +97,18 @@ struct WeightedVertexCover {
     }
 };
 
-std::vector<bool> llpWeightedVertexCover(const std::vector<std::vector<int>>& adj,
+std::vector<bool> llpWeightedVertexCover(const std::vector<int>& eu,
+                                         const std::vector<int>& ev,
                                          const std::vector<double>& w) {
-    return WeightedVertexCover(adj, w).run();
+    return WeightedVertexCover(eu, ev, w).run();
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {
-        {0, 1, 0, 0},
-        {1, 0, 1, 0},
-        {0, 1, 0, 1},
-        {0, 0, 1, 0}};
+    // path 0-1-2-3, as an edge list in lex order
+    std::vector<int> eu = {0, 1, 2};
+    std::vector<int> ev = {1, 2, 3};
     std::vector<double> w = {2.0, 1.0, 3.0, 1.5};
-    std::vector<bool> C = llpWeightedVertexCover(adj, w);
+    std::vector<bool> C = llpWeightedVertexCover(eu, ev, w);
     std::cout << "cover:";
     for (int i = 0; i < (int) C.size(); ++i) if (C[i]) std::cout << ' ' << i;
     std::cout << '\n';

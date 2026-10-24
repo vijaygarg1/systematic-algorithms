@@ -1,29 +1,33 @@
-"""LLP-Sort2: forbidden when some k > j has A[j] > A[k]; swap them."""
+"""LLP-Sort2: forbidden when some k > j has A[j] > A[k]; swap them.
 
-def forbidden(j, A):
-    """Returns the picked k (k > j with A[j] > A[k]) or -1 if none."""
-    for k in range(j + 1, len(A)):
-        if A[j] > A[k]:
-            return k
-    return -1
+Auto-generated from LLPSortPairwise.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def advance(j, k, A):
-    A[j], A[k] = A[k], A[j]
+class LLPSortPairwise:
+    def LLPSortPairwise(self, A):
+        self.A = A
+        self.n = len(self.A)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if self._pick_k(j):
+                    self.A[j], self.A[self.k] = self.A[self.k], self.A[j]
+                    _changed = True
+
+    def _pick_k(self, j):
+        for k in range((j + 1), ((self.n - 1)) + 1):
+            if (self.A[j] > self.A[k]):
+                self.k = k
+                return True
+        return False
 
 
-def llp_sort2(A):
-    changed = True
-    while changed:
-        changed = False
-        for j in range(len(A)):
-            k = forbidden(j, A)
-            if k >= 0:
-                advance(j, k, A)
-                changed = True
-
-
-if __name__ == "__main__":
-    A = [5, 2, 4, 6, 1, 3]
-    llp_sort2(A)
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = LLPSortPairwise()
+    prog.LLPSortPairwise(A)
     print(A)
+

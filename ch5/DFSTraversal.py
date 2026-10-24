@@ -1,38 +1,34 @@
-"""Recursive DFS recording discovery and finish times."""
+"""Recursive DFS recording discovery and finish times.
 
-def dfs(succ):
-    n = len(succ)
-    visited    = [False] * n
-    parent     = [-1] * n
-    discovered = [0] * n
-    finished   = [0] * n
-    tick = [1]                    # rides on a list to allow nested mutation
+Auto-generated from DFSTraversal.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
-    def visit(j):
-        visited[j] = True
-        discovered[j] = tick[0]
-        tick[0] += 1
+
+class DFSTraversal:
+    def traverse(self, succ):
+        self.succ = succ
+        self.n = len(self.succ)
+        self.G = [0] * (self.n)
+        self.parent = [0] * (self.n)
+        self.discovered = [0] * (self.n)
+        self.finished = [0] * (self.n)
+        for i in range(0, ((self.n - 1)) + 1):
+            self.parent[i] = (-1)
+        t = [0] * (1)
+        t[0] = 1
+        self.visit(0, self.succ, self.G, self.parent, self.discovered, self.finished, t)
+        return self.discovered
+
+    def visit(self, j, succ, G, parent, discovered, finished, t):
+        G[j] = 1
+        discovered[j] = t[0]
+        t[0] = (t[0] + 1)
         for k in succ[j]:
-            if not visited[k]:
+            if (G[k] == 0):
                 parent[k] = j
-                visit(k)
-        finished[j] = tick[0]
-        tick[0] += 1
-
-    visit(0)
-    return discovered, parent, finished
+                self.visit(k, succ, G, parent, discovered, finished, t)
+        finished[j] = t[0]
+        t[0] = (t[0] + 1)
 
 
-if __name__ == "__main__":
-    succ = [
-        [1, 2],
-        [3],
-        [3, 4],
-        [5],
-        [5],
-        [],
-    ]
-    discovered, parent, finished = dfs(succ)
-    print("discovered:", discovered)
-    print("parent:    ", parent)
-    print("finished:  ", finished)

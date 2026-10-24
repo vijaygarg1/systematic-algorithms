@@ -1,13 +1,23 @@
-"""Σ_{i,j < n} i*j computed by a doubly-nested loop."""
+"""Σ_{i,j < n} i*j computed by a doubly-nested loop.
 
-def nested_sum(n):
-    total = 0
-    for i in range(n):
-        for j in range(n):
-            total += i * j
-    return total
+Auto-generated from NestedSum.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    for n in [0, 1, 5, 10]:
-        print(f"nested_sum({n}) = {nested_sum(n)}")
+class NestedSum:
+    def NestedSum(self, n):
+        self.n = n
+        self.total = 0
+        for i in range(0, ((self.n - 1)) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
+                self.total = (self.total + (i * j))
+        return self.total
+
+
+if __name__ == '__main__':
+    n = 3
+    prog = NestedSum()
+    result = prog.NestedSum(n)
+    print(result)
+

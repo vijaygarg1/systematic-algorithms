@@ -1,13 +1,25 @@
-"""Return the first index i with A[i] = key, or -1 if absent."""
+"""Return the first index i with A[i] = key, or -1 if absent.
 
-def linear_search(A, key):
-    for i, x in enumerate(A):
-        if x == key:
-            return i
-    return -1
+Auto-generated from LinearSearch.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    A = [4, 2, 7, 1, 9, 3]
-    for key in [7, 4, 5, 9]:
-        print(f"key={key}: index = {linear_search(A, key)}")
+class LinearSearch:
+    def LinearSearch(self, A, key):
+        self.A = A
+        self.key = key
+        self.n = len(self.A)
+        for i in range(0, ((len(self.A) - 1)) + 1):
+            if (self.A[i] == self.key):
+                return i
+        return (-1)
+
+
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    key = 0
+    prog = LinearSearch()
+    result = prog.LinearSearch(A, key)
+    print(result)
+

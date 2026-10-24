@@ -5,11 +5,18 @@
 // alternating path..." step, plus its "assign S[] along the path"
 // follow-up, are both realized here by the alternatingPath(...) DFS --
 // the standard way of implementing that check.
+//
+// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
+// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
+// some R-vertex has no incident edge. A dense |L| x |R| matrix would make
+// every DFS step scan all of R however few edges exist -- and reading such
+// a matrix is Theta(|L| * |R|) before the algorithm starts, so no bound in
+// |E| is reachable from it at all.
 
 class SeqAugmentingPath {
-  int[] SeqAugmentingPath(int[][] adj) {
+  int[] SeqAugmentingPath(int[][] adj, int nr) {
     int n = adj.length;
-    int m = adj[0].length;
+    int m = nr;
     int[] G = new int[n];
     int[] S = new int[m];
     forall j in [0..n-1] : G[j] = 0;
@@ -29,15 +36,17 @@ class SeqAugmentingPath {
   // its current L-partner, to see if that partner can be re-matched
   // elsewhere and free k up for j.
   boolean alternatingPath(int j, int[][] adj, int[] S, boolean[] seen) {
-    int m = adj[0].length;
-    forall k in [0..m-1] : {
-      if (adj[j][k] == 1 && !seen[k]) {
+    int t = 0;
+    while (t < adj[j].length) {
+      int k = adj[j][t];
+      if (!seen[k]) {
         seen[k] = true;
         if (S[k] == 0 - 1 || alternatingPath(S[k], adj, S, seen)) {
           S[k] = j;
           return true;
         }
       };
+      t = t + 1;
     };
     return false;
   }

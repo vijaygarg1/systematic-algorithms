@@ -1,28 +1,47 @@
-"""LLP-MinMaxLate: schedule jobs (sorted by deadline) by raising each start time G[j] to the prefix sum of earlier processing times."""
+"""LLP-MinMaxLate: schedule jobs (sorted by deadline) by raising each start
+time G[j] to the prefix sum of earlier processing times.
+
+The targets are the prefix sums S[j] = t[0] + ... + t[j-1], and they are
+built once in a left-to-right scan rather than written inline as
+`sum i in [0..j-1] : t[i]`.  Written inline, that reduction is an O(j)
+loop the guard re-runs for every j -- and the advance runs it a second
+time -- so the program costs O(n^2) even though every target is already
+known from the one before it.  Computing them in a single scan is what
+makes the stated O(n) bound (Section 6.3, "a left-to-right scan") true
+of this program and not just of the algorithm it encodes.
+
+The deadlines d are the sort order of the input, not something the
+predicate reads: j's target depends only on the processing times ahead
+of it in that order.
+
+Auto-generated from LLPMinMaxLateness.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def prefix_sum(j, t):
-    return sum(t[:j])
+class LLPMinMaxLateness:
+    def LLPMinMaxLateness(self, t, d):
+        self.t = t
+        self.d = d
+        self.n = len(self.t)
+        self.S = [0] * (self.n)
+        self.G = [0] * (self.n)
+        for j in range(1, ((self.n - 1)) + 1):
+            self.S[j] = (self.S[(j - 1)] + self.t[(j - 1)])
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if (not (self.G[j] >= self.S[j])):
+                    self.G[j] = self.S[j]
+                    _changed = True
+        return self.G
 
 
-def llp_min_max_late(t, d):
-    n = len(t)
-    G = [0] * n
-    changed = True
-    while changed:
-        changed = False
-        for j in range(n):
-            target = prefix_sum(j, t)
-            if G[j] < target:
-                G[j] = target
-                changed = True
-    lateness = max(0, max(G[j] + t[j] - d[j] for j in range(n)))
-    return G, lateness
+if __name__ == '__main__':
+    t = [0, 0, 1, 2]
+    d = [0, 0, 1, 1]
+    prog = LLPMinMaxLateness()
+    result = prog.LLPMinMaxLateness(t, d)
+    print(result)
 
-
-if __name__ == "__main__":
-    # Jobs sorted by deadline; processing times and deadlines.
-    t = [3, 1, 2, 4]
-    d = [4, 5, 6, 7]
-    G, lateness = llp_min_max_late(t, d)
-    print("starts:", G, "lateness:", lateness)

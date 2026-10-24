@@ -37,7 +37,8 @@ import java.util.*;
 
 public class LLPWeightedSetCover {
   int n;
-  int[][] S;
+  int[][] mem;
+  int[][] inc;
   double[] w;
   int m;
   int u;
@@ -57,22 +58,21 @@ public class LLPWeightedSetCover {
   private void _advance0() {
     double step = minRemainingBudget(x);
     G[x] = (G[x] + step);
-    int s = 0;
-    while ((s < m)) {
-      if ((S[s][x] == 1)) {
-        sp[s] = (sp[s] + step);
-      }
-      s = (s + 1);
+    int t = 0;
+    while ((t < inc[x].length)) {
+      sp[inc[x][t]] = (sp[inc[x][t]] + step);
+      t = (t + 1);
     }
     fresh = false;
   }
 
-  public boolean[] LLPWeightedSetCover(int[][] S, double[] w) {
-    this.S = S;
+  public boolean[] LLPWeightedSetCover(int[][] mem, int[][] inc, double[] w) {
+    this.mem = mem;
+    this.inc = inc;
     this.w = w;
     this.n = w.length;
     this.m = w.length;
-    this.u = S[0].length;
+    this.u = inc.length;
     this.G = new double[u];
     this.sp = new double[m];
     this.slack = new boolean[u];
@@ -98,11 +98,7 @@ public class LLPWeightedSetCover {
   }
 
   public boolean covered(int x) {
-    boolean t1 = false;
-    for (int s = 0; s < m; s++) {
-      if ((S[s][x] == 1)) { t1 = true; break; }
-    }
-    return t1;
+    return (inc[x].length > 0);
   }
 
   public boolean setTight(int s) {
@@ -122,33 +118,31 @@ public class LLPWeightedSetCover {
   }
 
   public int firstSlackOf(int s) {
-    int e = 0;
-    while ((e < u)) {
-      if (((S[s][e] == 1) && slack[e])) {
-        return e;
+    int k = 0;
+    while ((k < mem[s].length)) {
+      if (slack[mem[s][k]]) {
+        return mem[s][k];
       }
-      e = (e + 1);
+      k = (k + 1);
     }
     return u;
   }
 
   public boolean isSlack(int e) {
-    boolean t2 = false;
-    for (int s = 0; s < m; s++) {
-      if (((S[s][e] == 1) && setTight(s))) { t2 = true; break; }
+    boolean t1 = false;
+    for (int s : inc[e]) {
+      if (setTight(s)) { t1 = true; break; }
     }
-    return (!t2);
+    return (!t1);
   }
 
   public double minRemainingBudget(int e) {
     double best = Double.POSITIVE_INFINITY;
-    for (int s = 0; s < m; s++) {
+    for (int s : inc[e]) {
       {
-        if ((S[s][e] == 1)) {
-          double budget = (w[s] - sp[s]);
-          if ((budget < best)) {
-            best = budget;
-          }
+        double budget = (w[s] - sp[s]);
+        if ((budget < best)) {
+          best = budget;
         }
       }
     }
@@ -160,21 +154,22 @@ public class LLPWeightedSetCover {
     if ((!slack[x])) {
       return false;
     }
-    int s = 0;
-    while ((s < m)) {
-      if (((S[s][x] == 1) && (minSlackIn[s] < x))) {
+    int k = 0;
+    while ((k < inc[x].length)) {
+      if ((minSlackIn[inc[x][k]] < x)) {
         return false;
       }
-      s = (s + 1);
+      k = (k + 1);
     }
     return true;
   }
 
   public static void main(String[] args) {
-    int[][] S = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] mem = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] inc = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     double[] w = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     LLPWeightedSetCover prog = new LLPWeightedSetCover();
-    boolean[] result = prog.LLPWeightedSetCover(S, w);
+    boolean[] result = prog.LLPWeightedSetCover(mem, inc, w);
     System.out.println(Arrays.toString(result));
   }
 }

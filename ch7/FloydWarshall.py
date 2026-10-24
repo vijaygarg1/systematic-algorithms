@@ -1,25 +1,26 @@
-"""Floyd-Warshall APSP: triple loop on intermediate vertex."""
+"""Floyd-Warshall APSP: triple loop on intermediate vertex, matching the
+book's three nested \For loops (bxx-shortestPath.tex, alg:floyd-warshall).
 
-INF = 2 ** 31 - 1
-
-
-def floyd_warshall(G):
-    n = len(G)
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                if G[i][k] != INF and G[k][j] != INF:
-                    if G[i][k] + G[k][j] < G[i][j]:
-                        G[i][j] = G[i][k] + G[k][j]
+Auto-generated from FloydWarshall.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    G = [
-        [0,   3,   INF, 7],
-        [8,   0,   2,   INF],
-        [5,   INF, 0,   1],
-        [2,   INF, INF, 0],
-    ]
-    floyd_warshall(G)
-    for row in G:
-        print(row)
+class FloydWarshall:
+    def FloydWarshall(self, G):
+        self.G = G
+        self.n = len(self.G)
+        for k in range(0, ((self.n - 1)) + 1):
+            for i in range(0, ((self.n - 1)) + 1):
+                for j in range(0, ((self.n - 1)) + 1):
+                    if ((self.G[i][k] != 2147483647) and (self.G[k][j] != 2147483647)):
+                        if ((self.G[i][k] + self.G[k][j]) < self.G[i][j]):
+                            self.G[i][j] = (self.G[i][k] + self.G[k][j])
+
+
+if __name__ == '__main__':
+    G = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
+    prog = FloydWarshall()
+    prog.FloydWarshall(G)
+    print(G)
+

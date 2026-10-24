@@ -1,17 +1,27 @@
-"""Return any index of key in a sorted array A, or -1 if absent."""
+"""Return any index of key in a sorted array A, or -1 if absent.
 
-def binary_search(A, key, low, high):
-    if low > high:
-        return -1
-    mid = (low + high) // 2
-    if A[mid] == key:
-        return mid
-    if A[mid] > key:
-        return binary_search(A, key, low, mid - 1)
-    return binary_search(A, key, mid + 1, high)
+Auto-generated from BinarySearch.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    A = [1, 3, 5, 7, 9, 11, 13, 15]
-    for key in [7, 1, 15, 4, 16]:
-        print(f"key={key}: index = {binary_search(A, key, 0, len(A) - 1)}")
+class BinarySearch:
+    def BinarySearch(self, A, key, low, high):
+        n = len(A)
+        if (low > high):
+            return (-1)
+        mid = int((low + high) / 2)
+        if (A[mid] == key):
+            return mid
+        if (A[mid] > key):
+            return self.BinarySearch(A, key, low, (mid - 1))
+        return self.BinarySearch(A, key, (mid + 1), high)
+
+
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    key = 0
+    prog = BinarySearch()
+    result = prog.BinarySearch(A, key, 0, len(A))
+    print(result)
+

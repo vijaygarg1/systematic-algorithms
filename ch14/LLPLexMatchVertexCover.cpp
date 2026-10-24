@@ -30,8 +30,8 @@ struct LexMatchVertexCover {
 
     // The smallest uncovered neighbour of u, or -1 when u has none.
     int minNbr(int u) const {
-        for (int y = 0; y < n; ++y)
-            if (adj[u][y] == 1 && !G[y]) return y;
+        for (int y : adj[u])
+            if (!G[y]) return y;
         return -1;
     }
 
@@ -66,11 +66,8 @@ std::vector<bool> llpLexMatchVertexCover(const std::vector<std::vector<int>>& ad
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {
-        {0, 1, 0, 0},
-        {1, 0, 1, 0},
-        {0, 1, 0, 1},
-        {0, 0, 1, 0}};
+    // path 0-1-2-3, as sorted adjacency lists
+    std::vector<std::vector<int>> adj = {{1}, {0, 2}, {1, 3}, {2}};
     std::vector<bool> G = llpLexMatchVertexCover(adj);
     std::cout << "cover:";
     for (int j = 0; j < (int) G.size(); ++j) if (G[j]) std::cout << ' ' << j;

@@ -7,12 +7,26 @@
 // only ever holds vertices whose d has become finite, the book's "if
 // d[v] = infinity, return null" (no spanning tree) becomes "if the heap
 // empties before every vertex is fixed, return null" here.
+//
+// The graph is a weighted adjacency list: adj[v] holds the neighbours of
+// v and the parallel aw[v] holds their edge weights, so the weight of
+// (v, adj[v][t]) is aw[v][t]. There is no n x n matrix anywhere, which is
+// what the book's \KwIn now asks for -- the whole structure is O(n + m).
+//
+// The relaxation loop walks adj[v], which is the book's
+// "forall v': not fixed[v'] and (v,v') in E". With the heap supplying the
+// minimum this is the O(m log n) variant of the chapter's summary table,
+// not the O(n^2) array-scan variant of the surrounding text
+// (bxx-mst.tex:1009) -- that one finds the minimum by scanning d[] rather
+// than with a heap. Scanning all n vertices and reading weights from a
+// dense matrix would cost Theta(n^2) however few edges the graph has, and
+// so could not meet O(m log n) on a sparse graph.
 
 import java.util.*;
 
 public class Prim {
-  public int[] mst(int[][] w) {
-    int n = w.length;
+  public int[] mst(int[][] adj, int[][] aw) {
+    int n = adj.length;
     int[] d = new int[n];
     int[] parent = new int[n];
     boolean[] fixed = new boolean[n];
@@ -35,14 +49,15 @@ public class Prim {
       if ((!fixed[v])) {
         fixed[v] = true;
         count = (count + 1);
-        for (int k = 0; k < n; k++) {
-          {
-            if ((((!fixed[k]) && (w[v][k] != Integer.MAX_VALUE)) && (w[v][k] < d[k]))) {
-              d[k] = w[v][k];
-              parent[k] = v;
-              H.add(new int[]{d[k], k});
-            }
+        int t = 0;
+        while ((t < adj[v].length)) {
+          int k = adj[v][t];
+          if (((!fixed[k]) && (aw[v][t] < d[k]))) {
+            d[k] = aw[v][t];
+            parent[k] = v;
+            H.add(new int[]{d[k], k});
           }
+          t = (t + 1);
         }
       }
     }
@@ -50,9 +65,10 @@ public class Prim {
   }
 
   public static void main(String[] args) {
-    int[][] w = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] aw = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     Prim prog = new Prim();
-    int[] result = prog.mst(w);
+    int[] result = prog.mst(adj, aw);
     System.out.println(Arrays.toString(result));
   }
 }

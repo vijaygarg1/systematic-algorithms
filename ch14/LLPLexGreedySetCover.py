@@ -1,55 +1,108 @@
-"""LLP parallel H_n-approximation for Set Cover: pick every set that maximises coverage among neighbours and is lex-minimal among ties."""
+"""LLP parallel H_n-approximation for Set Cover: pick every set that
+maximises coverage among its neighbours and is lex-minimal among ties.
+A neighbour of j is another unpicked set sharing an uncovered element
+with j; j is forbidden (i.e. should be picked) when it still covers
+something and no neighbour outranks it.
+
+The predicate is tested without comparing set pairs. For each uncovered
+element keep best[e], the unpicked set covering the most uncovered
+elements that contains e (lowest index on ties); then j outranks every
+neighbour exactly when best[e] = j for every uncovered e in s_j, since
+the neighbours of j are precisely the unpicked sets sharing such an e.
+The coverage counts cnt[j] = |s_j ∩ R| and the covered[] flags are
+maintained by the advance, so coverage is read in O(1) instead of being
+recomputed -- it used to cost an O(m) scan per element, inside an O(u)
+scan per set, inside an O(m) scan over neighbours.
+
+The instance is a pair of incidence lists: mem[s] holds the elements of
+set s and inc[e] holds the sets containing element e. Neither is an
+m x u matrix, so the whole instance is O(N) -- N being the number of
+(set, element) incidences -- rather than Theta(m*u). Every pass below
+walks one of these lists, so each costs O(N) and not O(m*u).
+
+That matters most for best[], which is rebuilt after every advance, and
+there are as many advances as sets picked: rebuilding it by scanning a
+whole matrix each time made the algorithm O(m*u) per advance, a full
+factor of n more than the chapter's O(N*min(m,n)) bound.
+
+Auto-generated from LLPLexGreedySetCover.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def is_covered(e, S, G):
-    return any(G[s] and S[s][e] == 1 for s in range(len(S)))
+class LLPLexGreedySetCover:
+    def LLPLexGreedySetCover(self, mem, inc):
+        self.mem = mem
+        self.inc = inc
+        self.n = len(self.mem)
+        self.m = len(self.mem)
+        self.u = len(self.inc)
+        self.G = [False] * (self.n)
+        self.covered = [False] * (self.u)
+        self.cnt = [0] * (self.m)
+        self.best = [0] * (self.u)
+        self.fresh = False
+        for s in range(0, ((self.m - 1)) + 1):
+            self.cnt[s] = len(self.mem[s])
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if self.isLexMaxCov(j):
+                    self.G[j] = True
+                    k = 0
+                    while (k < len(self.mem[j])):
+                        e = self.mem[j][k]
+                        if (not self.covered[e]):
+                            self.covered[e] = True
+                            t = 0
+                            while (t < len(self.inc[e])):
+                                self.cnt[self.inc[e][t]] = (self.cnt[self.inc[e][t]] - 1)
+                                t = (t + 1)
+                        k = (k + 1)
+                    self.fresh = False
+                    _changed = True
+        return self.G
 
-
-def coverage(j, S, G):
-    return sum(1 for e in range(len(S[j])) if S[j][e] == 1 and not is_covered(e, S, G))
-
-
-def share_uncovered(j, k, S, G):
-    return any(S[j][e] == 1 and S[k][e] == 1 and not is_covered(e, S, G)
-               for e in range(len(S[j])))
-
-
-def is_lex_max_cov(j, S, G):
-    if G[j]:
-        return False
-    cov_j = coverage(j, S, G)
-    if cov_j == 0:
-        return False
-    for k in range(len(S)):
-        if k == j or G[k]:
-            continue
-        if not share_uncovered(j, k, S, G):
-            continue
-        cov_k = coverage(k, S, G)
-        if cov_k > cov_j:
+    def isLexMaxCov(self, j):
+        if self.G[j]:
             return False
-        if cov_k == cov_j and k < j:
+        self.refresh()
+        if (self.cnt[j] <= 0):
             return False
-    return True
+        k = 0
+        while (k < len(self.mem[j])):
+            e = self.mem[j][k]
+            if ((not self.covered[e]) and (self.best[e] != j)):
+                return False
+            k = (k + 1)
+        return True
+
+    def refresh(self):
+        if (not self.fresh):
+            for e in range(0, ((self.u - 1)) + 1):
+                self.best[e] = self.bestAt(e)
+            self.fresh = True
+
+    def bestAt(self, e):
+        win = (0 - 1)
+        k = 0
+        while (k < len(self.inc[e])):
+            s = self.inc[e][k]
+            if (not self.G[s]):
+                if (win < 0):
+                    win = s
+                else:
+                    if (self.cnt[s] > self.cnt[win]):
+                        win = s
+            k = (k + 1)
+        return win
 
 
-def llp_lex_first_set_cover(S):
-    m = len(S)
-    G = [False] * m
-    while True:
-        changed = False
-        for j in range(m):
-            if is_lex_max_cov(j, S, G):
-                G[j] = True
-                changed = True
-        if not changed:
-            return G
+if __name__ == '__main__':
+    mem = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
+    inc = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]]
+    prog = LLPLexGreedySetCover()
+    result = prog.LLPLexGreedySetCover(mem, inc)
+    print(result)
 
-
-if __name__ == "__main__":
-    # Universe {0..5}; sets S_1={0,1,2}, S_2={0,3,4}, S_3={1,4,5}, S_4={2,5}.
-    S = [[1, 1, 1, 0, 0, 0],
-         [1, 0, 0, 1, 1, 0],
-         [0, 1, 0, 0, 1, 1],
-         [0, 0, 1, 0, 0, 1]]
-    print(llp_lex_first_set_cover(S))

@@ -1,43 +1,32 @@
-"""LLP-Antichain: maximum antichain by advancing chain indices to dominate-free positions."""
+"""LLP-Antichain: maximum antichain by advancing chain indices to dominate-free positions.
 
-def llp_antichain(chains, leq):
-    m = len(chains)
-    length = [len(c) for c in chains]
-    G = [0] * m
-    changed = True
-    while changed:
-        changed = False
-        for j in range(m):
-            if G[j] >= length[j]:
-                continue
-            x = chains[j][G[j]]
-            dominated = False
-            for k in range(m):
-                if k == j or G[k] >= length[k]:
-                    continue
-                y = chains[k][G[k]]
-                if x != y and leq[x][y]:
-                    dominated = True
-                    break
-            if dominated:
-                G[j] += 1
-                changed = True
-    return G, length
+Auto-generated from LLPAntichain.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    # Book's 5-element poset: x1 < x2 < x3, x4 < x5, x2 < x5
-    # Use a *non-minimum* cover to show advancing in action.
-    chains = [[0, 1, 2], [3], [4]]
-    # leq is the reflexive + transitive closure of the relation.
-    leq = [
-        [True,  True,  True,  False, True ],   # x1
-        [False, True,  True,  False, True ],   # x2
-        [False, False, True,  False, False],   # x3
-        [False, False, False, True,  True ],   # x4
-        [False, False, False, False, True ],   # x5
-    ]
-    G, length = llp_antichain(chains, leq)
-    antichain = [chains[j][G[j]] for j in range(len(G)) if G[j] < length[j]]
-    print(f"G = {G}")
-    print(f"antichain = {[f'x{i+1}' for i in antichain]}")
+class LLPAntichain:
+    def LLPAntichain(self, chains, len_, leq):
+        self.chains = chains
+        self.len_ = len_
+        self.leq = leq
+        self.n = len(self.chains)
+        self.G = [0] * (self.n)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if ((self.G[j] < self.len_[j]) and any(((k != j) and self.leq[self.chains[j][self.G[j]]][self.chains[k][self.G[k]]]) for k in range(0, ((self.n - 1)) + 1))):
+                    self.G[j] = (self.G[j] + 1)
+                    _changed = True
+        return self.G
+
+
+if __name__ == '__main__':
+    chains = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
+    len_ = [3, 1, 6, 1, 6, 3, 6, 4]
+    leq = [[True, False, False, False, False, False, False, False], [False, True, False, False, False, False, False, False], [False, False, True, False, False, False, False, False], [False, False, False, True, False, False, False, False], [False, False, False, False, True, False, False, False], [False, False, False, False, False, True, False, False], [False, False, False, False, False, False, True, False], [False, False, False, False, False, False, False, True]]
+    prog = LLPAntichain()
+    result = prog.LLPAntichain(chains, len_, leq)
+    print(result)
+

@@ -1,129 +1,110 @@
-// LLP-Prim: each non-root vertex advances when the global cross-cut is its
-// lightest edge.
+// LLP-Prim: each non-root vertex is fixed when the global cross-cut is its
+// lightest edge, matching bxx-mst-llp-prim.tex Algorithm LLP-Prim
+// (fig:alg-prim-imp).
 //
-// setBase(1) because every aux method here loops i = 1; while (i <= n),
-// a 1-indexed convention with index 0 unused. Declaring it makes
-// this.n = parent.length - 1; without it this.n = parent.length and those
-// same loops read parent[n], one past the end.
+// The graph is a weighted adjacency list: adj[j] holds the neighbours of j
+// and the parallel aw[j] their edge weights, so the weight of
+// (j, adj[j][t]) is aw[j][t]. No n x n matrix is involved.
 //
-// PRECONDITION the caller must establish, which this program cannot check:
-// on entry fixed[v] means "following the chosen edges from v reaches the
-// root" (the book's derived definition, bxx-mst-llp-prim.tex). fixed,
-// parent and C all arrive as parameters and propagateFixed() runs only
-// inside the advance, so nothing here establishes that meaning. Either the
-// book's initialization (lightest-edge parents, then propagate fixed from
-// the root BEFORE the first advance) or the demo's (parent[v] := v,
-// fixed := {root}, C[v] := 0, which degenerates to classical Prim) works,
-// and both reach the same C. Lightest-edge parents WITHOUT that initial
-// propagation do not: vertices that should already be fixed look free, and
-// roughly a quarter of random graphs come out wrong.
+// key[j] is the book's min{w[i,j] | (i,j) in E'}: the lightest edge from a
+// fixed vertex into j, infinity while j has no fixed neighbour. It is
+// maintained by the advance -- fixing j relaxes its neighbours -- rather
+// than recomputed, so the guard reads it in O(1).
+//
+// The global minimality the book's forbidden condition demands,
+// "w[i,j] = min{w[k,l] | (k,l) in E'}", is not tested here:
+// setContainer(PriorityQueue, key[j], min) holds the candidate indices in a
+// min-heap keyed by key, so the index offered to the guard already has the
+// smallest cross-cut weight and all that remains to check is that it is
+// unfixed and reachable. That is the same division of labour as
+// LLP-Dijkstra, and as the classical Prim of Algorithm Prim whose heap of
+// (v, c) pairs supplies the vertex while `if not fixed[v]` supplies the
+// rest. Lowering key[k] in the advance pushes k back with its new key; the
+// stale entry is discarded when it surfaces and the guard rejects it.
+//
+// The earlier version computed the global minimum directly, with
+// globalMinCrossCut() calling minCrossCut() for every vertex and each of
+// those scanning a dense W -- O(n^2) per guard evaluation, so a sweep cost
+// O(n^3) and the program could not reach the O(m log n) of the chapter's
+// summary table. It also needed propagateFixed() and a precondition the
+// caller had to establish, because fixed[] arrived as a parameter and the
+// lightest-edge initialization leaves vertices that ought to be fixed
+// looking free. Neither is needed now: j is fixed only when it is attached
+// to an already-fixed vertex, so "following the chosen edges from j reaches
+// the root" holds by construction.
 
 import java.util.*;
 
 public class LLPPrim {
   int n;
+  int[][] adj;
+  double[][] aw;
+  int root;
+  double[] C;
+  double[] key;
   int[] parent;
   boolean[] fixed;
-  double[][] W;
-  double[] C;
-  int root;
   int j;
+  java.util.PriorityQueue<double[]> _container;
 
-  private boolean forbidden(int j) {
+  private boolean _forbidden0(int j) {
     if (fixed[j]) return false;
-    if (!((minCrossCut(j) < Double.POSITIVE_INFINITY))) return false;
-    if (!((minCrossCut(j) <= globalMinCrossCut()))) return false;
-    if (!((C[j] < minCrossCut(j)))) return false;
+    if (!((key[j] < Double.POSITIVE_INFINITY))) return false;
     return true;
   }
 
-  private void advance() {
-    int i = argMinCrossCut(j);
-    parent[j] = i;
-    C[j] = W[i][j];
-    propagateFixed();
+  private void _advance0() {
+    fixed[j] = true;
+    C[j] = key[j];
+    int t = 0;
+    while ((t < adj[j].length)) {
+      int k = adj[j][t];
+      if (((!fixed[k]) && (aw[j][t] < key[k]))) {
+        key[k] = aw[j][t];
+        if (_container != null) _container.add(new double[]{priority(k), k});
+        parent[k] = j;
+      }
+      t = (t + 1);
+    }
   }
 
-  public double[] LLPPrim(int[] parent, boolean[] fixed, double[][] W, double[] C, int root) {
-    this.parent = parent;
-    this.fixed = fixed;
-    this.W = W;
-    this.C = C;
+  private double priority(int j) {
+    return key[j];
+  }
+
+  public double[] LLPPrim(int[][] adj, double[][] aw, int root) {
+    this.adj = adj;
+    this.aw = aw;
     this.root = root;
-    this.n = parent.length - 1;
-    {
-      boolean changed = true;
-      while (changed) {
-        changed = false;
-        for (int j = 1; j <= n; j++) {
-          if (forbidden(j)) {
-            this.j = j; advance();
-            changed = true;
-          }
-        }
+    this.n = adj.length;
+    this.C = new double[n];
+    this.key = new double[n];
+    this.parent = new int[n];
+    this.fixed = new boolean[n];
+    for (int v = 0; v < n; v++) {
+      {
+        key[v] = Double.POSITIVE_INFINITY;
+        parent[v] = (0 - 1);
       }
+    }
+    key[root] = 0;
+    java.util.PriorityQueue<double[]> _C = new java.util.PriorityQueue<>(
+        (a, b) -> Double.compare(a[0], b[0]));
+    this._container = _C;
+    for (int j = 0; j < n; j++) _C.add(new double[]{priority(j), j});
+    while (!_C.isEmpty()) {
+      int j = (int) _C.poll()[1];
+      if (!_forbidden0(j)) continue;
+      this.j = j; _advance0();
     }
     return C;
   }
 
-  public double minCrossCut(int j) {
-    double best = Double.POSITIVE_INFINITY;
-    for (int i = 1; i <= n; i++) {
-      {
-        if ((fixed[i] && (W[i][j] < best))) {
-          best = W[i][j];
-        }
-      }
-    }
-    return best;
-  }
-
-  public double globalMinCrossCut() {
-    double best = Double.POSITIVE_INFINITY;
-    for (int t = 1; t <= n; t++) {
-      {
-        if (((!fixed[t]) && (minCrossCut(t) < best))) {
-          best = minCrossCut(t);
-        }
-      }
-    }
-    return best;
-  }
-
-  public int argMinCrossCut(int j) {
-    int besti = (0 - 1);
-    double best = Double.POSITIVE_INFINITY;
-    for (int i = 1; i <= n; i++) {
-      {
-        if ((fixed[i] && (W[i][j] < best))) {
-          best = W[i][j];
-          besti = i;
-        }
-      }
-    }
-    return besti;
-  }
-
-  public void propagateFixed() {
-    boolean changed = true;
-    while (changed) {
-      changed = false;
-      for (int j = 1; j <= n; j++) {
-        if (((!fixed[j]) && fixed[parent[j]])) {
-          fixed[j] = true;
-          changed = true;
-        }
-      }
-    }
-  }
-
   public static void main(String[] args) {
-    int[] parent = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
-    boolean[] fixed = new boolean[] {false, false, false, false, false, false, false, false};
-    double[][] W = new double[][] {{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}, {9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0}, {17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0}, {25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0}, {33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0}, {41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0}, {49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0}, {57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0}};
-    double[] C = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    double[][] aw = new double[][] {{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}, {9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0}, {17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0}, {25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0}, {33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0}, {41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0}, {49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0}, {57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0}};
     LLPPrim prog = new LLPPrim();
-    double[] result = prog.LLPPrim(parent, fixed, W, C, 0);
+    double[] result = prog.LLPPrim(adj, aw, 0);
     System.out.println(Arrays.toString(result));
   }
 }

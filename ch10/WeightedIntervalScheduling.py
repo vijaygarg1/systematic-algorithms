@@ -1,37 +1,56 @@
 """Classical sequential weighted-interval-scheduling DP. Intervals are
-presorted once by finish time, with index 0 a 0-weight sentinel, so p[j]
--- the last interval that finishes no later than j starts -- is derived
-here rather than supplied: the largest such index, or the sentinel 0 when
-no earlier interval fits."""
+presorted once by finish time, with index 0 a 0-weight sentinel, so
+p[j] -- the last interval that finishes no later than j starts -- is
+derived here rather than supplied: it is the largest such index, or the
+sentinel 0 when no earlier interval fits.
+
+Auto-generated from WeightedIntervalScheduling.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def schedule(s, f, w):
-    n = len(s)
-    opt = [0] * n
-    G = [0] * n
-    p = [0] * n
-    for j in range(1, n):
-        p[j] = max((i for i in range(1, j) if f[i] <= s[j]), default=0)
-    # Phase 1: compute optimal values.
-    for cur in range(1, n):
-        if w[cur] + opt[p[cur]] >= opt[cur - 1]:
-            opt[cur] = w[cur] + opt[p[cur]]
-        else:
-            opt[cur] = opt[cur - 1]
-    # Phase 2: backtrack to find selected intervals.
-    cur = n - 1
-    while cur > 0:
-        if w[cur] + opt[p[cur]] >= opt[cur - 1]:
-            G[cur] = 1
-            cur = p[cur]
-        else:
-            cur = cur - 1
-    return G
+class WeightedIntervalScheduling:
+    def schedule(self, s, f, w):
+        self.s = s
+        self.f = f
+        self.w = w
+        self.n = len(self.s)
+        self.p = [0] * (self.n)
+        self.opt = [0] * (self.n)
+        self.G = [0] * (self.n)
+        for j in range(1, ((self.n - 1)) + 1):
+            self.p[j] = self.lastCompatible(j, self.s, self.f)
+        self.opt[0] = 0
+        for cur in range(1, ((self.n - 1)) + 1):
+            self.opt[cur] = max((self.w[cur] + self.opt[self.p[cur]]), self.opt[(cur - 1)])
+        cur = (self.n - 1)
+        while (cur > 0):
+            if ((self.w[cur] + self.opt[self.p[cur]]) >= self.opt[(cur - 1)]):
+                self.G[cur] = 1
+                cur = self.p[cur]
+            else:
+                cur = (cur - 1)
+        return self.G
+
+    def lastCompatible(self, j, s, f):
+        lo = 1
+        hi = (j - 1)
+        best = 0
+        while (lo <= hi):
+            mid = int((lo + hi) / 2)
+            if (f[mid] <= s[j]):
+                best = mid
+                lo = (mid + 1)
+            else:
+                hi = (mid - 1)
+        return best
 
 
-if __name__ == "__main__":
-    # Book's 5-interval example.  Index 0 is a 0-weight sentinel.
-    s = [0, 1, 2, 4, 6, 5]
-    f = [0, 3, 5, 6, 8, 9]
-    w = [0, 4, 6, 5, 3, 7]
-    print("selected:", schedule(s, f, w))
+if __name__ == '__main__':
+    s = [0, 0, 1, 2]
+    f = [0, 0, 1, 1]
+    w = [0, 0, 0, 2]
+    prog = WeightedIntervalScheduling()
+    result = prog.schedule(s, f, w)
+    print(result)
+

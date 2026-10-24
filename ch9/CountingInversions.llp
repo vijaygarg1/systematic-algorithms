@@ -17,7 +17,7 @@ class CountingInversions {
   }
 
   int mergeAndCount(int[] A, int low, int mid, int high) {
-    // Sized to the sub-range, not to A.  `new int[A.length]` allocated and
+    // Sized to the sub-range, not to A.  A new int[A.length] allocated and
     // zero-filled n elements on every one of the Theta(n) merge calls, which
     // costs Theta(n^2) on its own and swamped the O(n log n) the merging
     // itself achieves.

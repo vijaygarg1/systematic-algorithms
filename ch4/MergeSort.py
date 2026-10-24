@@ -1,47 +1,70 @@
-"""Sequential merge sort, in the book's shape: each call returns a newly
-sorted list and the merge step is MergeTwo.
+"""Sequential merge sort, in the book's own shape: each call RETURNS a
+newly sorted array rather than sorting a range of G in place, and the
+merge step is the sibling MergeTwo program -- `MergeTwo(B, C)`,
+compiling to `new MergeTwo().merge(B, C)` -- exactly as Algorithm
+MergeSort in bxx-sort.tex writes `Return MergeTwo(B, C)`. That makes
+MergeSort.java a multi-file program: it needs MergeTwo.java alongside
+it to compile (see JAVA_MULTI_FILE in validate-site.py and the
+`javaRequires` demo-spec field in llp.js).
 
-merge_two below is the same algorithm as MergeTwo.py; it is repeated here
-rather than imported because every companion Python program has to run as
-a single standalone file.
+An earlier version sorted G[lo..hi] in place and carried its own
+26-line two-pointer merge, duplicating MergeTwo.llp.
+
+The parallel companion is MergeSortPar in progs-divideConquer/, which
+is the same recurrence with the two recursive calls run in parallel --
+a split only this out-of-place shape makes natural, since in-place
+halves would contend for one array.
+
+Auto-generated from MergeSort.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
 """
 
-def merge_two(B, C):
-    m = len(B)
-    n = len(C)
-    D = [0] * (m + n)
-    i = 0
-    j = 0
-    k = 0
-    while i < m and j < n:
-        # <= , not < : ties go to B, which is what makes the sort stable.
-        if B[i] <= C[j]:
-            D[k] = B[i]
-            i += 1
-        else:
-            D[k] = C[j]
-            j += 1
-        k += 1
-    while i < m:
-        D[k] = B[i]
-        i += 1
-        k += 1
-    while j < n:
-        D[k] = C[j]
-        j += 1
-        k += 1
-    return D
+
+class MergeTwo:
+    def merge(self, B, C):
+        self.B = B
+        self.C = C
+        self.m = len(self.B)
+        self.n = len(self.C)
+        self.D = [0] * ((self.m + self.n))
+        self.i = 0
+        self.j = 0
+        self.k = 0
+        while ((self.i < self.m) and (self.j < self.n)):
+            if (self.B[self.i] <= self.C[self.j]):
+                self.D[self.k] = self.B[self.i]
+                self.i = (self.i + 1)
+            else:
+                self.D[self.k] = self.C[self.j]
+                self.j = (self.j + 1)
+            self.k = (self.k + 1)
+        while (self.i < self.m):
+            self.D[self.k] = self.B[self.i]
+            self.i = (self.i + 1)
+            self.k = (self.k + 1)
+        while (self.j < self.n):
+            self.D[self.k] = self.C[self.j]
+            self.j = (self.j + 1)
+            self.k = (self.k + 1)
+        return self.D
 
 
-def sort(A, lo, hi):
-    if lo < hi:
-        mid = (lo + hi) // 2
-        B = sort(A, lo, mid)
-        C = sort(A, mid + 1, hi)
-        return merge_two(B, C)
-    return [A[lo]]
+class MergeSort:
+    def sort(self, A, lo, hi):
+        n = len(A)
+        if (lo < hi):
+            mid = int((lo + hi) / 2)
+            B = self.sort(A, lo, mid)
+            C = self.sort(A, (mid + 1), hi)
+            return MergeTwo().merge(B, C)
+        single = [0] * (1)
+        single[0] = A[lo]
+        return single
 
 
-if __name__ == "__main__":
-    A = [5, 2, 4, 6, 1, 3]
-    print(sort(A, 0, len(A) - 1))
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = MergeSort()
+    result = prog.sort(A, 0, len(A) - 1)
+    print(result)
+

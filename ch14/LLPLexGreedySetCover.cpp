@@ -1,7 +1,8 @@
 // LLP-LexGreedySetCover: greedy set cover as a lattice-linear predicate.
 // A set j is forbidden when it is unpicked, covers at least one still
 // uncovered element, and no competing set k beats it -- more coverage, or
-// equal coverage and a smaller index. S is an m x u incidence matrix.
+// equal coverage and a smaller index. The instance is a pair of incidence
+// lists: mem[s] holds the elements of set s, inc[e] the sets containing e.
 //
 // The predicate is tested without comparing set pairs. For each uncovered
 // element keep best[e], the unpicked set covering the most uncovered
@@ -14,12 +15,20 @@
 // O(u) scan per set, inside an O(m) scan over neighbours. best[] is a
 // lazily-refreshed cache, rebuilt once per advance rather than once per
 // candidate.
+//
+// Neither list is an m x u matrix, so the whole instance is O(N) -- N being
+// the number of (set, element) incidences -- rather than Theta(m*u), and
+// every pass below walks one of them for O(N) instead of O(m*u). That
+// matters most for best[], which is rebuilt after every advance: rebuilding
+// it by scanning a whole matrix made the algorithm O(m*u) per advance, a
+// full factor of n more than the chapter's O(N*min(m,n)) bound.
 
 #include <iostream>
 #include <vector>
 
 struct LexGreedySetCover {
-    const std::vector<std::vector<int>>& S;
+    const std::vector<std::vector<int>>& mem;   // mem[s]: elements of set s
+    const std::vector<std::vector<int>>& inc;   // inc[e]: sets containing e
     std::vector<bool> G;
     std::vector<bool> covered;
     std::vector<int> cnt;
@@ -27,26 +36,23 @@ struct LexGreedySetCover {
     bool fresh;
     int m, u;
 
-    explicit LexGreedySetCover(const std::vector<std::vector<int>>& s)
-        : S(s), m((int) s.size()), u(s.empty() ? 0 : (int) s[0].size()) {
+    LexGreedySetCover(const std::vector<std::vector<int>>& memIn,
+                      const std::vector<std::vector<int>>& incIn)
+        : mem(memIn), inc(incIn), m((int) memIn.size()), u((int) incIn.size()) {
         G.assign(m, false);
         covered.assign(u, false);
         cnt.assign(m, 0);
         best.assign(u, -1);
         fresh = false;
-        for (int t = 0; t < m; ++t) {
-            int c = 0;
-            for (int e = 0; e < u; ++e) if (S[t][e] == 1) ++c;
-            cnt[t] = c;
-        }
+        for (int t = 0; t < m; ++t) cnt[t] = (int) mem[t].size();
     }
 
     // The unpicked set covering the most uncovered elements that contains
     // e (lowest index on ties, since ties keep whichever came first).
     int bestAt(int e) const {
         int win = -1;
-        for (int s = 0; s < m; ++s) {
-            if (S[s][e] == 1 && !G[s]) {
+        for (int s : inc[e]) {
+            if (!G[s]) {
                 if (win < 0 || cnt[s] > cnt[win]) win = s;
             }
         }
@@ -64,8 +70,8 @@ struct LexGreedySetCover {
         if (G[j]) return false;
         refresh();
         if (cnt[j] <= 0) return false;
-        for (int e = 0; e < u; ++e)
-            if (S[j][e] == 1 && !covered[e] && best[e] != j) return false;
+        for (int e : mem[j])
+            if (!covered[e] && best[e] != j) return false;
         return true;
     }
 
@@ -76,11 +82,10 @@ struct LexGreedySetCover {
             for (int j = 0; j < m; ++j) {
                 if (isLexMaxCov(j)) {
                     G[j] = true;
-                    for (int e = 0; e < u; ++e) {
-                        if (S[j][e] == 1 && !covered[e]) {
+                    for (int e : mem[j]) {
+                        if (!covered[e]) {
                             covered[e] = true;
-                            for (int t = 0; t < m; ++t)
-                                if (S[t][e] == 1) --cnt[t];
+                            for (int t : inc[e]) --cnt[t];
                         }
                     }
                     fresh = false;
@@ -92,16 +97,16 @@ struct LexGreedySetCover {
     }
 };
 
-std::vector<bool> llpLexGreedySetCover(const std::vector<std::vector<int>>& S) {
-    return LexGreedySetCover(S).run();
+std::vector<bool> llpLexGreedySetCover(const std::vector<std::vector<int>>& mem,
+                                      const std::vector<std::vector<int>>& inc) {
+    return LexGreedySetCover(mem, inc).run();
 }
 
 int main() {
-    std::vector<std::vector<int>> S = {
-        {1, 1, 1, 0},
-        {0, 1, 1, 1},
-        {1, 0, 0, 1}};
-    std::vector<bool> G = llpLexGreedySetCover(S);
+    // {0,1,2}, {1,2,3}, {0,3} over the universe {0,1,2,3}
+    std::vector<std::vector<int>> mem = {{0, 1, 2}, {1, 2, 3}, {0, 3}};
+    std::vector<std::vector<int>> inc = {{0, 2}, {0, 1}, {0, 1}, {1, 2}};
+    std::vector<bool> G = llpLexGreedySetCover(mem, inc);
     std::cout << "chosen sets:";
     for (int j = 0; j < (int) G.size(); ++j) if (G[j]) std::cout << ' ' << j;
     std::cout << '\n';

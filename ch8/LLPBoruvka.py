@@ -1,80 +1,99 @@
-"""LLP-Boruvka: the book's recursive Boruvka(V,E), written as a loop (tail
-recursion) so the pointer-jumping kernel stays a clean fixpoint step. Each
-round selects every active vertex's minimum-weight edge (breaking a mutual
-mwe tie toward the smaller-numbered vertex), pointer-jumps to rooted stars,
-records every active vertex's own mwe edge in the tree, keeps only the
-roots active, and repeats until one component remains. `progress` guards
-against a disconnected graph or an isolated vertex (no outgoing edge at
-all) -- outside the book's own stated connected-graph assumption -- so the
-loop cannot spin forever waiting for a spanning tree that cannot exist."""
+"""LLP-Boruvka: Boruvka's minimum spanning tree with the component
+contraction done by LLP pointer jumping instead of recursion.
 
-INF = float("inf")
+Each round every active component finds its cheapest outgoing edge,
+points at the component on the other end, and then the guard below
+jumps those pointers until each chain collapses to one representative:
+forbidden when G[j] is not yet its own component's root, advance by
+following one more link. Mutual choices are broken by keeping the lower
+index as the root, which is what pointTo decides.
 
+A round that merges nothing means the graph is disconnected, which is
+what progress stops on.
 
-def find(v, g):
-    while g[v] != v:
-        v = g[v]
-    return v
-
-
-def other_endpoint(e, u, v, x):
-    return v[e] if u[e] == x else u[e]
+Auto-generated from LLPBoruvka.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def llp_boruvka(n, u, v, w):
-    m = len(u)
-    t = [False] * m
-    g = list(range(n))
-    active = [True] * n
+class LLPBoruvka:
+    def mst(self, n, U, V, W):
+        self.n = n
+        self.U = U
+        self.V = V
+        self.W = W
+        self.T = [False] * (len(self.U))
+        self.active = [False] * (self.n)
+        self.G = [0] * (self.n)
+        self.mweEdge = [0] * (self.n)
+        self.mweW = [0.0] * (self.n)
+        for i in range(0, ((self.n - 1)) + 1):
+            self.G[i] = i
+            self.active[i] = True
+        progress = True
+        while ((self.countActive() > 1) and progress):
+            before = self.countActive()
+            for i in range(0, ((self.n - 1)) + 1):
+                self.mweEdge[i] = (0 - 1)
+                self.mweW[i] = float('inf')
+            for e in range(0, ((len(self.U) - 1)) + 1):
+                ru = self.find(self.U[e])
+                rv = self.find(self.V[e])
+                if ((self.active[ru] and self.active[rv]) and (ru != rv)):
+                    self.relax(ru, e, self.W)
+                    self.relax(rv, e, self.W)
+            for i in range(0, ((self.n - 1)) + 1):
+                if self.active[i]:
+                    self.G[i] = self.pointTo(i)
+            _changed = True
+            while _changed:
+                _changed = False
+                for j in range(0, (self.n - 1) + 1):
+                    if (self.active[j] and (self.G[j] != self.G[self.G[j]])):
+                        self.G[j] = self.G[self.G[j]]
+                        _changed = True
+            for i in range(0, ((self.n - 1)) + 1):
+                if (self.active[i] and (self.mweEdge[i] != (0 - 1))):
+                    self.T[self.mweEdge[i]] = True
+            for i in range(0, ((self.n - 1)) + 1):
+                if (self.active[i] and (self.G[i] != i)):
+                    self.active[i] = False
+            progress = (self.countActive() < before)
+        return self.T
 
-    progress = True
-    while sum(active) > 1 and progress:
-        before = sum(active)
-        mwe_edge = [-1] * n
-        mwe_w = [INF] * n
-        for e in range(m):
-            ru, rv = find(u[e], g), find(v[e], g)
-            if active[ru] and active[rv] and ru != rv:
-                if w[e] < mwe_w[ru]:
-                    mwe_w[ru], mwe_edge[ru] = w[e], e
-                if w[e] < mwe_w[rv]:
-                    mwe_w[rv], mwe_edge[rv] = w[e], e
+    def relax(self, comp, e, W):
+        if (W[e] < self.mweW[comp]):
+            self.mweW[comp] = W[e]
+            self.mweEdge[comp] = e
 
-        for i in range(n):
-            if active[i]:
-                if mwe_edge[i] == -1:
-                    g[i] = i
-                else:
-                    nb = other_endpoint(mwe_edge[i], u, v, i)
-                    nb_edge = mwe_edge[nb]
-                    if (nb_edge != -1 and other_endpoint(nb_edge, u, v, nb) == i
-                            and i < nb):
-                        g[i] = i
-                    else:
-                        g[i] = nb
+    def pointTo(self, i):
+        if (self.mweEdge[i] == (0 - 1)):
+            return i
+        w = self.otherEndpoint(self.mweEdge[i], i)
+        wEdge = self.mweEdge[w]
+        if (((wEdge != (0 - 1)) and (self.otherEndpoint(wEdge, w) == i)) and (i < w)):
+            return i
+        return w
 
-        changed = True
-        while changed:
-            changed = False
-            for j in range(n):
-                if active[j] and g[j] != g[g[j]]:
-                    g[j] = g[g[j]]
-                    changed = True
+    def find(self, v):
+        while (self.G[v] != v):
+            v = self.G[v]
+        return v
 
-        for i in range(n):
-            if active[i] and mwe_edge[i] != -1:
-                t[mwe_edge[i]] = True
-        for i in range(n):
-            if active[i] and g[i] != i:
-                active[i] = False
-        progress = sum(active) < before
+    def countActive(self):
+        return sum(1 for i in range(0, ((self.n - 1)) + 1) if self.active[i])
 
-    return t
+    def otherEndpoint(self, e, v):
+        if (self.find(self.U[e]) == v):
+            return self.find(self.V[e])
+        return self.find(self.U[e])
 
 
-if __name__ == "__main__":
-    # Same 5-vertex graph as the Kruskal/Prim/Boruvka demos.
-    u = [1, 0, 0, 1, 2, 2, 3]
-    v = [2, 1, 2, 3, 3, 4, 4]
-    w = [1, 2, 3, 4, 5, 6, 7]
-    print(llp_boruvka(5, u, v, w))
+if __name__ == '__main__':
+    U = [0, 0, 1, 2]
+    V = [0, 0, 1, 1]
+    W = [0, 0, 0, 2]
+    prog = LLPBoruvka()
+    result = prog.mst(len(U), U, V, W)
+    print(result)
+

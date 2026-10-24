@@ -24,7 +24,8 @@
 #include <limits>
 
 struct WeightedSetCover {
-    const std::vector<std::vector<int>>& S;
+    const std::vector<std::vector<int>>& mem;   // mem[s]: elements of set s
+    const std::vector<std::vector<int>>& inc;   // inc[e]: sets containing e
     const std::vector<double>& w;
     std::vector<double> G;
     std::vector<double> sp;
@@ -33,10 +34,11 @@ struct WeightedSetCover {
     bool fresh;
     int m, u;
 
-    WeightedSetCover(const std::vector<std::vector<int>>& s,
+    WeightedSetCover(const std::vector<std::vector<int>>& memIn,
+                     const std::vector<std::vector<int>>& incIn,
                      const std::vector<double>& ws)
-        : S(s), w(ws), m((int) ws.size()),
-          u(s.empty() ? 0 : (int) s[0].size()) {
+        : mem(memIn), inc(incIn), w(ws), m((int) ws.size()),
+          u((int) incIn.size()) {
         G.assign(u, 0.0);
         sp.assign(m, 0.0);
         slack.assign(u, false);
@@ -46,22 +48,22 @@ struct WeightedSetCover {
 
     // x belongs to at least one set.
     bool covered(int x) const {
-        for (int s = 0; s < m; ++s) if (S[s][x] == 1) return true;
+        return !inc[x].empty();
         return false;
     }
 
     bool setTight(int s) const { return sp[s] >= w[s]; }
 
     bool isSlack(int e) const {
-        for (int s = 0; s < m; ++s)
-            if (S[s][e] == 1 && setTight(s)) return false;
+        for (int s : inc[e])
+            if (setTight(s)) return false;
         return true;
     }
 
     // The smallest slack element of set s, or u if it has none.
     int firstSlackOf(int s) const {
-        for (int e = 0; e < u; ++e)
-            if (S[s][e] == 1 && slack[e]) return e;
+        for (int e : mem[s])
+            if (slack[e]) return e;
         return u;
     }
 
@@ -76,16 +78,15 @@ struct WeightedSetCover {
     bool slackMin(int x) {
         refresh();
         if (!slack[x]) return false;
-        for (int s = 0; s < m; ++s)
-            if (S[s][x] == 1 && minSlackIn[s] < x) return false;
+        for (int s : inc[x])
+            if (minSlackIn[s] < x) return false;
         return true;
     }
 
     // Smallest remaining budget among the sets containing element e.
     double minRemainingBudget(int e) const {
         double best = std::numeric_limits<double>::infinity();
-        for (int s = 0; s < m; ++s) {
-            if (S[s][e] != 1) continue;
+        for (int s : inc[e]) {
             double budget = w[s] - sp[s];
             if (budget < best) best = budget;
         }
@@ -100,8 +101,7 @@ struct WeightedSetCover {
                 if (covered(x) && slackMin(x)) {
                     double step = minRemainingBudget(x);
                     G[x] += step;
-                    for (int s = 0; s < m; ++s)
-                        if (S[s][x] == 1) sp[s] += step;
+                    for (int s : inc[x]) sp[s] += step;
                     fresh = false;
                     changed = true;
                 }
@@ -113,18 +113,18 @@ struct WeightedSetCover {
     }
 };
 
-std::vector<bool> llpWeightedSetCover(const std::vector<std::vector<int>>& S,
+std::vector<bool> llpWeightedSetCover(const std::vector<std::vector<int>>& mem,
+                                     const std::vector<std::vector<int>>& inc,
                                       const std::vector<double>& w) {
-    return WeightedSetCover(S, w).run();
+    return WeightedSetCover(mem, inc, w).run();
 }
 
 int main() {
-    std::vector<std::vector<int>> S = {
-        {1, 1, 1, 0},
-        {0, 1, 1, 1},
-        {1, 0, 0, 1}};
+    // {0,1,2}, {1,2,3}, {0,3} over the universe {0,1,2,3}
+    std::vector<std::vector<int>> mem = {{0, 1, 2}, {1, 2, 3}, {0, 3}};
+    std::vector<std::vector<int>> inc = {{0, 2}, {0, 1}, {0, 1}, {1, 2}};
     std::vector<double> w = {3.0, 2.0, 2.5};
-    std::vector<bool> C = llpWeightedSetCover(S, w);
+    std::vector<bool> C = llpWeightedSetCover(mem, inc, w);
     std::cout << "chosen sets:";
     for (int s = 0; s < (int) C.size(); ++s) if (C[s]) std::cout << ' ' << s;
     std::cout << '\n';

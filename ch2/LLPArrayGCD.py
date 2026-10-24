@@ -1,32 +1,38 @@
-"""LLP-GCD: forbidden when some G[i] < G[j]; advance shrinks G[j] via mod."""
+"""LLP-ArrayGCD: forbidden when some G[i] < G[j]; advance shrinks G[j] via mod.
 
-def forbidden(j, G):
-    for i in range(len(G)):
-        if i != j and G[j] > G[i]:
-            return i
-    return None
+Auto-generated from LLPArrayGCD.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def advance(j, i, G):
-    if G[j] % G[i] == 0:
-        G[j] = G[i]
-    else:
-        G[j] = G[j] % G[i]
+class LLPArrayGCD:
+    def LLPArrayGCD(self, A):
+        self.A = A
+        self.n = len(self.A)
+        self.G = list(self.A)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if self._pick_i(j):
+                    if ((self.G[j] % self.G[self.i]) == 0):
+                        self.G[j] = self.G[self.i]
+                    else:
+                        self.G[j] = (self.G[j] % self.G[self.i])
+                    _changed = True
+        return self.G
+
+    def _pick_i(self, j):
+        for i in range(0, ((self.n - 1)) + 1):
+            if (self.G[j] > self.G[i]):
+                self.i = i
+                return True
+        return False
 
 
-def llp_gcd(A):
-    G = list(A)
-    changed = True
-    while changed:
-        changed = False
-        for j in range(len(G)):
-            i = forbidden(j, G)
-            if i is not None:
-                advance(j, i, G)
-                changed = True
-    return G
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = LLPArrayGCD()
+    result = prog.LLPArrayGCD(A)
+    print(result)
 
-
-if __name__ == "__main__":
-    for A in [[48, 18], [100, 75, 50], [60, 36, 24]]:
-        print(f"llp_gcd({A}) = {llp_gcd(A)}")

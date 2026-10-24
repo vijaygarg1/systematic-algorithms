@@ -1,20 +1,21 @@
-"""Reachability as a 1-bit LLP: forbidden = unreached vertex with reached predecessor."""
+"""Reachability as a 1-bit LLP: forbidden = unreached vertex with reached predecessor.
 
-def llp_traversal(pre, G):
-    n = len(G)
-    changed = True
-    while changed:
-        changed = False
-        for j in range(n):
-            if not G[j] and any(G[i] for i in pre[j]):
-                G[j] = True
-                changed = True
-    return G
+Auto-generated from LLPTraversal.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    pre = [[], [0], [0], [1, 2], [2], [3, 4]]
-    n = len(pre)
-    G = [False] * n
-    G[0] = True
-    print("reachable:", llp_traversal(pre, G))
+class LLPTraversal:
+    def LLPTraversal(self, pre, G):
+        self.pre = pre
+        self.G = G
+        self.n = len(self.pre)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if ((not self.G[j]) and any(self.G[i] for i in self.pre[j])):
+                    self.G[j] = True
+                    _changed = True
+
+

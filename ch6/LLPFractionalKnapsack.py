@@ -1,45 +1,53 @@
-"""LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each fraction G[j] in [0,1] to its target G*[j], read in O(1) from one prefix scan of the weights."""
+"""LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each
+fraction G[j] in [0,1] to its target G*[j], read in O(1) from one
+prefix scan of the weights.
+
+S is the EXCLUSIVE prefix sum, S[k] = w[0] + ... + w[k-1], with
+S[0] = 0 -- one slot longer than w. That is what removes target's
+j > 0 special case: the weight before item j is just S[j], and the
+weight through item j is S[j+1], so both ends of the breakpoint test
+are plain reads. The scan stays a sequential while loop because
+S[i+1] depends on S[i]; a forall would not be a prefix sum.
+
+Auto-generated from LLPFractionalKnapsack.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def prefix_scan(w):
-    """One left-to-right scan: S[j] = w[0] + ... + w[j]."""
-    S = [0.0] * len(w)
-    run = 0.0
-    for i in range(len(w)):
-        run += w[i]
-        S[i] = run
-    return S
+class LLPFractionalKnapsack:
+    def LLPFractionalKnapsack(self, v, w, W):
+        self.v = v
+        self.w = w
+        self.W = W
+        self.n = len(self.v)
+        self.G = [0.0] * (self.n)
+        self.S = [0.0] * ((self.n + 1))
+        self.i = 0
+        while (self.i < self.n):
+            self.S[(self.i + 1)] = (self.S[self.i] + self.w[self.i])
+            self.i = (self.i + 1)
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if (self.G[j] < self.target(j)):
+                    self.G[j] = self.target(j)
+                    _changed = True
+        return self.G
+
+    def target(self, j):
+        if (self.S[(j + 1)] <= self.W):
+            return 1.0
+        if (self.S[j] >= self.W):
+            return 0.0
+        return (self.W - self.S[j]) / self.w[j]
 
 
-def target(j, w, W, S):
-    """G*[j], read in O(1) from S: 1 while the cumulative weight S[j] stays
-    under W, the partial fraction at the breakpoint, then 0 thereafter."""
-    prev = S[j - 1] if j > 0 else 0.0
-    if S[j] <= W:
-        return 1.0
-    if prev >= W:
-        return 0.0
-    return (W - prev) / w[j]
+if __name__ == '__main__':
+    v = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+    w = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+    W = 10.0
+    prog = LLPFractionalKnapsack()
+    result = prog.LLPFractionalKnapsack(v, w, W)
+    print(result)
 
-
-def llp_fractional_knapsack(v, w, W):
-    n = len(v)
-    G = [0.0] * n
-    S = prefix_scan(w)
-    changed = True
-    while changed:
-        changed = False
-        for j in range(n):
-            t = target(j, w, W, S)
-            if G[j] < t:
-                G[j] = t
-                changed = True
-    return G
-
-
-if __name__ == "__main__":
-    # Items already sorted by v/w density (descending).
-    v = [60.0, 100.0, 120.0]
-    w = [10.0, 20.0, 30.0]
-    W = 50.0
-    print(llp_fractional_knapsack(v, w, W))

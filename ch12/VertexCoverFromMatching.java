@@ -8,13 +8,20 @@
 // j (or -1 if unmatched), with matchR (the same matching read from the
 // R side -- the only direction the book's "partner[w]" needs, since w is
 // always an R-vertex at that point in the algorithm) derived from it.
+//
+// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
+// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
+// some R-vertex has no incident edge. Following "every (w,v) in E \ M"
+// over a dense |L| x |R| matrix would scan all of R for every dequeued
+// L-vertex however few edges exist, and reading such a matrix is already
+// Theta(|L| * |R|).
 
 import java.util.*;
 
 public class VertexCoverFromMatching {
-  public boolean[] VertexCoverFromMatching(int[][] adj, int[] matchL) {
+  public boolean[] VertexCoverFromMatching(int[][] adj, int nr, int[] matchL) {
     int L = adj.length;
-    int R = adj[0].length;
+    int R = nr;
     int[] matchR = new int[R];
     for (int v = 0; v < R; v++) {
       matchR[v] = (0 - 1);
@@ -39,14 +46,15 @@ public class VertexCoverFromMatching {
       int w = Q[head];
       head = (head + 1);
       if ((w < L)) {
-        int v = 0;
-        while ((v < R)) {
-          if ((((adj[w][v] == 1) && (matchL[w] != v)) && (!inZ[(L + v)]))) {
+        int t = 0;
+        while ((t < adj[w].length)) {
+          int v = adj[w][t];
+          if (((matchL[w] != v) && (!inZ[(L + v)]))) {
             inZ[(L + v)] = true;
             Q[tail] = (L + v);
             tail = (tail + 1);
           }
-          v = (v + 1);
+          t = (t + 1);
         }
       } else {
         int r = (w - L);
@@ -71,7 +79,7 @@ public class VertexCoverFromMatching {
     int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     int[] matchL = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     VertexCoverFromMatching prog = new VertexCoverFromMatching();
-    boolean[] result = prog.VertexCoverFromMatching(adj, matchL);
+    boolean[] result = prog.VertexCoverFromMatching(adj, adj.length, matchL);
     System.out.println(Arrays.toString(result));
   }
 }

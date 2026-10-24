@@ -1,70 +1,103 @@
 // LLP-WeightedVertexCover: primal-dual 2-approximation for weighted
 // vertex cover, matching bxx-approximate.tex Algorithm
-// LLP-WeightedVertexCover (fig:llp-wvc). G[u][v] is the price on edge
-// {u,v}; a vertex v is tight when its incident prices saturate w[v]; an
-// edge is slack when neither endpoint is tight; slackMin(u,v) further
-// requires {u,v} to be lex-minimal among every slack edge sharing an
+// LLP-WeightedVertexCover (fig:llp-wvc). The lattice is indexed by EDGES,
+// as the book's "G: array[E] of real" and "Forbidden(e)" say: G[e] is the
+// price on edge e. A vertex v is tight when its incident prices saturate
+// w[v]; an edge is slack when neither endpoint is tight; slackMin(e)
+// further requires e to be lex-minimal among every slack edge sharing an
 // endpoint with it. Advancing raises the edge's price by the smaller of
 // its two endpoints' remaining budgets, tightening at least one.
+//
+// The graph arrives as an edge list -- eu[e], ev[e] are the endpoints of
+// edge e, with the edges in lex order -- which is the book's
+// "E: set of edges". inc[v] lists the edges incident to v, built once from
+// that list in O(n + m). No n x n structure appears anywhere: the earlier
+// version indexed both the lattice (G[u][v]) and the graph (adj[u][v]) by
+// vertex PAIRS, which cost Theta(n^2) in memory and, because the forbidden
+// clause ranged over pairs, made the rescan enumerate all n^2 of them in
+// every sweep however few edges the graph had. Indexing by edge makes a
+// sweep O(m).
 //
 // Two things keep the predicate cheap. First, price[] is maintained by the
 // advance instead of being re-summed on every call, so tight() is O(1)
 // rather than an O(nv) sum. Second, the lex-minimality test does not scan
-// all edge pairs: the lex-least slack edge at a vertex u is always
-// {u, minSlack[u]} where minSlack[u] is u's smallest non-tight neighbour
-// (a neighbour y < u contributes the key (y,u) and y > u the key (u,y), so
-// the smallest index wins either way), hence {u,v} is lex-minimal among the
-// slack edges touching it exactly when it is the lex-least at both ends.
-// minSlack[] is rebuilt only after an advance has moved a price.
+// all edge pairs: with the edges in lex order, the lex-least slack edge at
+// a vertex is simply the first slack one in inc[v], so e is lex-minimal
+// among the slack edges touching it exactly when it is first at both ends.
+// minSlackEdge[] is rebuilt only after an advance has moved a price, and a
+// rebuild consults each vertex's own incident edges only, so it is O(m)
+// rather than O(n^2).
 
 import java.util.*;
 
 public class LLPWeightedVertexCover {
   int n;
-  int[][] adj;
+  int[] eu;
+  int[] ev;
   double[] w;
   int nv;
-  double[][] G;
+  int m;
+  double[] G;
   double[] price;
-  int[] minSlack;
+  int[] minSlackEdge;
+  int[] edeg;
+  int[] efill;
+  int[][] inc;
   boolean fresh;
-  int u;
-  int v;
+  int e;
 
-  private boolean _forbidden0(int u, int v) {
-    if (!((u < v))) return false;
-    if (!(slackMin(u, v))) return false;
+  private boolean _forbidden0(int e) {
+    if (!(slackMin(e))) return false;
     return true;
   }
 
   private void _advance0() {
-    double step = Math.min((w[u] - price[u]), (w[v] - price[v]));
-    G[u][v] = (G[u][v] + step);
-    G[v][u] = G[u][v];
-    price[u] = (price[u] + step);
-    price[v] = (price[v] + step);
+    double step = Math.min((w[eu[e]] - price[eu[e]]), (w[ev[e]] - price[ev[e]]));
+    G[e] = (G[e] + step);
+    price[eu[e]] = (price[eu[e]] + step);
+    price[ev[e]] = (price[ev[e]] + step);
     fresh = false;
   }
 
-  public boolean[] LLPWeightedVertexCover(int[][] adj, double[] w) {
-    this.adj = adj;
+  public boolean[] LLPWeightedVertexCover(int[] eu, int[] ev, double[] w) {
+    this.eu = eu;
+    this.ev = ev;
     this.w = w;
-    this.n = w.length;
+    this.n = eu.length;
     this.nv = w.length;
-    this.G = new double[nv][nv];
+    this.m = eu.length;
+    this.G = new double[m];
     this.price = new double[nv];
-    this.minSlack = new int[nv];
+    this.minSlackEdge = new int[nv];
+    this.edeg = new int[nv];
+    this.efill = new int[nv];
+    this.inc = new int[nv][];
     this.fresh = false;
+    for (int e = 0; e < m; e++) {
+      {
+        edeg[eu[e]] = (edeg[eu[e]] + 1);
+        edeg[ev[e]] = (edeg[ev[e]] + 1);
+      }
+    }
+    for (int v = 0; v < nv; v++) {
+      inc[v] = new int[edeg[v]];
+    }
+    for (int e = 0; e < m; e++) {
+      {
+        inc[eu[e]][efill[eu[e]]] = e;
+        efill[eu[e]] = (efill[eu[e]] + 1);
+        inc[ev[e]][efill[ev[e]]] = e;
+        efill[ev[e]] = (efill[ev[e]] + 1);
+      }
+    }
     {
       boolean changed = true;
       while (changed) {
         changed = false;
-        for (int u = 0; u < n; u++) {
-          for (int v = 0; v < n; v++) {
-            if (_forbidden0(u, v)) {
-              this.u = u; this.v = v; _advance0();
-              changed = true;
-            }
+        for (int e = 0; e < n; e++) {
+          if (_forbidden0(e)) {
+            this.e = e; _advance0();
+            changed = true;
           }
         }
       }
@@ -80,42 +113,44 @@ public class LLPWeightedVertexCover {
     return (price[v] >= w[v]);
   }
 
+  public boolean slack(int e) {
+    return ((!tight(eu[e])) && (!tight(ev[e])));
+  }
+
   public void refresh() {
     if ((!fresh)) {
-      for (int u = 0; u < nv; u++) {
-        minSlack[u] = firstSlackNbr(u);
+      for (int v = 0; v < nv; v++) {
+        minSlackEdge[v] = firstSlackEdge(v);
       }
       fresh = true;
     }
   }
 
-  public int firstSlackNbr(int u) {
-    int y = 0;
-    while ((y < nv)) {
-      if (((adj[u][y] == 1) && (!tight(y)))) {
-        return y;
+  public int firstSlackEdge(int v) {
+    int k = 0;
+    while ((k < inc[v].length)) {
+      if (slack(inc[v][k])) {
+        return inc[v][k];
       }
-      y = (y + 1);
+      k = (k + 1);
     }
     return (0 - 1);
   }
 
-  public boolean slackMin(int u, int v) {
-    if ((adj[u][v] != 1)) {
-      return false;
-    }
+  public boolean slackMin(int e) {
     refresh();
-    if ((tight(u) || tight(v))) {
+    if ((!slack(e))) {
       return false;
     }
-    return ((minSlack[u] == v) && (minSlack[v] == u));
+    return ((minSlackEdge[eu[e]] == e) && (minSlackEdge[ev[e]] == e));
   }
 
   public static void main(String[] args) {
-    int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
-    double[] w = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    int[] eu = new int[] {0, 0, 1, 2};
+    int[] ev = new int[] {0, 0, 1, 1};
+    double[] w = new double[] {1.0, 2.0, 3.0, 4.0};
     LLPWeightedVertexCover prog = new LLPWeightedVertexCover();
-    boolean[] result = prog.LLPWeightedVertexCover(adj, w);
+    boolean[] result = prog.LLPWeightedVertexCover(eu, ev, w);
     System.out.println(Arrays.toString(result));
   }
 }

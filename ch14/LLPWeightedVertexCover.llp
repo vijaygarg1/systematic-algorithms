@@ -1,36 +1,61 @@
 // LLP-WeightedVertexCover: primal-dual 2-approximation for weighted
 // vertex cover, matching bxx-approximate.tex Algorithm
-// LLP-WeightedVertexCover (fig:llp-wvc). G[u][v] is the price on edge
-// {u,v}; a vertex v is tight when its incident prices saturate w[v]; an
-// edge is slack when neither endpoint is tight; slackMin(u,v) further
-// requires {u,v} to be lex-minimal among every slack edge sharing an
+// LLP-WeightedVertexCover (fig:llp-wvc). The lattice is indexed by EDGES,
+// as the book's "G: array[E] of real" and "Forbidden(e)" say: G[e] is the
+// price on edge e. A vertex v is tight when its incident prices saturate
+// w[v]; an edge is slack when neither endpoint is tight; slackMin(e)
+// further requires e to be lex-minimal among every slack edge sharing an
 // endpoint with it. Advancing raises the edge's price by the smaller of
 // its two endpoints' remaining budgets, tightening at least one.
+//
+// The graph arrives as an edge list -- eu[e], ev[e] are the endpoints of
+// edge e, with the edges in lex order -- which is the book's
+// "E: set of edges". inc[v] lists the edges incident to v, built once from
+// that list in O(n + m). No n x n structure appears anywhere: the earlier
+// version indexed both the lattice (G[u][v]) and the graph (adj[u][v]) by
+// vertex PAIRS, which cost Theta(n^2) in memory and, because the forbidden
+// clause ranged over pairs, made the rescan enumerate all n^2 of them in
+// every sweep however few edges the graph had. Indexing by edge makes a
+// sweep O(m).
 //
 // Two things keep the predicate cheap. First, price[] is maintained by the
 // advance instead of being re-summed on every call, so tight() is O(1)
 // rather than an O(nv) sum. Second, the lex-minimality test does not scan
-// all edge pairs: the lex-least slack edge at a vertex u is always
-// {u, minSlack[u]} where minSlack[u] is u's smallest non-tight neighbour
-// (a neighbour y < u contributes the key (y,u) and y > u the key (u,y), so
-// the smallest index wins either way), hence {u,v} is lex-minimal among the
-// slack edges touching it exactly when it is the lex-least at both ends.
-// minSlack[] is rebuilt only after an advance has moved a price.
+// all edge pairs: with the edges in lex order, the lex-least slack edge at
+// a vertex is simply the first slack one in inc[v], so e is lex-minimal
+// among the slack edges touching it exactly when it is first at both ends.
+// minSlackEdge[] is rebuilt only after an advance has moved a price, and a
+// rebuild consults each vertex's own incident edges only, so it is O(m)
+// rather than O(n^2).
 
 class LLPWeightedVertexCover {
-  boolean[] LLPWeightedVertexCover(int[][] adj, double[] w) {
+  boolean[] LLPWeightedVertexCover(int[] eu, int[] ev, double[] w) {
     int nv = w.length;
-    double[][] G = new double[nv][nv];
+    int m = eu.length;
+    double[] G = new double[m];
     double[] price = new double[nv];
-    int[] minSlack = new int[nv];
+    int[] minSlackEdge = new int[nv];
+    int[] edeg = new int[nv];
+    int[] efill = new int[nv];
+    int[][] inc = new int[nv][];
     boolean fresh = false;
-    forbidden (u, v) : u < v && slackMin(u, v) =>
+    forall e in [0..m-1] : {
+      edeg[eu[e]] = edeg[eu[e]] + 1;
+      edeg[ev[e]] = edeg[ev[e]] + 1;
+    };
+    forall v in [0..nv-1] : inc[v] = new int[edeg[v]];
+    forall e in [0..m-1] : {
+      inc[eu[e]][efill[eu[e]]] = e;
+      efill[eu[e]] = efill[eu[e]] + 1;
+      inc[ev[e]][efill[ev[e]]] = e;
+      efill[ev[e]] = efill[ev[e]] + 1;
+    };
+    forbidden (e) : slackMin(e) =>
       advance : {
-        double step = min(w[u] - price[u], w[v] - price[v]);
-        G[u][v] = G[u][v] + step;
-        G[v][u] = G[u][v];
-        price[u] = price[u] + step;
-        price[v] = price[v] + step;
+        double step = min(w[eu[e]] - price[eu[e]], w[ev[e]] - price[ev[e]]);
+        G[e] = G[e] + step;
+        price[eu[e]] = price[eu[e]] + step;
+        price[ev[e]] = price[ev[e]] + step;
         fresh = false;
       };
     boolean[] C = new boolean[nv];
@@ -42,28 +67,37 @@ class LLPWeightedVertexCover {
     return price[v] >= w[v];
   }
 
-  // Rebuild the per-vertex lex-least slack neighbour when a price has moved.
+  // Neither endpoint of e is tight, so e's price can still be raised.
+  boolean slack(int e) {
+    return !tight(eu[e]) && !tight(ev[e]);
+  }
+
+  // Rebuild each vertex's lex-least slack incident edge when a price has
+  // moved. Each vertex consults only its own incident edges, so the whole
+  // rebuild is O(m).
   void refresh() {
     if (!fresh) {
-      forall u in [0..nv-1] : minSlack[u] = firstSlackNbr(u);
+      forall v in [0..nv-1] : minSlackEdge[v] = firstSlackEdge(v);
       fresh = true;
     }
   }
 
-  // u's smallest non-tight neighbour, or -1 when it has none.
-  int firstSlackNbr(int u) {
-    int y = 0;
-    while (y < nv) {
-      if (adj[u][y] == 1 && !tight(y)) { return y; };
-      y = y + 1;
+  // The first slack edge in inc[v], or -1 when v has none. Because the
+  // edges are in lex order, "first" is the same as "lex-least".
+  int firstSlackEdge(int v) {
+    int k = 0;
+    while (k < inc[v].length) {
+      if (slack(inc[v][k])) { return inc[v][k]; };
+      k = k + 1;
     };
     return 0 - 1;
   }
 
-  boolean slackMin(int u, int v) {
-    if (adj[u][v] != 1) { return false; };
+  // e is slack and lex-minimal among the slack edges sharing an endpoint
+  // with it -- which holds exactly when it is the lex-least at both ends.
+  boolean slackMin(int e) {
     refresh();
-    if (tight(u) || tight(v)) { return false; };
-    return minSlack[u] == v && minSlack[v] == u;
+    if (!slack(e)) { return false; };
+    return minSlackEdge[eu[e]] == e && minSlackEdge[ev[e]] == e;
   }
 }

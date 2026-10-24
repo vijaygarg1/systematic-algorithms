@@ -1,33 +1,49 @@
-"""LLP driver for the least mincut satisfying a lattice-linear side predicate."""
+"""LLP driver for the least mincut satisfying a lattice-linear side predicate.
 
-def llp_mincut(C, Bcheck, forbidden_for_B, next_mincut):
-    while True:
-        # Inner: drive every B-forbidden j to True.
-        changed = True
-        while changed:
-            changed = False
-            for j in range(len(C)):
-                if forbidden_for_B(j, C):
-                    if C[j]:
-                        return None       # already True ↔ no extension exists
-                    C[j] = True
-                    changed = True
-        # Now C is closed under B; jump to the least mincut >= C.
-        if Bcheck(C):
-            return C
-        nxt = next_mincut(C)
-        if nxt is None:
-            return None
-        C = nxt
+Auto-generated from LLPMincut.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    # Trivial concrete demo: B = "always true", next_mincut = identity.
-    n = 4
-    C = [True, False, False, False]   # s = 0 in S; t = 3 not in S
-    print("result:", llp_mincut(
-        list(C),
-        Bcheck=lambda c: True,
-        forbidden_for_B=lambda j, c: False,
-        next_mincut=lambda c: c,
-    ))
+class LLPMincut:
+    def LLPMincut(self, G):
+        self.G = G
+        self.n = len(self.G)
+        self.done = False
+        while (not self.done):
+            changed = True
+            while changed:
+                changed = False
+                j = 0
+                while (j < self.n):
+                    if self.forbiddenForB(j, self.G):
+                        if self.G[j]:
+                            return None
+                        self.G[j] = True
+                        changed = True
+                    j = (j + 1)
+            if self.Bcheck(self.G):
+                self.done = True
+            else:
+                next_ = self.nextMincut(self.G)
+                if (next_ == None):
+                    return None
+                self.G = next_
+        return self.G
+
+    def Bcheck(self, G):
+        return True
+
+    def forbiddenForB(self, j, G):
+        return False
+
+    def nextMincut(self, G):
+        return G
+
+
+if __name__ == '__main__':
+    G = [False, False, False, False, False, False, False, False]
+    prog = LLPMincut()
+    result = prog.LLPMincut(G)
+    print(result)
+

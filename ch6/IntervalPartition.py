@@ -1,29 +1,44 @@
-"""Interval partition: for each interval (sorted by start time), reuse the
-earliest-free room via a min-heap of (finishTime, roomNumber) pairs --
-extract-min when its finish time is <= the current start time, else open
-a new room. Rooms used = max overlap depth."""
+"""IntervalPartition (bxx-greedy.tex, algo:interval-partition): for each
+interval i (sorted by start time), reuse the earliest-free room via a
+min-priority-queue Q of (finishTime, roomNumber) pairs -- extract-min
+when Q is non-empty and its minimum finish time is <= s[i], else open
+a new room -- matching the book's binary-heap algorithm exactly, not
+a linear scan over existing rooms each iteration. Uses the heap<int>
+builtin (-> java.util.PriorityQueue<int[]>, lexicographically ordered
+by (finish, room) so ties reuse the lowest-numbered free room) instead
+of hand-rolled heapPush/heapPop/heapify/greater.
 
+Auto-generated from IntervalPartition.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 import heapq
 
 
-def partition(s, f):
-    n = len(s)
-    G = [0] * n
-    heap = []  # (finishTime, roomNumber), min-heap
-    num_rooms = 0
-    for j in range(n):
-        if heap and heap[0][0] <= s[j]:
-            _, r = heapq.heappop(heap)
-        else:
-            r = num_rooms
-            num_rooms += 1
-        G[j] = r + 1
-        heapq.heappush(heap, (f[j], r))
-    return G
+class IntervalPartition:
+    def partition(self, s, f):
+        self.s = s
+        self.f = f
+        self.n = len(self.s)
+        self.G = [0] * (self.n)
+        self.Q = []
+        self.numRooms = 0
+        for j in range(0, ((self.n - 1)) + 1):
+            r = (0 - 1)
+            if ((not (not self.Q)) and (self.Q[0][0] <= self.s[j])):
+                r = self.Q[0][1]
+                heapq.heappop(self.Q)
+            else:
+                r = self.numRooms
+                self.numRooms = (self.numRooms + 1)
+            self.G[j] = (r + 1)
+            heapq.heappush(self.Q, (self.f[j], r))
+        return self.G
 
 
-if __name__ == "__main__":
-    # Five courses sorted by start time.
-    s = [0, 1, 2, 3, 4]
-    f = [3, 4, 5, 6, 7]
-    print(partition(s, f))
+if __name__ == '__main__':
+    s = [0, 0, 1, 2]
+    f = [0, 0, 1, 1]
+    prog = IntervalPartition()
+    result = prog.partition(s, f)
+    print(result)
+

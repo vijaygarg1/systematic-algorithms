@@ -1,13 +1,24 @@
-"""Return the largest element of A."""
+"""Return the largest element of A.
 
-def max_element(A):
-    best = A[0]
-    for x in A[1:]:
-        if x > best:
-            best = x
-    return best
+Auto-generated from MaxElement.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    A = [4, 2, 7, 1, 9, 3, 8]
-    print(f"max({A}) = {max_element(A)}")
+class MaxElement:
+    def MaxElement(self, A):
+        self.A = A
+        self.n = len(self.A)
+        max_ = self.A[0]
+        for i in range(1, ((len(self.A) - 1)) + 1):
+            if (self.A[i] > max_):
+                max_ = self.A[i]
+        return max_
+
+
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = MaxElement()
+    result = prog.MaxElement(A)
+    print(result)
+

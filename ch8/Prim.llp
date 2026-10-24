@@ -7,10 +7,24 @@
 // only ever holds vertices whose d has become finite, the book's "if
 // d[v] = infinity, return null" (no spanning tree) becomes "if the heap
 // empties before every vertex is fixed, return null" here.
+//
+// The graph is a weighted adjacency list: adj[v] holds the neighbours of
+// v and the parallel aw[v] holds their edge weights, so the weight of
+// (v, adj[v][t]) is aw[v][t]. There is no n x n matrix anywhere, which is
+// what the book's \KwIn now asks for -- the whole structure is O(n + m).
+//
+// The relaxation loop walks adj[v], which is the book's
+// "forall v': not fixed[v'] and (v,v') in E". With the heap supplying the
+// minimum this is the O(m log n) variant of the chapter's summary table,
+// not the O(n^2) array-scan variant of the surrounding text
+// (bxx-mst.tex:1009) -- that one finds the minimum by scanning d[] rather
+// than with a heap. Scanning all n vertices and reading weights from a
+// dense matrix would cost Theta(n^2) however few edges the graph has, and
+// so could not meet O(m log n) on a sparse graph.
 
 class Prim {
-  int[] mst(int[][] w) {
-    int n = w.length;
+  int[] mst(int[][] adj, int[][] aw) {
+    int n = adj.length;
     int[] d = new int[n];
     int[] parent = new int[n];
     boolean[] fixed = new boolean[n];
@@ -28,12 +42,15 @@ class Prim {
       if (!fixed[v]) {
         fixed[v] = true;
         count = count + 1;
-        forall k in [0..n-1] : {
-          if (!fixed[k] && w[v][k] != infinity && w[v][k] < d[k]) {
-            d[k] = w[v][k];
+        int t = 0;
+        while (t < adj[v].length) {
+          int k = adj[v][t];
+          if (!fixed[k] && aw[v][t] < d[k]) {
+            d[k] = aw[v][t];
             parent[k] = v;
             H.push(d[k], k);
           };
+          t = t + 1;
         }
       }
     };

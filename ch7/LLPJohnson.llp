@@ -1,14 +1,46 @@
 // LLP form of Johnson reweighting: raise prices G[j] until every reduced edge weight is non-negative.
+//
+// The graph is a weighted adjacency list of PREDECESSORS: pre[j] holds the
+// tails of the edges into j and the parallel pw[j] their weights, so the
+// weight of (pre[j][t], j) is pw[j][t]. No n x n matrix is involved, so the
+// whole instance is O(n + m). The matrix form cost Theta(n^2) to hold and
+// read, which put a floor under any bound expressed in m.
+//
+// The book states O(mn) for this program (bxx-sp-llp-johnson.tex:38: "Each
+// LLP iteration can be computed in O(m) time, so the graph is reweighted in
+// O(mn) time"). The O(nm log n) of the chapter summary table is for the
+// COMBINED all-pairs method -- this reweighting followed by Dijkstra from
+// every source -- which this program does not do; its output is the price
+// vector, as the algorithm box's KwOut says.
 
 class LLPJohnson {
-  int[] LLPJohnson(set<int>[] pre, int[][] w) {
+  int[] LLPJohnson(int[][] pre, int[][] pw) {
     int[] G = 0;
-    forbidden (j) :
-      exists i in pre[j] : G[j] < G[i] - w[i][j]
-    =>
+    forbidden (j) : reducedNegative(j) =>
       advance :
-        forall k in [0..n-1] :
-          G[k] = max(G[k], max i in pre[k] : G[i] - w[i][k]);
+        forall k in [0..n-1] : G[k] = raised(k);
     return G;
+  }
+
+  // Some edge into j is still negative under the current prices.
+  boolean reducedNegative(int j) {
+    int t = 0;
+    while (t < pre[j].length) {
+      if (G[j] < G[pre[j][t]] - pw[j][t]) { return true; };
+      t = t + 1;
+    };
+    return false;
+  }
+
+  // G[k] raised to the largest price any edge into k demands.
+  int raised(int k) {
+    int best = G[k];
+    int t = 0;
+    while (t < pre[k].length) {
+      int cand = G[pre[k][t]] - pw[k][t];
+      if (cand > best) { best = cand; };
+      t = t + 1;
+    };
+    return best;
   }
 }

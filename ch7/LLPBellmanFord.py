@@ -1,42 +1,27 @@
-"""LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation."""
+"""LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation.
+The advance leaves G[0] alone -- the source distance is pinned at 0 -- and
+recomputes every other G[k] from its predecessors, as in the book's box.
 
-import math
-
-
-def forbidden(j, G, pre, w):
-    return any(G[i] != math.inf and G[i] + w[i][j] < G[j] for i in pre[j])
-
-
-def advance(G, pre, w, n):
-    new_G = list(G)
-    for k in range(1, n):
-        for i in pre[k]:
-            if G[i] != math.inf and G[i] + w[i][k] < new_G[k]:
-                new_G[k] = G[i] + w[i][k]
-    for k in range(1, n):
-        G[k] = new_G[k]
+Auto-generated from LLPBellmanFord.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-def llp_bellman_ford(pre, w, n):
-    G = [math.inf] * n
-    G[0] = 0
-    changed = True
-    while changed:
-        changed = False
-        for j in range(n):
-            if forbidden(j, G, pre, w):
-                advance(G, pre, w, n)
-                changed = True
-                break
-    return G
+class LLPBellmanFord:
+    def LLPBellmanFord(self, pre, w):
+        self.pre = pre
+        self.w = w
+        self.n = len(self.pre)
+        self.G = [float('inf')] * (self.n)
+        self.G[0] = 0
+        _changed = True
+        while _changed:
+            _changed = False
+            for j in range(0, (self.n - 1) + 1):
+                if any((self.G[j] > (self.G[i] + self.w[i][j])) for i in self.pre[j]):
+                    for k in range(1, ((self.n - 1)) + 1):
+                        self.G[k] = min(((self.G[i] + self.w[i][k]) for i in self.pre[k]), default=float('inf'))
+                    _changed = True
+        return self.G
 
 
-if __name__ == "__main__":
-    n = 4
-    # 0 -> 1 (1), 0 -> 2 (4), 1 -> 2 (-3), 2 -> 3 (1)
-    pre = [[], [0], [0, 1], [2]]
-    w = [[0, 1, 4, math.inf],
-         [math.inf, 0, -3, math.inf],
-         [math.inf, math.inf, 0, 1],
-         [math.inf, math.inf, math.inf, 0]]
-    print("G =", llp_bellman_ford(pre, w, n))

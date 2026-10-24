@@ -9,9 +9,12 @@
 // R side -- the only direction the book's "partner[w]" needs, since w is
 // always an R-vertex at that point in the algorithm) derived from it.
 
-fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
+// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
+// L-vertex j, and nr is |R|. Following "every (w,v) in E \ M" over a dense
+// matrix would scan all of R for every dequeued L-vertex.
+fn vertex_cover_from_matching(adj: &[Vec<usize>], nr: usize, match_l: &[i32]) -> Vec<bool> {
     let l = adj.len();
-    let r = adj[0].len();
+    let r = nr;
     let mut match_r = vec![-1i32; r];
     for j in 0..l {
         if match_l[j] != -1 {
@@ -35,8 +38,8 @@ fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
         head += 1;
         if w < l {
             // w in L: follow every (w, v) in E \ M with v not in Z.
-            for v in 0..r {
-                if adj[w][v] == 1 && match_l[w] != v as i32 && !in_z[l + v] {
+            for &v in &adj[w] {
+                if match_l[w] != v as i32 && !in_z[l + v] {
                     in_z[l + v] = true;
                     q.push(l + v);
                 }
@@ -63,13 +66,9 @@ fn vertex_cover_from_matching(adj: &[Vec<i32>], match_l: &[i32]) -> Vec<bool> {
 }
 
 fn main() {
-    let adj = vec![
-        vec![1, 1, 0],
-        vec![1, 0, 1],
-        vec![0, 1, 1],
-    ];
+    let adj: Vec<Vec<usize>> = vec![vec![0, 1], vec![0, 2], vec![1, 2]];
     let match_l = [0i32, 2, 1];
-    let c = vertex_cover_from_matching(&adj, &match_l);
+    let c = vertex_cover_from_matching(&adj, 3, &match_l);
     print!("cover bits:");
     for b in &c { print!(" {}", if *b { 1 } else { 0 }); }
     println!();

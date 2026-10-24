@@ -13,31 +13,43 @@
 // maintained by the advance, so coverage is read in O(1) instead of being
 // recomputed -- it used to cost an O(m) scan per element, inside an O(u)
 // scan per set, inside an O(m) scan over neighbours.
+//
+// The instance is a pair of incidence lists: mem[s] holds the elements of
+// set s and inc[e] holds the sets containing element e. Neither is an
+// m x u matrix, so the whole instance is O(N) -- N being the number of
+// (set, element) incidences -- rather than Theta(m*u). Every pass below
+// walks one of these lists, so each costs O(N) and not O(m*u).
+//
+// That matters most for best[], which is rebuilt after every advance, and
+// there are as many advances as sets picked: rebuilding it by scanning a
+// whole matrix each time made the algorithm O(m*u) per advance, a full
+// factor of n more than the chapter's O(N*min(m,n)) bound.
 
 class LLPLexGreedySetCover {
-  boolean[] LLPLexGreedySetCover(int[][] S) {
-    int m = S.length;
-    int u = S[0].length;
+  boolean[] LLPLexGreedySetCover(int[][] mem, int[][] inc) {
+    int m = mem.length;
+    int u = inc.length;
     boolean[] G = false;
     boolean[] covered = new boolean[u];
     int[] cnt = new int[m];
     int[] best = new int[u];
     boolean fresh = false;
-    forall s in [0..m-1] : cnt[s] = count e in [0..u-1] : S[s][e] == 1;
+    forall s in [0..m-1] : cnt[s] = mem[s].length;
     forbidden (j) : isLexMaxCov(j) =>
       advance : {
         G[j] = true;
-        int e = 0;
-        while (e < u) {
-          if (S[j][e] == 1 && !covered[e]) {
+        int k = 0;
+        while (k < mem[j].length) {
+          int e = mem[j][k];
+          if (!covered[e]) {
             covered[e] = true;
             int t = 0;
-            while (t < m) {
-              if (S[t][e] == 1) { cnt[t] = cnt[t] - 1; };
+            while (t < inc[e].length) {
+              cnt[inc[e][t]] = cnt[inc[e][t]] - 1;
               t = t + 1;
             };
           };
-          e = e + 1;
+          k = k + 1;
         };
         fresh = false;
       };
@@ -50,15 +62,17 @@ class LLPLexGreedySetCover {
     if (G[j]) { return false; };
     refresh();
     if (cnt[j] <= 0) { return false; };
-    int e = 0;
-    while (e < u) {
-      if (S[j][e] == 1 && !covered[e] && best[e] != j) { return false; };
-      e = e + 1;
+    int k = 0;
+    while (k < mem[j].length) {
+      int e = mem[j][k];
+      if (!covered[e] && best[e] != j) { return false; };
+      k = k + 1;
     };
     return true;
   }
 
-  // Rebuild best[] after an advance has covered elements.
+  // Rebuild best[] after an advance has covered elements. Each element
+  // consults only the sets that contain it, so the whole rebuild is O(N).
   void refresh() {
     if (!fresh) {
       forall e in [0..u-1] : best[e] = bestAt(e);
@@ -70,12 +84,13 @@ class LLPLexGreedySetCover {
   // on ties; -1 when no unpicked set contains e.
   int bestAt(int e) {
     int win = 0 - 1;
-    int s = 0;
-    while (s < m) {
-      if (S[s][e] == 1 && !G[s]) {
+    int k = 0;
+    while (k < inc[e].length) {
+      int s = inc[e][k];
+      if (!G[s]) {
         if (win < 0) { win = s; } else { if (cnt[s] > cnt[win]) { win = s; } };
       };
-      s = s + 1;
+      k = k + 1;
     };
     return win;
   }

@@ -1,13 +1,23 @@
-"""Move n disks from source to target through aux (Towers of Hanoi)."""
+"""Move n disks from source to target through aux (Towers of Hanoi).
 
-def hanoi(n, source, aux, target):
-    if n == 1:
-        print(f"move disk 1 from {source} to {target}")
-    else:
-        hanoi(n - 1, source, target, aux)
-        print(f"move disk {n} from {source} to {target}")
-        hanoi(n - 1, aux, source, target)
+Auto-generated from Hanoi.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    hanoi(3, "A", "B", "C")
+class Hanoi:
+    def Hanoi(self, n, source, aux, target):
+        if (n == 1):
+            pass
+        else:
+            self.Hanoi((n - 1), source, target, aux)
+            self.Hanoi((n - 1), aux, source, target)
+
+
+if __name__ == '__main__':
+    n = 3
+    aux = 0
+    target = 0
+    prog = Hanoi()
+    prog.Hanoi(n, 0, aux, target)
+

@@ -1,17 +1,27 @@
-"""Classical O(n²) LIS DP."""
+"""Classical O(n²) LIS DP.
 
-def solve(A):
-    n = len(A)
-    dp = [1] * n
-    for i in range(1, n):
-        for j in range(i):
-            if A[j] < A[i] and dp[j] + 1 > dp[i]:
-                dp[i] = dp[j] + 1
-    return dp
+Auto-generated from LIS.llp by lang/llcpy.py.
+Do not edit by hand; edit the .llp source and rerun the build.
+"""
 
 
-if __name__ == "__main__":
-    A = [3, 10, 2, 1, 20, 4]
-    dp = solve(A)
-    print(f"A = {A}")
-    print(f"dp = {dp}, LIS length = {max(dp)}")
+class LIS:
+    def solve(self, A):
+        self.A = A
+        self.n = len(self.A)
+        self.dp = [0] * (self.n)
+        for i in range(0, ((self.n - 1)) + 1):
+            self.dp[i] = 1
+        for i in range(1, ((self.n - 1)) + 1):
+            for j in range(0, ((i - 1)) + 1):
+                if (self.A[j] < self.A[i]):
+                    self.dp[i] = max(self.dp[i], (self.dp[j] + 1))
+        return self.dp
+
+
+if __name__ == '__main__':
+    A = [3, 1, 6, 1, 6, 3, 6, 4]
+    prog = LIS()
+    result = prog.solve(A)
+    print(result)
+

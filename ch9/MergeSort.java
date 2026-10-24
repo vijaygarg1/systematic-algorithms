@@ -16,30 +16,30 @@ public class MergeSort {
   }
 
   public void Merge(int lo, int mid, int hi, int[] G) {
-    int[] B = new int[G.length];
+    int[] B = new int[((hi - lo) + 1)];
     for (int k = lo; k <= hi; k++) {
-      B[k] = G[k];
+      B[(k - lo)] = G[k];
     }
     int i = lo;
     int j = (mid + 1);
     int k = lo;
     while (((i <= mid) && (j <= hi))) {
-      if ((B[i] <= B[j])) {
-        G[k] = B[i];
+      if ((B[(i - lo)] <= B[(j - lo)])) {
+        G[k] = B[(i - lo)];
         i = (i + 1);
       } else {
-        G[k] = B[j];
+        G[k] = B[(j - lo)];
         j = (j + 1);
       }
       k = (k + 1);
     }
     while ((i <= mid)) {
-      G[k] = B[i];
+      G[k] = B[(i - lo)];
       i = (i + 1);
       k = (k + 1);
     }
     while ((j <= hi)) {
-      G[k] = B[j];
+      G[k] = B[(j - lo)];
       j = (j + 1);
       k = (k + 1);
     }

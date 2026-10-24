@@ -13,12 +13,24 @@
 // maintained by the advance, so coverage is read in O(1) instead of being
 // recomputed -- it used to cost an O(m) scan per element, inside an O(u)
 // scan per set, inside an O(m) scan over neighbours.
+//
+// The instance is a pair of incidence lists: mem[s] holds the elements of
+// set s and inc[e] holds the sets containing element e. Neither is an
+// m x u matrix, so the whole instance is O(N) -- N being the number of
+// (set, element) incidences -- rather than Theta(m*u). Every pass below
+// walks one of these lists, so each costs O(N) and not O(m*u).
+//
+// That matters most for best[], which is rebuilt after every advance, and
+// there are as many advances as sets picked: rebuilding it by scanning a
+// whole matrix each time made the algorithm O(m*u) per advance, a full
+// factor of n more than the chapter's O(N*min(m,n)) bound.
 
 import java.util.*;
 
 public class LLPLexGreedySetCover {
   int n;
-  int[][] S;
+  int[][] mem;
+  int[][] inc;
   int m;
   int u;
   boolean[] G;
@@ -35,39 +47,35 @@ public class LLPLexGreedySetCover {
 
   private void _advance0() {
     G[j] = true;
-    int e = 0;
-    while ((e < u)) {
-      if (((S[j][e] == 1) && (!covered[e]))) {
+    int k = 0;
+    while ((k < mem[j].length)) {
+      int e = mem[j][k];
+      if ((!covered[e])) {
         covered[e] = true;
         int t = 0;
-        while ((t < m)) {
-          if ((S[t][e] == 1)) {
-            cnt[t] = (cnt[t] - 1);
-          }
+        while ((t < inc[e].length)) {
+          cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
           t = (t + 1);
         }
       }
-      e = (e + 1);
+      k = (k + 1);
     }
     fresh = false;
   }
 
-  public boolean[] LLPLexGreedySetCover(int[][] S) {
-    this.S = S;
-    this.n = S.length;
-    this.m = S.length;
-    this.u = S[0].length;
+  public boolean[] LLPLexGreedySetCover(int[][] mem, int[][] inc) {
+    this.mem = mem;
+    this.inc = inc;
+    this.n = mem.length;
+    this.m = mem.length;
+    this.u = inc.length;
     this.G = new boolean[n];
     this.covered = new boolean[u];
     this.cnt = new int[m];
     this.best = new int[u];
     this.fresh = false;
     for (int s = 0; s < m; s++) {
-      int t1 = 0;
-      for (int e = 0; e < u; e++) {
-        if ((S[s][e] == 1)) t1++;
-      }
-      cnt[s] = t1;
+      cnt[s] = mem[s].length;
     }
     {
       boolean changed = true;
@@ -92,12 +100,13 @@ public class LLPLexGreedySetCover {
     if ((cnt[j] <= 0)) {
       return false;
     }
-    int e = 0;
-    while ((e < u)) {
-      if ((((S[j][e] == 1) && (!covered[e])) && (best[e] != j))) {
+    int k = 0;
+    while ((k < mem[j].length)) {
+      int e = mem[j][k];
+      if (((!covered[e]) && (best[e] != j))) {
         return false;
       }
-      e = (e + 1);
+      k = (k + 1);
     }
     return true;
   }
@@ -113,9 +122,10 @@ public class LLPLexGreedySetCover {
 
   public int bestAt(int e) {
     int win = (0 - 1);
-    int s = 0;
-    while ((s < m)) {
-      if (((S[s][e] == 1) && (!G[s]))) {
+    int k = 0;
+    while ((k < inc[e].length)) {
+      int s = inc[e][k];
+      if ((!G[s])) {
         if ((win < 0)) {
           win = s;
         } else {
@@ -124,15 +134,16 @@ public class LLPLexGreedySetCover {
           }
         }
       }
-      s = (s + 1);
+      k = (k + 1);
     }
     return win;
   }
 
   public static void main(String[] args) {
-    int[][] S = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] mem = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] inc = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     LLPLexGreedySetCover prog = new LLPLexGreedySetCover();
-    boolean[] result = prog.LLPLexGreedySetCover(S);
+    boolean[] result = prog.LLPLexGreedySetCover(mem, inc);
     System.out.println(Arrays.toString(result));
   }
 }

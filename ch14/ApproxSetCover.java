@@ -12,22 +12,29 @@
 // set containing it, so the total number of updates over the whole run is
 // one per (set, element) incidence. Recomputing all m counts in each of the
 // up-to min(m,n) rounds costs a factor min(m,n) more.
+//
+// The instance is a pair of incidence lists: mem[s] holds the elements of
+// set s and inc[e] holds the sets containing element e. Neither is an
+// m x u matrix, so the whole instance is O(N) -- N being the number of
+// (set, element) incidences -- rather than Theta(m*u). Every loop below
+// walks one of these lists, so each pass costs O(N) and not O(m*u).
+//
+// Taking them as input rather than building them from a matrix is what
+// makes that real: an m x u matrix had to be read once to build the lists,
+// which is Theta(m*u) on its own and reached a gigabyte at n = 16000.
 
 import java.util.*;
 
 public class ApproxSetCover {
-  public boolean[] ApproxSetCover(int[][] S, int n) {
-    int m = S.length;
+  public boolean[] ApproxSetCover(int[][] mem, int[][] inc) {
+    int m = mem.length;
+    int n = inc.length;
     boolean[] C = new boolean[m];
     boolean[] covered = new boolean[n];
     int[] cnt = new int[m];
     int remaining = n;
     for (int s = 0; s < m; s++) {
-      int t1 = 0;
-      for (int e = 0; e < n; e++) {
-        if ((S[s][e] == 1)) t1++;
-      }
-      cnt[s] = t1;
+      cnt[s] = mem[s].length;
     }
     while ((remaining > 0)) {
       int bestIdx = 0;
@@ -41,30 +48,29 @@ public class ApproxSetCover {
         s = (s + 1);
       }
       C[bestIdx] = true;
-      int e = 0;
-      while ((e < n)) {
-        if (((S[bestIdx][e] == 1) && (!covered[e]))) {
+      int k = 0;
+      while ((k < mem[bestIdx].length)) {
+        int e = mem[bestIdx][k];
+        if ((!covered[e])) {
           covered[e] = true;
           remaining = (remaining - 1);
           int t = 0;
-          while ((t < m)) {
-            if ((S[t][e] == 1)) {
-              cnt[t] = (cnt[t] - 1);
-            }
+          while ((t < inc[e].length)) {
+            cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
             t = (t + 1);
           }
         }
-        e = (e + 1);
+        k = (k + 1);
       }
     }
     return C;
   }
 
   public static void main(String[] args) {
-    int[][] S = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
-    int n = 0;
+    int[][] mem = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
+    int[][] inc = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     ApproxSetCover prog = new ApproxSetCover();
-    boolean[] result = prog.ApproxSetCover(S, n);
+    boolean[] result = prog.ApproxSetCover(mem, inc);
     System.out.println(Arrays.toString(result));
   }
 }

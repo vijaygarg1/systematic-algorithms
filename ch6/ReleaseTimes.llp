@@ -5,7 +5,7 @@
 
 class ReleaseTimes {
   int[] ReleaseTimes(int[] r, int[] G) {
-    ensure (j) : G[j] >= r[j];
+    ensure (j in [0..n-1]) : G[j] >= r[j];
     return G;
   }
 }

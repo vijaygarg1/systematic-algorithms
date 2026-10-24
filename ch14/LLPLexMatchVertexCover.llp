@@ -18,7 +18,7 @@ class LLPLexMatchVertexCover {
     // program silently returned an empty cover for every input.
     int n = adj.length;
     boolean[] G = false;
-    forbidden (j) : isLexMin(j) =>
+    forbidden (j in [0..n-1]) : isLexMin(j) =>
       advance : {
         // Cover BOTH endpoints of the selected edge. Marking only j would
         // leave its partner i uncovered, and i's own test then sees a

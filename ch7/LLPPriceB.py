@@ -16,7 +16,7 @@ class LLPPriceB:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if any((self.G[j] < (self.G[i] - self.w[i][j])) for i in self.pre[j]):
                     self.G[j] = self.maxPricePred(j, self.pre, self.w, self.G)
                     _changed = True

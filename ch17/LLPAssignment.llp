@@ -19,7 +19,7 @@ class LLPAssignment {
     int[] G = new int[n], partner = new int[n];
     boolean[] itemInJ = new boolean[n], bidderInB = new boolean[m];
     boolean fresh = false;
-    forbidden (j) : overdemanded(j) =>
+    forbidden (j in [0..n-1]) : overdemanded(j) =>
       advance : raiseJ();
     return G;
   }

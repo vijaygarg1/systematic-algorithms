@@ -9,7 +9,7 @@
 int[] GCD2(int[] A) {
   int[] G = 0;
   forall k in [0..n-1] : G[k] = 1;
-  forbidden (j) : exists i in [0..n-1] pick i :
+  forbidden (j in [0..n-1]) : exists i in [0..n-1] pick i :
       G[j] * A[i] < A[j] * G[i] =>
     advance : G[j] = (A[j] * G[i] + A[i] - 1) / A[i];
   return G;

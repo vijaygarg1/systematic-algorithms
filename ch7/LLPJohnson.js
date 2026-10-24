@@ -28,7 +28,7 @@ class LLPJohnson {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this.reducedNegative(j)) {
                 for (let k = 0; k <= ((this.n - 1)); k++) {
                     this.G[k] = this.raised(k);

@@ -30,7 +30,7 @@ class LLPIntervalScheduling:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((((j > 0) and (not self.deleted[j])) and (not self.G[j])) and (self.f[self.prevArr[j]] <= self.s[j])):
                     self.G[j] = True
                     _changed = True

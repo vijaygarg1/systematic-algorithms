@@ -64,8 +64,8 @@ class LLPApproxKnapsack:
         _changed = True
         while _changed:
             _changed = False
-            for i in range(0, (self.n - 1) + 1):
-                for p in range(0, (self.n - 1) + 1):
+            for i in range(0, ((self.n - 1)) + 1):
+                for p in range(0, ((self.n - 1)) + 1):
                     if (((((i >= 1) and (i <= self.nf)) and (p >= 1)) and (p <= self.Vp)) and (self.D[i][p] > min(self.D[(i - 1)][p], (self.fw[(i - 1)] + self.D[(i - 1)][max(0, (p - self.vPrime[(i - 1)]))])))):
                         self.D[i][p] = min(self.D[(i - 1)][p], (self.fw[(i - 1)] + self.D[(i - 1)][max(0, (p - self.vPrime[(i - 1)]))]))
                         _changed = True

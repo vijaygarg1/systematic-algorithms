@@ -29,7 +29,7 @@ class LLPFractionalKnapsack:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (self.G[j] < self.target(j)):
                     self.G[j] = self.target(j)
                     _changed = True

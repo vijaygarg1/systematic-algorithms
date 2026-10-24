@@ -47,7 +47,7 @@ class LLPLexGreedySetCover:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self.isLexMaxCov(j):
                     self.G[j] = True
                     k = 0

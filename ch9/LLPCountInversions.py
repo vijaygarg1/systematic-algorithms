@@ -13,7 +13,7 @@ class LLPCountInversions:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not (self.G[j] >= self.countLeft(self.A, j))):
                     self.G[j] = self.countLeft(self.A, j)
                     _changed = True

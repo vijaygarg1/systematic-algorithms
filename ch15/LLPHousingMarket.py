@@ -82,7 +82,7 @@ class LLPHousingMarket:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((not self.inSubmatching(j, self.G, self.pref)) and self.inSubmatching(self.wish(j, self.G, self.pref), self.G, self.pref)):
                     self.G[j] = (self.G[j] + 1)
                     self.fresh = False

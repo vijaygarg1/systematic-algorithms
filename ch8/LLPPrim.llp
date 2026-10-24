@@ -43,7 +43,7 @@ class LLPPrim {
     setContainer(PriorityQueue, key[j], min);
     forall v in [0..n-1] : { key[v] = infinity; parent[v] = 0 - 1; };
     key[root] = 0;
-    forbidden (j) : !fixed[j] && key[j] < infinity =>
+    forbidden (j in [0..n-1]) : !fixed[j] && key[j] < infinity =>
       advance : {
         fixed[j] = true;
         C[j] = key[j];

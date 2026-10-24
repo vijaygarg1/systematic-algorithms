@@ -51,7 +51,7 @@ class MandatoryMST:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (self.M[j] and (not self.G[j])):
                     if (UnionFind().find(self.parent, self.u[j]) == UnionFind().find(self.parent, self.v[j])):
                         return None

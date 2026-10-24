@@ -19,7 +19,7 @@ class LLPConjunctiveDetection {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this.happenedBefore(j, this.G, this.vc)) {
                 if ((this.G[j] >= this.T[j])) {
                     return null;

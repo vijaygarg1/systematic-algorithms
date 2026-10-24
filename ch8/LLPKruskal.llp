@@ -10,7 +10,7 @@ class LLPKruskal {
   boolean[] LLPKruskal(int[] u, int[] v, int[] parent) {
     boolean[] G = false;
     int[] rank = new int[parent.length];
-    forbidden (j) : !G[j] && UnionFind.find(parent, u[j]) != UnionFind.find(parent, v[j])  =>
+    forbidden (j in [0..n-1]) : !G[j] && UnionFind.find(parent, u[j]) != UnionFind.find(parent, v[j])  =>
       advance : {
         G[j] = true;
         UnionFind.union(parent, rank, u[j], v[j]);

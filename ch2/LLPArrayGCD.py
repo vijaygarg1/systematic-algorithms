@@ -13,7 +13,7 @@ class LLPArrayGCD:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self._pick_i(j):
                     if ((self.G[j] % self.G[self.i]) == 0):
                         self.G[j] = self.G[self.i]

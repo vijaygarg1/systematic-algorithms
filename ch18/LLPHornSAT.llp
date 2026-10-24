@@ -61,7 +61,7 @@ class LLPHornSAT {
         byHead[head[c]][hfill[head[c]]] = c;
         hfill[head[c]] = hfill[head[c]] + 1;
       };
-    forbidden (j) : definiteImplied(j) =>
+    forbidden (j in [0..n-1]) : definiteImplied(j) =>
       advance : { G[j] = true; };
     // The goal clauses are checked once, after the least model is reached,
     // rather than inside the fixpoint.  G only grows and allTrue is

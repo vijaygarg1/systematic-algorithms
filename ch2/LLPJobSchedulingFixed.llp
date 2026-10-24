@@ -5,7 +5,7 @@ class LLPJobSchedulingFixed {
     int[] G = new int[n];
     boolean[] fixed = new boolean[n];
     forall k in [0..n-1] : G[k] = t[k];
-    forbidden (j) : !fixed[j] && forall i in pre[j] : fixed[i] =>
+    forbidden (j in [0..n-1]) : !fixed[j] && forall i in pre[j] : fixed[i] =>
       advance : {
         G[j] = max(t[j], max i in pre[j] : G[i] + t[j]);
         fixed[j] = true;

@@ -15,7 +15,7 @@ class LLPJobSchedulingForbidden {
     // topological order over pre, declared acyclic
     let _indeg = new Array(this.n).fill(0);
     let _succ = Array.from({length: this.n}, () => []);
-    for (let _k = 0; _k <= (this.n - 1); _k++) {
+    for (let _k = 0; _k <= ((this.n - 1)); _k++) {
         for (const _i of this.pre[_k]) {
             if (_i >= 0 && _i < this.n) {
                 _indeg[_k] += 1;
@@ -24,7 +24,7 @@ class LLPJobSchedulingForbidden {
         }
     }
     let _q = [];
-    for (let _k = 0; _k <= (this.n - 1); _k++) {
+    for (let _k = 0; _k <= ((this.n - 1)); _k++) {
         if (_indeg[_k] === 0) {
             _q.push(_k);
         }
@@ -46,7 +46,7 @@ class LLPJobSchedulingForbidden {
             }
         }
     }
-    let _total = (this.n - 1) - (0) + 1;
+    let _total = ((this.n - 1)) - (0) + 1;
     if (_seen !== _total) {
         throw new Error("pre has a cycle; setAcyclic promises it does not");
     }

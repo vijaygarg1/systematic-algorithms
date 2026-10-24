@@ -17,7 +17,7 @@ class LLPConjunctiveDetection:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self.happenedBefore(j, self.G, self.vc):
                     if (self.G[j] >= self.T[j]):
                         return None

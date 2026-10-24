@@ -18,7 +18,7 @@ class HopBound:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (self.h[j] > self.k):
                     return None
                     _changed = True

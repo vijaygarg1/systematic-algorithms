@@ -17,7 +17,7 @@ class LLPPriceB {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((() => { for (const i of this.pre[j]) { if ((this.G[j] < (this.G[i] - this.w[i][j]))) return true; } return false; })()) {
                 this.G[j] = this.maxPricePred(j, this.pre, this.w, this.G);
                 _changed = true;

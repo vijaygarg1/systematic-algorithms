@@ -15,7 +15,7 @@ class LLPFractionalKnapsack {
     double[] S = new double[n + 1];
     int i = 0;
     while (i < n) { S[i + 1] = S[i] + w[i]; i = i + 1; };
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       G[j] < target(j)
     =>
       advance : G[j] = target(j);

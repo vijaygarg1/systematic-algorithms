@@ -24,7 +24,7 @@ class LLPLexMatchVertexCover {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this.isLexMin(j)) {
                 let i = this.minNbr(j);
                 this.G[j] = true;

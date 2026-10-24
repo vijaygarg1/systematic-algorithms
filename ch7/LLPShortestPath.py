@@ -19,7 +19,7 @@ class LLPShortestPath:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not self.fixed[j]):
                     self.G[j] = self.minCrossCut(j, self.pre, self.w, self.G, self.fixed)
                     self.fixed[j] = True

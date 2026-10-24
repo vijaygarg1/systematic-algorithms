@@ -29,8 +29,8 @@ class LLPOptimalBinarySearchTree:
         _changed = True
         while _changed:
             _changed = False
-            for i in range(0, (self.n - 1) + 1):
-                for j in range(0, (self.n - 1) + 1):
+            for i in range(0, ((self.n - 1)) + 1):
+                for j in range(0, ((self.n - 1)) + 1):
                     if ((i <= j) and (self.G[i][j] < self.optCost(self.p, self.G, i, j))):
                         self.G[i][j] = self.optCost(self.p, self.G, i, j)
                         _changed = True

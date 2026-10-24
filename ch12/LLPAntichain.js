@@ -16,7 +16,7 @@ class LLPAntichain {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (((this.G[j] < this.len_[j]) && (() => { for (let k = 0; k <= ((this.n - 1)); k++) { if (((k !== j) && this.leq[this.chains[j][this.G[j]]][this.chains[k][this.G[k]]])) return true; } return false; })())) {
                 this.G[j] = (this.G[j] + 1);
                 _changed = true;

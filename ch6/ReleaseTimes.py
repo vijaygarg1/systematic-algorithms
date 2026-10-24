@@ -16,7 +16,7 @@ class ReleaseTimes:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not (self.G[j] >= self.r[j])):
                     self.G[j] = self.r[j]
                     _changed = True

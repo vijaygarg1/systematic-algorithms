@@ -16,7 +16,7 @@ class ParCRT:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self._pick_i(j):
                     self.G[j] = (self.G[j] + (int((((self.G[self.i] - self.G[j]) + self.m[j]) - 1) / self.m[j]) * self.m[j]))
                     _changed = True

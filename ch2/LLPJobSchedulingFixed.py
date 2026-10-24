@@ -15,7 +15,7 @@ class LLPJobSchedulingFixed:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((not self.fixed[j]) and all(self.fixed[i] for i in self.pre[j])):
                     self.G[j] = max(self.t[j], max(((self.G[i] + self.t[j]) for i in self.pre[j]), default=-2147483647))
                     self.fixed[j] = True

@@ -12,7 +12,7 @@ class LLPSortPairwise:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self._pick_k(j):
                     self.A[j], self.A[self.k] = self.A[self.k], self.A[j]
                     _changed = True

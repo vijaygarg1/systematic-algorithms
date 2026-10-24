@@ -29,7 +29,7 @@ class LLPDijkstra {
     boolean[] fixed = false;
     setContainer(PriorityQueue, G[j], min);
     G[0] = 0;
-    forbidden (j) : !fixed[j] && G[j] < infinity =>
+    forbidden (j in [0..n-1]) : !fixed[j] && G[j] < infinity =>
       advance : {
         fixed[j] = true;
         forall k in adj[j] : {

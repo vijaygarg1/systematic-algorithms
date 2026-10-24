@@ -12,7 +12,7 @@
 
 class VertexImplications {
   void VertexImplications(set<int>[] inI, boolean[] G) {
-    forbidden (w) :
+    forbidden (w in [0..n-1]) :
       exists v in inI[w] : G[v] && !G[w]
     =>
       advance : G[w] = true;

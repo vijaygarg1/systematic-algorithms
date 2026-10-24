@@ -31,7 +31,7 @@ class LLPFractionalKnapsack {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((this.G[j] < this.target(j))) {
                 this.G[j] = this.target(j);
                 _changed = true;

@@ -50,7 +50,7 @@ class LLPWeightedVertexCover {
       inc[ev[e]][efill[ev[e]]] = e;
       efill[ev[e]] = efill[ev[e]] + 1;
     };
-    forbidden (e) : slackMin(e) =>
+    forbidden (e in [0..n-1]) : slackMin(e) =>
       advance : {
         double step = min(w[eu[e]] - price[eu[e]], w[ev[e]] - price[ev[e]]);
         G[e] = G[e] + step;

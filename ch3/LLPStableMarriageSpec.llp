@@ -27,7 +27,7 @@ class LLPStableMarriageSpec {
     int[0..n] G = 0;
     forall k in [1..n] : G[k] = I[k];
     always : int z = mpref[j][G[j]];
-    forbidden (j) :
+    forbidden (j in [1..n]) :
       exists i in [1..n] :
         exists k in [1..G[i]] :
           mpref[i][k] == z && rank[z][i] < rank[z][j]

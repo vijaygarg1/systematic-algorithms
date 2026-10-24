@@ -13,7 +13,7 @@ class LLPTraversal:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((not self.G[j]) and any(self.G[i] for i in self.pre[j])):
                     self.G[j] = True
                     _changed = True

@@ -2,7 +2,7 @@
 
 class LLPSortPairwise {
   void LLPSortPairwise(int[] A) {
-    forbidden (j) : exists k in [j+1..n-1] pick k : A[j] > A[k]  =>
+    forbidden (j in [0..n-1]) : exists k in [j+1..n-1] pick k : A[j] > A[k]  =>
       advance : swap(A[j], A[k]);
   }
 }

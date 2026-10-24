@@ -19,7 +19,7 @@ class MandatoryIntervals:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (self.S[j] and (not self.G[j])):
                     if any((self.G[k] and self.overlap(j, k, self.s, self.f)) for k in range(0, ((self.n - 1)) + 1)):
                         return None

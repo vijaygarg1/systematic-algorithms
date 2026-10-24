@@ -3,7 +3,7 @@
 
 class LLPBFS {
   void LLPBFS(set<int>[] pre, int[]      G) {
-    forbidden (j) : G[j] > (min i in pre[j] : G[i] + 1)  =>
+    forbidden (j in [0..n-1]) : G[j] > (min i in pre[j] : G[i] + 1)  =>
       advance : G[j] = min i in pre[j] : G[i] + 1;
   }
 }

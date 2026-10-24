@@ -23,7 +23,7 @@ class GCD2 {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this._pick_i(j)) {
                 this.G[j] = Math.trunc((((this.A[j] * this.G[this.i]) + this.A[this.i]) - 1) / this.A[this.i]);
                 _changed = true;

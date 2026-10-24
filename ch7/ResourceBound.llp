@@ -6,7 +6,7 @@
 
 class ResourceBound {
   int[] ResourceBound(int[] rho, int B, int[] G) {
-    forbidden (j) : rho[j] > B =>
+    forbidden (j in [0..n-1]) : rho[j] > B =>
       advance : return null;
     return G;
   }

@@ -7,7 +7,7 @@ class LLPShortestPath {
     int[] G = 0;
     boolean[] fixed = false;
     fixed[s] = true;
-    forbidden (j) : !fixed[j] =>
+    forbidden (j in [0..n-1]) : !fixed[j] =>
       advance : {
         G[j] = minCrossCut(j, pre, w, G, fixed);
         fixed[j] = true;

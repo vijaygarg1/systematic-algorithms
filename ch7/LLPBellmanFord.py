@@ -17,7 +17,7 @@ class LLPBellmanFord:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if any((self.G[j] > (self.G[i] + self.w[i][j])) for i in self.pre[j]):
                     for k in range(1, ((self.n - 1)) + 1):
                         self.G[k] = min(((self.G[i] + self.w[i][k]) for i in self.pre[k]), default=float('inf'))

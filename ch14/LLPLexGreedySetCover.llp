@@ -35,7 +35,7 @@ class LLPLexGreedySetCover {
     int[] best = new int[u];
     boolean fresh = false;
     forall s in [0..m-1] : cnt[s] = mem[s].length;
-    forbidden (j) : isLexMaxCov(j) =>
+    forbidden (j in [0..n-1]) : isLexMaxCov(j) =>
       advance : {
         G[j] = true;
         int k = 0;

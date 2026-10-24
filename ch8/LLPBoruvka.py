@@ -48,7 +48,7 @@ class LLPBoruvka:
             _changed = True
             while _changed:
                 _changed = False
-                for j in range(0, (self.n - 1) + 1):
+                for j in range(0, ((self.n - 1)) + 1):
                     if (self.active[j] and (self.G[j] != self.G[self.G[j]])):
                         self.G[j] = self.G[self.G[j]]
                         _changed = True

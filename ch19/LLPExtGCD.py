@@ -43,7 +43,7 @@ class LLPExtGCD:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self._pick_i(j):
                     q = int((self.G[j] - 1) / self.G[self.i])
                     self.G[j] = (self.G[j] - (q * self.G[self.i]))

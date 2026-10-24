@@ -84,7 +84,7 @@ class LLPHousingMarket {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (((!this.inSubmatching(j, this.G, this.pref)) && this.inSubmatching(this.wish(j, this.G, this.pref), this.G, this.pref))) {
                 this.G[j] = (this.G[j] + 1);
                 this.fresh = false;

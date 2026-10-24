@@ -23,7 +23,7 @@ class VertexImplications:
         _changed = True
         while _changed:
             _changed = False
-            for w in range(0, (self.n - 1) + 1):
+            for w in range(0, ((self.n - 1)) + 1):
                 if any((self.G[v] and (not self.G[w])) for v in self.inI[w]):
                     self.G[w] = True
                     _changed = True

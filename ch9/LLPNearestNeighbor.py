@@ -15,7 +15,7 @@ class LLPNearestNeighbor:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not (self.G[j] <= self.nearestDist(self.px, self.py, j))):
                     self.G[j] = self.nearestDist(self.px, self.py, j)
                     _changed = True

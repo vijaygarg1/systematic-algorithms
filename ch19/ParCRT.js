@@ -17,7 +17,7 @@ class ParCRT {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this._pick_i(j)) {
                 this.G[j] = (this.G[j] + (Math.trunc((((this.G[this.i] - this.G[j]) + this.m[j]) - 1) / this.m[j]) * this.m[j]));
                 _changed = true;

@@ -34,7 +34,7 @@ class LLPStableMarriage {
     int[0..n] G = 0;
     int[0..n] partner = 0;
     always : int z = mpref[i][G[i]];
-    forbidden (i) :
+    forbidden (i in [1..n]) :
       G[i] == 0 || (partner[z] != 0 && rank[z][partner[z]] < rank[z][i])
     =>
       advance : {

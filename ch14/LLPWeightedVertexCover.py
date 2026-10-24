@@ -61,7 +61,7 @@ class LLPWeightedVertexCover:
         _changed = True
         while _changed:
             _changed = False
-            for e in range(0, (self.n - 1) + 1):
+            for e in range(0, ((self.n - 1)) + 1):
                 if self.slackMin(e):
                     step = min((self.w[self.eu[e]] - self.price[self.eu[e]]), (self.w[self.ev[e]] - self.price[self.ev[e]]))
                     self.G[e] = (self.G[e] + step)

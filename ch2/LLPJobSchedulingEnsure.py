@@ -14,13 +14,13 @@ class LLPJobSchedulingEnsure:
         # topological order over pre, declared acyclic
         _indeg = [0] * (self.n)
         _succ = [[] for _ in range(self.n)]
-        for _k in range(0, (self.n - 1) + 1):
+        for _k in range(0, ((self.n - 1)) + 1):
             for _i in self.pre[_k]:
                 if _i >= 0 and _i < self.n:
                     _indeg[_k] += 1
                     _succ[_i].append(_k)
         _q = []
-        for _k in range(0, (self.n - 1) + 1):
+        for _k in range(0, ((self.n - 1)) + 1):
             if _indeg[_k] == 0:
                 _q.append(_k)
         _seen = 0
@@ -36,7 +36,7 @@ class LLPJobSchedulingEnsure:
                 _indeg[_x] -= 1
                 if _indeg[_x] == 0:
                     _q.append(_x)
-        _total = (self.n - 1) - (0) + 1
+        _total = ((self.n - 1)) - (0) + 1
         if _seen != _total:
             raise ValueError('pre has a cycle; setAcyclic promises it does not')
         return self.G

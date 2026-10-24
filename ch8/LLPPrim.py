@@ -56,7 +56,7 @@ class LLPPrim:
         # setContainer: indices are offered smallest-key-first, so the
         # predicate below need not establish global minimality itself.
         _container = []
-        for j in range(0, (self.n - 1) + 1):
+        for j in range(0, ((self.n - 1)) + 1):
             heapq.heappush(_container, (self.key[j], j))
         while _container:
             j = heapq.heappop(_container)[1]

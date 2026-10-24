@@ -18,7 +18,7 @@ class LLPLayering {
   int[] LLPLayering(set<int>[] pre) {
     int[] G = 0;
     setAcyclic(pre);
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       exists i in pre[j] : G[j] <= G[i]
     =>
       advance : {

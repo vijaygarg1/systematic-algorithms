@@ -52,7 +52,7 @@ class LLPKruskal {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (((!this.G[j]) && (new UnionFind().find(this.parent, this.u[j]) !== new UnionFind().find(this.parent, this.v[j])))) {
                 this.G[j] = true;
                 new UnionFind().union(this.parent, this.rank, this.u[j], this.v[j]);

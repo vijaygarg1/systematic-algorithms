@@ -8,7 +8,7 @@ class LLPQHornSAT {
     boolean[] H = new boolean[n2];
     // Phase 1: solve Horn clauses on X variables.  G and H start all-false,
     // which is Java's default for a fresh boolean[].
-    forbidden (j) : hornImplied(j) =>
+    forbidden (j in [0..n-1]) : hornImplied(j) =>
       advance : G[j] = true;
     // Phase 2: substitute X values into Type-2 clauses, solve 2-SAT on Y
     return G;

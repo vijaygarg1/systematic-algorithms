@@ -5,7 +5,7 @@
 class LLPPriceB {
   void LLPPriceB(int[][] pre, int[][] w) {
     int[] G = 0;
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       exists i in pre[j] : G[j] < G[i] - w[i][j]
     =>
       advance : G[j] = maxPricePred(j, pre, w, G);

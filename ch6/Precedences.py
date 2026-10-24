@@ -18,7 +18,7 @@ class Precedences:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not (self.G[j] >= max(((self.G[i] + self.t[i]) for i in self.pre[j]), default=-2147483647))):
                     self.G[j] = max(((self.G[i] + self.t[i]) for i in self.pre[j]), default=-2147483647)
                     _changed = True

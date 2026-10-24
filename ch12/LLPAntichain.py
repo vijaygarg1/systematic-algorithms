@@ -15,7 +15,7 @@ class LLPAntichain:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((self.G[j] < self.len_[j]) and any(((k != j) and self.leq[self.chains[j][self.G[j]]][self.chains[k][self.G[k]]]) for k in range(0, ((self.n - 1)) + 1))):
                     self.G[j] = (self.G[j] + 1)
                     _changed = True

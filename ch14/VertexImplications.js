@@ -24,7 +24,7 @@ class VertexImplications {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let w = 0; w <= (this.n - 1); w++) {
+        for (let w = 0; w <= ((this.n - 1)); w++) {
             if ((() => { for (const v of this.inI[w]) { if ((this.G[v] && (!this.G[w]))) return true; } return false; })()) {
                 this.G[w] = true;
                 _changed = true;

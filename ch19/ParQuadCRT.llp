@@ -11,7 +11,7 @@
 int[] ParQuadCRT(int[] m, int[] a, int[] roots) {
   int[] G = 0;
   forall k in [0..n-1] : G[k] = roots[k];
-  forbidden (j) : exists i in [0..n-1] pick i : G[j] < G[i] =>
+  forbidden (j in [0..n-1]) : exists i in [0..n-1] pick i : G[j] < G[i] =>
     advance : G[j] = G[j] + ((G[i] - G[j] + m[j] - 1) / m[j]) * m[j];
   return G;
 }

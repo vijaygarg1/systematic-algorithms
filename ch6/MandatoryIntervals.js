@@ -20,7 +20,7 @@ class MandatoryIntervals {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((this.S[j] && (!this.G[j]))) {
                 if ((() => { for (let k = 0; k <= ((this.n - 1)); k++) { if ((this.G[k] && this.overlap(j, k, this.s, this.f))) return true; } return false; })()) {
                     return null;

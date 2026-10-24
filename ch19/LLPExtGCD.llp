@@ -32,7 +32,7 @@ class LLPExtGCD {
     Y[0] = 0;
     X[1] = 0;
     Y[1] = 1;
-    forbidden (j) : exists i in [0..1] pick i : G[j] > G[i] =>
+    forbidden (j in [0..n-1]) : exists i in [0..1] pick i : G[j] > G[i] =>
       advance : {
         int q = (G[j] - 1) / G[i];
         G[j] = G[j] - q * G[i];

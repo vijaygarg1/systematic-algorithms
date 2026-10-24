@@ -14,7 +14,7 @@ class LLPCountInversions {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((!(this.G[j] >= this.countLeft(this.A, j)))) {
                 this.G[j] = this.countLeft(this.A, j);
                 _changed = true;

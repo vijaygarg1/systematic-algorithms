@@ -40,7 +40,7 @@ class LLPDijkstra {
     // setContainer: indices are offered smallest-key-first, so the
     // predicate below need not establish global minimality itself.
     let _container = [];
-    for (let j = 0; j <= (this.n - 1); j++) {
+    for (let j = 0; j <= ((this.n - 1)); j++) {
         this._heapPush(_container, this.G[j], j);
     }
     while (_container.length > 0) {

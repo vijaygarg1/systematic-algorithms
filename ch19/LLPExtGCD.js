@@ -44,7 +44,7 @@ class LLPExtGCD {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this._pick_i(j)) {
                 let q = Math.trunc((this.G[j] - 1) / this.G[this.i]);
                 this.G[j] = (this.G[j] - (q * this.G[this.i]));

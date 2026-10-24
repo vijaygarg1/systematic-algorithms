@@ -14,7 +14,7 @@ class LCM1:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self._pick_i(j):
                     self.G[j] = (self.G[j] + (int((((self.G[self.i] - self.G[j]) + self.A[j]) - 1) / self.A[j]) * self.A[j]))
                     _changed = True

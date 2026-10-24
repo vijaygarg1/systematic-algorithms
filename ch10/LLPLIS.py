@@ -20,7 +20,7 @@ class LLPLIS:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (not (self.G[j] >= max(1, max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647)))):
                     self.G[j] = max(1, max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647))
                     _changed = True

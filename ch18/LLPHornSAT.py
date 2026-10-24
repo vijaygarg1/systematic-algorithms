@@ -29,7 +29,7 @@ class LLPHornSAT:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if self.definiteImplied(j):
                     self.G[j] = True
                     _changed = True

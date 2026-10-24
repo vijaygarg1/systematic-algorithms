@@ -45,7 +45,7 @@ class LLPKruskal:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if ((not self.G[j]) and (UnionFind().find(self.parent, self.u[j]) != UnionFind().find(self.parent, self.v[j]))):
                     self.G[j] = True
                     UnionFind().union(self.parent, self.rank, self.u[j], self.v[j])

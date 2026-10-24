@@ -65,7 +65,7 @@ class LLPWeightedVertexCover {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let e = 0; e <= (this.n - 1); e++) {
+        for (let e = 0; e <= ((this.n - 1)); e++) {
             if (this.slackMin(e)) {
                 let step = Math.min((this.w[this.eu[e]] - this.price[this.eu[e]]), (this.w[this.ev[e]] - this.price[this.ev[e]]));
                 this.G[e] = (this.G[e] + step);

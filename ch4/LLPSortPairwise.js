@@ -13,7 +13,7 @@ class LLPSortPairwise {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this._pick_k(j)) {
                 const _sw1 = this.A[j]; this.A[j] = this.A[this.k]; this.A[this.k] = _sw1;
                 _changed = true;

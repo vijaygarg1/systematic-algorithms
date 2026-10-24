@@ -4,7 +4,7 @@
 class LLPNearestNeighbor {
   void LLPNearestNeighbor(double[] px, double[] py) {
     double[] G = infinity;
-    ensure (j) : G[j] <= nearestDist(px, py, j);
+    ensure (j in [0..n-1]) : G[j] <= nearestDist(px, py, j);
   }
 
   double nearestDist(double[] px, double[] py, int j) {

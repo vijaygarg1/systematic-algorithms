@@ -3,7 +3,7 @@
 int[] LLPArrayGCD(int[] A) {
   int[] G = 0;
   forall k in [0..n-1] : G[k] = A[k];
-  forbidden (j) : exists i in [0..n-1] pick i : G[j] > G[i]  =>
+  forbidden (j in [0..n-1]) : exists i in [0..n-1] pick i : G[j] > G[i]  =>
     advance :
       if (G[j] % G[i] == 0) { G[j] = G[i];
         } else { G[j] = G[j] % G[i];

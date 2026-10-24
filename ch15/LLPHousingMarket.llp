@@ -72,7 +72,7 @@ class LLPHousingMarket {
     int[] q = new int[n];
     boolean fresh = false;
     forall k in [0..n-1] : G[k] = 0;
-    forbidden (j) : !inSubmatching(j, G, pref) && inSubmatching(wish(j, G, pref), G, pref) =>
+    forbidden (j in [0..n-1]) : !inSubmatching(j, G, pref) && inSubmatching(wish(j, G, pref), G, pref) =>
       advance : {
         G[j] = G[j] + 1;
         fresh = false;

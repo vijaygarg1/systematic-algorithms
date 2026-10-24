@@ -16,7 +16,7 @@ class Mandatory:
         _changed = True
         while _changed:
             _changed = False
-            for j in range(0, (self.n - 1) + 1):
+            for j in range(0, ((self.n - 1)) + 1):
                 if (self.S[j] and (not self.G[j])):
                     if self.overlaps(j, self.G, self.s, self.f):
                         return None

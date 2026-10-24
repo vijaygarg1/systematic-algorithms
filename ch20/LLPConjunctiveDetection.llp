@@ -6,7 +6,7 @@ class LLPConjunctiveDetection {
     int n = vc.length;
     int[] G = new int[n];
     forall k in [0..n-1] : G[k] = 1;
-    forbidden (j) : happenedBefore(j, G, vc) =>
+    forbidden (j in [0..n-1]) : happenedBefore(j, G, vc) =>
       advance : {
         if (G[j] >= T[j]) {
           return null;

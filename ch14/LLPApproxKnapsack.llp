@@ -49,7 +49,7 @@ class LLPApproxKnapsack {
     // D[a][0] = 0: profit 0 needs weight 0. Every other cell starts at INF.
     forall a in [0..nf] : forall b in [1..Vp] : D[a][b] = INF;
     n = max(nf, Vp) + 1;
-    forbidden (i, p) :
+    forbidden (i in [0..n-1], p in [0..n-1]) :
       i >= 1 && i <= nf && p >= 1 && p <= Vp &&
       D[i][p] > min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])])
     =>

@@ -67,8 +67,8 @@ class LLPApproxKnapsack {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let i = 0; i <= (this.n - 1); i++) {
-            for (let p = 0; p <= (this.n - 1); p++) {
+        for (let i = 0; i <= ((this.n - 1)); i++) {
+            for (let p = 0; p <= ((this.n - 1)); p++) {
                 if ((((((i >= 1) && (i <= this.nf)) && (p >= 1)) && (p <= this.Vp)) && (this.D[i][p] > Math.min(this.D[(i - 1)][p], (this.fw[(i - 1)] + this.D[(i - 1)][Math.max(0, (p - this.vPrime[(i - 1)]))]))))) {
                     this.D[i][p] = Math.min(this.D[(i - 1)][p], (this.fw[(i - 1)] + this.D[(i - 1)][Math.max(0, (p - this.vPrime[(i - 1)]))]));
                     _changed = true;

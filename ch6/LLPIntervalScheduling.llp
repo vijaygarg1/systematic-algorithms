@@ -18,12 +18,12 @@ class LLPIntervalScheduling {
     forall i in [0..n-1] : prevArr[i] = i - 1;
     forall i in [0..n-1] : nextArr[i] = i + 1;
     G[0] = true;
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       j > 0 && !deleted[j] && !G[j] && f[prevArr[j]] <= s[j]
     =>
       advance : { G[j] = true; }
     &&
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       j > 0 && !deleted[j] && G[prevArr[j]] && s[j] < f[prevArr[j]]
     =>
       advance : {

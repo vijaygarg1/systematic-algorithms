@@ -30,8 +30,8 @@ class LLPOptimalBinarySearchTree {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let i = 0; i <= (this.n - 1); i++) {
-            for (let j = 0; j <= (this.n - 1); j++) {
+        for (let i = 0; i <= ((this.n - 1)); i++) {
+            for (let j = 0; j <= ((this.n - 1)); j++) {
                 if (((i <= j) && (this.G[i][j] < this.optCost(this.p, this.G, i, j)))) {
                     this.G[i][j] = this.optCost(this.p, this.G, i, j);
                     _changed = true;

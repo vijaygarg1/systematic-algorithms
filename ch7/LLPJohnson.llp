@@ -16,7 +16,7 @@
 class LLPJohnson {
   int[] LLPJohnson(int[][] pre, int[][] pw) {
     int[] G = 0;
-    forbidden (j) : reducedNegative(j) =>
+    forbidden (j in [0..n-1]) : reducedNegative(j) =>
       advance :
         forall k in [0..n-1] : G[k] = raised(k);
     return G;

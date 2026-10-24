@@ -19,7 +19,7 @@ class HopBound {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((this.h[j] > this.k)) {
                 return null;
                 _changed = true;

@@ -6,7 +6,7 @@ class LLPBellmanFord {
   double[] LLPBellmanFord(set<int>[] pre, int[][] w) {
     double[] G = infinity;
     G[0] = 0;
-    forbidden (j) :
+    forbidden (j in [0..n-1]) :
       exists i in pre[j] : G[j] > G[i] + w[i][j]
     =>
       advance :

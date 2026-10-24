@@ -29,7 +29,7 @@ class LLPBoruvka {
       };
 
       forall i in [0..n-1] : if (active[i]) { G[i] = pointTo(i); };
-      forbidden (j) : active[j] && G[j] != G[G[j]]  =>
+      forbidden (j in [0..n-1]) : active[j] && G[j] != G[G[j]]  =>
         advance : G[j] = G[G[j]];
       forall i in [0..n-1] : if (active[i] && mweEdge[i] != 0 - 1) { T[mweEdge[i]] = true; };
       forall i in [0..n-1] : if (active[i] && G[i] != i) { active[i] = false; };

@@ -15,7 +15,7 @@ class LCM1 {
     let _changed = true;
     while (_changed) {
         _changed = false;
-        for (let j = 0; j <= (this.n - 1); j++) {
+        for (let j = 0; j <= ((this.n - 1)); j++) {
             if (this._pick_i(j)) {
                 this.G[j] = (this.G[j] + (Math.trunc((((this.G[this.i] - this.G[j]) + this.A[j]) - 1) / this.A[j]) * this.A[j]));
                 _changed = true;

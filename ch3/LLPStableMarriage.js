@@ -1,60 +1,33 @@
 /*
- * LLP-StableMarriage: Gale-Shapley via a cached partner[] vector, giving
- * O(1) guards instead of LLPStableMarriageSpec's O(n) rescan over every
- * man's whole proposal history. Matches bxx-stableMatching.tex's
- * Algorithm LLP-StableMarriage (the optimization of LLP-StableMarriage-Spec).
+ * LLP-StableMarriage: Gale-Shapley as a lattice-linear program, exactly
+ * as bxx-stableMatching.tex's Algorithm LLP-StableMarriage states it.
  *
- * G[i] is a PROPOSAL COUNT (how many proposals man i has made so far,
- * 0..n) -- unlike LLPStableMarriageSpec.llp and progs-topicsStableMatching's
- * sibling programs, which use G[j] as a direct (0-indexed) index into
- * mpref[j]. The count form is what lets "forbidden" mean G[i]=0 with no
- * separate initial-proposal loop, matching the book's own derivation.
- * Since mpref is 0-indexed here but the count is 1-based once nonzero,
- * every mpref lookup is mpref[i][G[i]-1], not mpref[i][G[i]].
+ * Always    (i): z = mpref[i][G[i]]
+ * Forbidden (i): (G[i] = 0) or ((partner[z] != null) and
+ * (rank[z][partner[z]] < rank[z][i]))
+ * Advance      : G[i] := G[i] + 1;
+ * if ((partner[z] = null) or (rank[z][i] < rank[z][partner[z]])):
+ * partner[z] := i
  *
- * partner[z] (-1 if unmatched) caches the best man who has proposed to z
- * so far -- redundant state, recoverable from G in O(n), kept only so
- * the guard is O(1) instead of a rescan. It must be allocated and filled
- * via an explicit new int[n] + forall, not the "int[] partner = -1;"
- * shorthand used for plain all-zero fills elsewhere in this codebase:
- * without a following forall that copies another array's values into it
- * (as LLPStableMarriageSpec.llp's "int[] G = 0;" has), that shorthand
- * silently allocates a length-1 array instead of length n -- a real
- * compiler gap, not a style choice.
+ * G[i] is a PROPOSAL COUNT: how many proposals man i has made, 0..n. The
+ * book's arrays are 1-indexed, so its z = mpref[i][G[i]] is the proposal
+ * man i is currently standing on; mpref here is 0-indexed, so the same
+ * woman is mpref[i][G[i]-1], and G[i] = 0 means he has proposed to
+ * nobody yet (the guard's first disjunct, which short-circuits before z
+ * is ever needed).
  *
- * This is written procedurally with an explicit worklist, not as a
- * forbidden/advance pair, because llc.py's forbidden/advance always
- * realizes as either (a) a full O(n) rescan every round, repeated until
- * a round finds nothing to advance, or (b) with setContainer, a
- * PriorityQueue -- and PriorityQueue only re-pushes the index whose
- * *key* array changed, which here would be G, but the man a proposal
- * displaces (see "int y = partner[z]" below) needs re-checking too,
- * and his G does not change. (A dummy key array bumped for both the
- * proposer and the displaced man would work, but costs O(log n) per
- * heap operation for no reason -- plain FIFO order is already correct,
- * since nothing here depends on processing order, only on eventually
- * reconsidering every newly-forbidden man.) Option (a) measured O(n^3)
- * in practice (confirmed against this exact LCG-seeded generator, not
- * just asymptotically): the number of *rounds* to convergence is not
- * O(n) the way it is for Dijkstra-style settle-once algorithms, since a
- * displaced man can re-trigger forbidden() for men already scanned
- * earlier in the same round, pushing convergence out over many rounds.
- * A worklist sidesteps this entirely: only men who just became
- * forbidden (freshly rejected, or just displaced) are ever re-examined,
- * giving O(1) amortized work per check and a true O(n^2) worst case
- * bound (same precedent as EarlyFixingStableMarriage.llp's explicit
- * inX/queue arrays, also procedural for a similar reason).
+ * z is written out at each use rather than declared with LL's `always`.
+ * The book's Always is a definition, re-read wherever it appears, and
+ * the advance reads it AFTER incrementing G[i] -- man i proposes to his
+ * NEXT choice. llc.py's `always` instead binds once on entry to each of
+ * forbidden() and advance(), so the advance would propose to the woman
+ * who had just rejected him.
  *
- * The queue is a circular buffer of capacity n+1, not the n^2+1 a naive
- * worst-case bound on total pushes would suggest: inQueue[] stops a man
- * being enqueued twice at once, so at most n distinct men are ever
- * in-flight simultaneously, regardless of how many times each is
- * pushed over the full run. (An n^2-sized buffer was tried first and
- * exhausted heap memory well before n reached the sizes needed to
- * confirm the complexity fix.)
- *
- * Cross-checked against LLPStableMarriageSpec.llp on instances with
- * cascading rejections: both return the same matching.
+ * partner[z] (-1 if unmatched) is the best man who has proposed to z so
+ * far. It is redundant state, recoverable from G in O(n), and exists
+ * only so the guard is O(1): LLPStableMarriageSpec.llp is the same
+ * algorithm with the guard rescanning every man's whole proposal
+ * history instead, and the book derives this program from that one.
  *
  * Auto-generated from LLPStableMarriage.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
@@ -71,54 +44,26 @@ class LLPStableMarriage {
     for (let z = 0; z <= ((this.n - 1)); z++) {
         this.partner[z] = (-1);
     }
-    let cap = (this.n + 1);
-    let queue = new Array(cap).fill(0);
-    let inQueue = new Array(this.n).fill(false);
-    let qHead = 0;
-    let qCount = 0;
-    let qTail = 0;
-    for (let i = 0; i <= ((this.n - 1)); i++) {
-        queue[qTail] = i;
-        qTail = ((qTail + 1) % cap);
-        qCount = (qCount + 1);
-        inQueue[i] = true;
-    }
-    while ((qCount > 0)) {
-        let i = queue[qHead];
-        qHead = ((qHead + 1) % cap);
-        qCount = (qCount - 1);
-        inQueue[i] = false;
-        let isForbidden = false;
-        if ((this.G[i] === 0)) {
-            isForbidden = true;
-        } else {
-            let z0 = this.mpref[i][(this.G[i] - 1)];
-            if (((this.partner[z0] !== (-1)) && (this.rank[z0][this.partner[z0]] < this.rank[z0][i]))) {
-                isForbidden = true;
-            }
-        }
-        if (isForbidden) {
-            this.G[i] = (this.G[i] + 1);
-            let z = this.mpref[i][(this.G[i] - 1)];
-            if (((this.partner[z] === (-1)) || (this.rank[z][i] < this.rank[z][this.partner[z]]))) {
-                let y = this.partner[z];
-                this.partner[z] = i;
-                if (((y !== (-1)) && (!inQueue[y]))) {
-                    queue[qTail] = y;
-                    qTail = ((qTail + 1) % cap);
-                    qCount = (qCount + 1);
-                    inQueue[y] = true;
+    let _changed = true;
+    while (_changed) {
+        _changed = false;
+        for (let i = 0; i <= (this.n - 1); i++) {
+            if (((this.G[i] === 0) || this.rejected(i))) {
+                this.G[i] = (this.G[i] + 1);
+                let z = this.mpref[i][(this.G[i] - 1)];
+                if (((this.partner[z] === (-1)) || (this.rank[z][i] < this.rank[z][this.partner[z]]))) {
+                    this.partner[z] = i;
                 }
-            }
-            if ((!inQueue[i])) {
-                queue[qTail] = i;
-                qTail = ((qTail + 1) % cap);
-                qCount = (qCount + 1);
-                inQueue[i] = true;
+                _changed = true;
             }
         }
     }
     return this.G;
+  }
+
+  rejected(i) {
+    let z = this.mpref[i][(this.G[i] - 1)];
+    return ((this.partner[z] !== (-1)) && (this.rank[z][this.partner[z]] < this.rank[z][i]));
   }
 }
 

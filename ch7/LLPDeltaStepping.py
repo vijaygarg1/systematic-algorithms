@@ -54,13 +54,11 @@ class LLPDeltaStepping:
 
     def relaxHeavy(self, v, pre, w, isLight, G, delta):
         relaxed = False
-        k = 0
-        while (k < len(pre[v])):
+        for k in range(0, ((len(pre[v]) - 1)) + 1):
             u = pre[v][k]
             if ((not isLight[u][v]) and ((G[u] + w[u][v]) < G[v])):
                 G[v] = (G[u] + w[u][v])
                 relaxed = True
-            k = (k + 1)
         return relaxed
 
 

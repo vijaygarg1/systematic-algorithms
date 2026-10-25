@@ -11,18 +11,14 @@ class ChainCoverFromMatching {
     this.matchPartner = matchPartner;
     this.n = this.matchPartner.length;
     this.C = new Array(this.n).fill(0);
-    this.i = 0;
-    while ((this.i < this.n)) {
-        this.C[this.i] = this.i;
-        this.i = (this.i + 1);
+    for (let i = 0; i <= ((this.n - 1)); i++) {
+        this.C[i] = i;
     }
-    let u = 0;
-    while ((u < this.n)) {
+    for (let u = 0; u <= ((this.n - 1)); u++) {
         let v = this.matchPartner[u];
         if ((v !== (0 - 1))) {
             this.C[u] = v;
         }
-        u = (u + 1);
     }
     this.parentPointerJumping(this.C);
     return this.C;
@@ -33,14 +29,12 @@ class ChainCoverFromMatching {
     let changed = true;
     while (changed) {
         changed = false;
-        let i = 0;
-        while ((i < n)) {
+        for (let i = 0; i <= ((n - 1)); i++) {
             let p = C[i];
             if ((C[p] !== p)) {
                 C[i] = C[p];
                 changed = true;
             }
-            i = (i + 1);
         }
     }
   }

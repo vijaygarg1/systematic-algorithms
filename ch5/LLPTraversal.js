@@ -7,10 +7,11 @@
 
 
 class LLPTraversal {
-  LLPTraversal(pre, G) {
+  LLPTraversal(pre) {
     this.pre = pre;
-    this.G = G;
     this.n = this.pre.length;
+    this.G = new Array(this.n).fill(false);
+    this.G[0] = true;
     let _changed = true;
     while (_changed) {
         _changed = false;
@@ -21,6 +22,7 @@ class LLPTraversal {
             }
         }
     }
+    return this.G;
   }
 }
 

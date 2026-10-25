@@ -8,7 +8,7 @@
 // Sizes are assumed to be powers of two, so every split is exact.
 
 class Strassen {
-  int[][] multiply(int[][] A, int[][] B) {
+  int[][] Strassen(int[][] A, int[][] B) {
     int n = A.length;
     if (n == 1) { int[][] C1 = new int[1][1]; C1[0][0] = A[0][0] * B[0][0]; return C1; };
     int h = n / 2;
@@ -16,10 +16,10 @@ class Strassen {
             A21 = quadrant(A, h, 0, h), A22 = quadrant(A, h, h, h);
     int[][] B11 = quadrant(B, 0, 0, h), B12 = quadrant(B, 0, h, h),
             B21 = quadrant(B, h, 0, h), B22 = quadrant(B, h, h, h);
-    int[][] M1 = multiply(add(A11, A22), add(B11, B22)), M2 = multiply(add(A21, A22), B11),
-            M3 = multiply(A11, sub(B12, B22)),           M4 = multiply(A22, sub(B21, B11)),
-            M5 = multiply(add(A11, A12), B22),           M6 = multiply(sub(A21, A11), add(B11, B12)),
-            M7 = multiply(sub(A12, A22), add(B21, B22));
+    int[][] M1 = Strassen(add(A11, A22), add(B11, B22)), M2 = Strassen(add(A21, A22), B11),
+            M3 = Strassen(A11, sub(B12, B22)),           M4 = Strassen(A22, sub(B21, B11)),
+            M5 = Strassen(add(A11, A12), B22),           M6 = Strassen(sub(A21, A11), add(B11, B12)),
+            M7 = Strassen(sub(A12, A22), add(B21, B22));
     int[][] C11 = add(sub(add(M1, M4), M5), M7), C12 = add(M3, M5),
             C21 = add(M2, M4),                   C22 = add(add(sub(M1, M2), M3), M6);
     return combine(C11, C12, C21, C22);

@@ -22,7 +22,7 @@ class LLPLayering {
       exists i in pre[j] : G[j] <= G[i]
     =>
       advance : {
-        G[j] = max(0, max i in pre[j] : G[i] + 1);
+        G[j] = max i in pre[j] : G[i] + 1;
       };
     return G;
   }

@@ -36,30 +36,26 @@ class ApproxSetCover {
       // Pick the set with the largest current coverage, lowest index on ties.
       int bestIdx   = 0;
       int bestCover = 0 - 1;
-      int s = 0;
-      while (s < m) {
+      for s in [0..(m) - 1] : {
         if (cnt[s] > bestCover) {
-          bestCover = cnt[s];
-          bestIdx   = s;
+        bestCover = cnt[s];
+        bestIdx   = s;
         };
-        s = s + 1;
       };
       C[bestIdx] = true;
       // Cover its elements and charge the decrements to their incidences.
-      int k = 0;
-      while (k < mem[bestIdx].length) {
+      for k in [0..(mem[bestIdx].length) - 1] : {
         int e = mem[bestIdx][k];
         if (!covered[e]) {
-          covered[e] = true;
-          remaining  = remaining - 1;
-          int t = 0;
-          while (t < inc[e].length) {
-            cnt[inc[e][t]] = cnt[inc[e][t]] - 1;
-            t = t + 1;
-          };
+        covered[e] = true;
+        remaining  = remaining - 1;
+        int t = 0;
+        while (t < inc[e].length) {
+        cnt[inc[e][t]] = cnt[inc[e][t]] - 1;
+        t = t + 1;
         };
-        k = k + 1;
-      }
+        };
+      };
     };
     return C;
   }

@@ -21,7 +21,7 @@ public class BinarySearch {
     int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     int key = 0;
     BinarySearch prog = new BinarySearch();
-    int result = prog.BinarySearch(A, key, 0, A.length);
+    int result = prog.BinarySearch(A, key, 0, A.length - 1);
     System.out.println(result);
   }
 }

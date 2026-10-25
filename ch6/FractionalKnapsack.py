@@ -13,16 +13,13 @@ class FractionalKnapsack:
         self.n = len(self.v)
         self.x = [0.0] * (self.n)
         self.rem = self.W
-        self.done = False
-        self.i = 0
-        while ((self.i < self.n) and (not self.done)):
-            if (self.w[self.i] <= self.rem):
-                self.x[self.i] = 1.0
-                self.rem = (self.rem - self.w[self.i])
+        for i in range(0, ((self.n - 1)) + 1):
+            if (self.w[i] <= self.rem):
+                self.x[i] = 1.0
+                self.rem = (self.rem - self.w[i])
             else:
-                self.x[self.i] = self.rem / self.w[self.i]
-                self.done = True
-            self.i = (self.i + 1)
+                self.x[i] = self.rem / self.w[i]
+                break
         return self.x
 
 

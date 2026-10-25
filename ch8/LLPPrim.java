@@ -56,15 +56,15 @@ public class LLPPrim {
   private void _advance0() {
     fixed[j] = true;
     C[j] = key[j];
-    int t = 0;
-    while ((t < adj[j].length)) {
-      int k = adj[j][t];
-      if (((!fixed[k]) && (aw[j][t] < key[k]))) {
-        key[k] = aw[j][t];
-        if (_container != null) _container.add(new double[]{priority(k), k});
-        parent[k] = j;
+    for (int t = 0; t < adj[j].length; t++) {
+      {
+        int k = adj[j][t];
+        if (((!fixed[k]) && (aw[j][t] < key[k]))) {
+          key[k] = aw[j][t];
+          if (_container != null) _container.add(new double[]{priority(k), k});
+          parent[k] = j;
+        }
       }
-      t = (t + 1);
     }
   }
 

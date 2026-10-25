@@ -53,10 +53,10 @@ class LLPHornSAT {
     int[] hcount = new int[n];
     int[][] byHead = new int[n][];
     int[] hfill = new int[n];
-    forall c in [0..body.length-1] :
+    for c in [0..body.length-1] :
       if (head[c] >= 0) { hcount[head[c]] = hcount[head[c]] + 1; };
     forall v in [0..n-1] : byHead[v] = new int[hcount[v]];
-    forall c in [0..body.length-1] :
+    for c in [0..body.length-1] :
       if (head[c] >= 0) {
         byHead[head[c]][hfill[head[c]]] = c;
         hfill[head[c]] = hfill[head[c]] + 1;

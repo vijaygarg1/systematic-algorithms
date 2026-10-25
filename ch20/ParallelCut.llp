@@ -8,10 +8,10 @@ class ParallelCut {
     while (i < n) {
       int j = 0;
       while (j < n) {
-        if (i != j && hb(vc, i, 0, j, 0, n)) {
-          F[i] = 1;
-        };
-        j = j + 1;
+      if (i != j && hb(vc, i, 0, j, 0, n)) {
+      F[i] = 1;
+      };
+      j = j + 1;
       };
       i = i + 1;
     };
@@ -61,13 +61,13 @@ class ParallelCut {
         while (ip < n) {
           int jp = 0;
           while (jp < m) {
-            if (R[i * m + 0][ip * m + jp]) {
-              valid[ip][jp] = false;
-            };
-            jp = jp + 1;
+          if (R[i * m + 0][ip * m + jp]) {
+          valid[ip][jp] = false;
+          };
+          jp = jp + 1;
           };
           ip = ip + 1;
-        }
+        };
       };
       i = i + 1;
     };
@@ -101,16 +101,16 @@ class ParallelCut {
     while (k < sz) {
       int i = 0;
       while (i < sz) {
-        int j = 0;
-        while (j < sz) {
-          if (R[i][k] && R[k][j]) {
-            R[i][j] = true;
-          };
-          j = j + 1;
-        };
-        i = i + 1;
+      int j = 0;
+      while (j < sz) {
+      if (R[i][k] && R[k][j]) {
+      R[i][j] = true;
+      };
+      j = j + 1;
+      };
+      i = i + 1;
       };
       k = k + 1;
-    }
+    };
   }
 }

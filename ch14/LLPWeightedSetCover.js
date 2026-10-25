@@ -59,10 +59,8 @@ class LLPWeightedSetCover {
             if ((this.covered(x) && this.slackMin(x))) {
                 let step = this.minRemainingBudget(x);
                 this.G[x] = (this.G[x] + step);
-                let t = 0;
-                while ((t < this.inc[x].length)) {
+                for (let t = 0; t <= ((this.inc[x].length - 1)); t++) {
                     this.sp[this.inc[x][t]] = (this.sp[this.inc[x][t]] + step);
-                    t = (t + 1);
                 }
                 this.fresh = false;
                 _changed = true;

@@ -55,10 +55,8 @@ class LLPLexGreedySetCover:
                         e = self.mem[j][k]
                         if (not self.covered[e]):
                             self.covered[e] = True
-                            t = 0
-                            while (t < len(self.inc[e])):
+                            for t in range(0, ((len(self.inc[e]) - 1)) + 1):
                                 self.cnt[self.inc[e][t]] = (self.cnt[self.inc[e][t]] - 1)
-                                t = (t + 1)
                         k = (k + 1)
                     self.fresh = False
                     _changed = True
@@ -86,8 +84,7 @@ class LLPLexGreedySetCover:
 
     def bestAt(self, e):
         win = (0 - 1)
-        k = 0
-        while (k < len(self.inc[e])):
+        for k in range(0, ((len(self.inc[e]) - 1)) + 1):
             s = self.inc[e][k]
             if (not self.G[s]):
                 if (win < 0):
@@ -95,7 +92,6 @@ class LLPLexGreedySetCover:
                 else:
                     if (self.cnt[s] > self.cnt[win]):
                         win = s
-            k = (k + 1)
         return win
 
 

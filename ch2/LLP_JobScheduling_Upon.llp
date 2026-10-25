@@ -12,7 +12,7 @@
 int[] LLP_JobScheduling_Upon(int[0..n-1] t, set<int>[0..n-1] pre) {
   int[0..n-1] G = 0;
   setAcyclic(pre);
-  forall k in [0..n] : G[k] = t[k];
+  forall k in [0..n-1] : G[k] = t[k];
   upon G[j] < max i in pre[j] : G[i] + t[j] {
     G[j] = max i in pre[j] : G[i] + t[j];
   }

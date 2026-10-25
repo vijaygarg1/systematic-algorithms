@@ -18,7 +18,7 @@
 
 
 class LLPBoruvka {
-  mst(n, U, V, W) {
+  LLPBoruvka(n, U, V, W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -122,6 +122,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const V = [0, 0, 1, 1];
     const W = [0, 0, 0, 2];
     const prog = new LLPBoruvka();
-    const result = prog.mst(U.length, U, V, W);
+    const result = prog.LLPBoruvka(U.length, U, V, W);
     console.log(JSON.stringify(result));
 }

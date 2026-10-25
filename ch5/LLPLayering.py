@@ -44,7 +44,7 @@ class LLPLayering:
             _h += 1
             _seen += 1
             if any((self.G[j] <= self.G[i]) for i in self.pre[j]):
-                self.G[j] = max(0, max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647))
+                self.G[j] = max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647)
             for _x in _succ[j]:
                 _indeg[_x] -= 1
                 if _indeg[_x] == 0:

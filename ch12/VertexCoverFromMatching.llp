@@ -29,7 +29,7 @@ class VertexCoverFromMatching {
     int[] Q = new int[L + R];
     int head = 0;
     int tail = 0;
-    forall j in [0..L-1] :
+    for j in [0..L-1] :
       if (matchL[j] == 0 - 1) {
         inZ[j] = true;
         Q[tail] = j;
@@ -41,15 +41,13 @@ class VertexCoverFromMatching {
       head = head + 1;
       if (w < L) {
         // w in L: follow every (w, v) in E \ M with v not in Z.
-        int t = 0;
-        while (t < adj[w].length) {
+        for t in [0..(adj[w].length) - 1] : {
           int v = adj[w][t];
           if (matchL[w] != v && !inZ[L + v]) {
-            inZ[L + v] = true;
-            Q[tail] = L + v;
-            tail = tail + 1;
+          inZ[L + v] = true;
+          Q[tail] = L + v;
+          tail = tail + 1;
           };
-          t = t + 1;
         };
       } else {
         // w in R: if w is matched and partner[w] not in Z, add it.

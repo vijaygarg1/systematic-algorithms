@@ -43,10 +43,8 @@ class LLPLexGreedySetCover {
           int e = mem[j][k];
           if (!covered[e]) {
             covered[e] = true;
-            int t = 0;
-            while (t < inc[e].length) {
+            for t in [0..(inc[e].length) - 1] : {
               cnt[inc[e][t]] = cnt[inc[e][t]] - 1;
-              t = t + 1;
             };
           };
           k = k + 1;
@@ -84,13 +82,11 @@ class LLPLexGreedySetCover {
   // on ties; -1 when no unpicked set contains e.
   int bestAt(int e) {
     int win = 0 - 1;
-    int k = 0;
-    while (k < inc[e].length) {
+    for k in [0..(inc[e].length) - 1] : {
       int s = inc[e][k];
       if (!G[s]) {
-        if (win < 0) { win = s; } else { if (cnt[s] > cnt[win]) { win = s; } };
+      if (win < 0) { win = s; } else { if (cnt[s] > cnt[win]) { win = s; } };
       };
-      k = k + 1;
     };
     return win;
   }

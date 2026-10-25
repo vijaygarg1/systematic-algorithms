@@ -17,10 +17,8 @@ class Ord:
         k = 1
         i = 0
         while (i < self.s):
-            j = 0
-            while (j < self.e[i]):
+            for j in range(0, ((self.e[i] - 1)) + 1):
                 k = (k * self.p[i])
-                j = (j + 1)
             i = (i + 1)
         changed = True
         while changed:

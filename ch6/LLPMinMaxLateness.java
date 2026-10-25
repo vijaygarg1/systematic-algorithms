@@ -54,6 +54,12 @@ public class LLPMinMaxLateness {
         }
       }
     }
+    int t1 = Integer.MIN_VALUE;
+    for (int j = 0; j < n; j++) {
+      int _v = Math.max(0, ((G[j] + t[j]) - d[j]));
+      if (_v > t1) t1 = _v;
+    }
+    int lateness = t1;
     return G;
   }
 

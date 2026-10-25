@@ -1,8 +1,13 @@
-// Companion-only program, like its .llp and .java siblings: the book
-// presents LLP-FloydWarshall only as LaTeX pseudocode, so there is no
-// book/lang/progs-shortestPath/ counterpart to sync from. See
-// COMPANION_ONLY_STEMS in sync-code-from-lang.py -- this file must be
-// preserved there or a sync run will delete it.
+// Hand-written C++ port of LLP-FloydWarshall, alongside the other ch7
+// LLP ports in this directory.
+//
+// RESTORED 2026-10-25. This file used to live only under
+// companion/code/ch7/, pinned there by COMPANION_ONLY_STEMS in
+// sync-code-from-lang.py because LLP-FloydWarshall had no book/lang
+// source. It now has one (progs-shortestPath/LLPFloydWarshall.llp), so
+// that pin was removed -- and since .cpp is COPIED from progs-*/cpp/
+// rather than generated, the next sync deleted the port with nothing to
+// copy in its place. Keeping it here is what stops that happening again.
 //
 // Revised to match the book's staged formulation (bxx-sp-llp-apsp.tex):
 // the intermediate vertex k is processed in n sequential stages

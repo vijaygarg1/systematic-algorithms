@@ -19,7 +19,7 @@
 
 
 class TTC {
-  assign(pref) {
+  TTC(pref) {
     this.pref = pref;
     this.n = this.pref.length;
     this.house = new Array(this.n).fill(0);
@@ -86,6 +86,6 @@ if (typeof module !== 'undefined') module.exports = TTC;
 if (typeof require !== 'undefined' && require.main === module) {
     const pref = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]];
     const prog = new TTC();
-    const result = prog.assign(pref);
+    const result = prog.TTC(pref);
     console.log(JSON.stringify(result));
 }

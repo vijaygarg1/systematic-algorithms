@@ -7,17 +7,16 @@ public class FractionalKnapsack {
     int n = v.length;
     double[] x = new double[n];
     double rem = W;
-    boolean done = false;
-    int i = 0;
-    while (((i < n) && (!done))) {
-      if ((w[i] <= rem)) {
-        x[i] = 1.0;
-        rem = (rem - w[i]);
-      } else {
-        x[i] = (rem / w[i]);
-        done = true;
+    for (int i = 0; i < n; i++) {
+      {
+        if ((w[i] <= rem)) {
+          x[i] = 1.0;
+          rem = (rem - w[i]);
+        } else {
+          x[i] = (rem / w[i]);
+          break;
+        }
       }
-      i = (i + 1);
     }
     return x;
   }

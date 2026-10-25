@@ -1,8 +1,8 @@
 /*
  * Classical Kruskal MST: sort edges, union-find with rank and path-compression.
- * Calls the sibling UnionFind program (`UnionFind.union(parent, rank, u, v)`,
+ * Calls the sibling UnionFind program (`UnionFind.Union(parent, rank, u, v)`,
  * compiling to `new UnionFind().union(parent, rank, u, v)`) instead of
- * keeping its own copy of find/union-by-rank -- UnionFind.union() already
+ * keeping its own copy of find/union-by-rank -- UnionFind.Union() already
  * finds both roots internally and reports whether they were distinct, so
  * Kruskal's main loop needs no separate find() call of its own. This makes
  * Kruskal.java a multi-file program: it requires UnionFind.java alongside
@@ -15,17 +15,17 @@
 
 
 class UnionFind {
-  find(parent, x) {
+  Find(parent, x) {
     let n = parent.length;
     if ((parent[x] !== x)) {
-        parent[x] = this.find(parent, parent[x]);
+        parent[x] = this.Find(parent, parent[x]);
     }
     return parent[x];
   }
 
-  union(parent, rank, x, y) {
-    let rx = this.find(parent, x);
-    let ry = this.find(parent, y);
+  Union(parent, rank, x, y) {
+    let rx = this.Find(parent, x);
+    let ry = this.Find(parent, y);
     if ((rx === ry)) {
         return false;
     }
@@ -44,7 +44,7 @@ class UnionFind {
 }
 
 class Kruskal {
-  mst(n, U, V, W) {
+  Kruskal(n, U, V, W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -59,7 +59,7 @@ class Kruskal {
     let chosen = 0;
     let e = 0;
     while (((e < this.m) && (chosen < (this.n - 1)))) {
-        if (new UnionFind().union(this.parent, this.rank, this.U[e], this.V[e])) {
+        if (new UnionFind().Union(this.parent, this.rank, this.U[e], this.V[e])) {
             this.T[e] = true;
             chosen = (chosen + 1);
         }
@@ -76,6 +76,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const V = [0, 0, 1, 1];
     const W = [0, 0, 0, 2];
     const prog = new Kruskal();
-    const result = prog.mst(U.length, U, V, W);
+    const result = prog.Kruskal(U.length, U, V, W);
     console.log(JSON.stringify(result));
 }

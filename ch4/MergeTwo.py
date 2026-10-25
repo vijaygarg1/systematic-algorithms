@@ -8,7 +8,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class MergeTwo:
-    def merge(self, B, C):
+    def MergeTwo(self, B, C):
         self.B = B
         self.C = C
         self.m = len(self.B)
@@ -40,6 +40,6 @@ if __name__ == '__main__':
     B = [0, 0, 1, 2]
     C = [0, 0, 1, 1]
     prog = MergeTwo()
-    result = prog.merge(B, C)
+    result = prog.MergeTwo(B, C)
     print(result)
 

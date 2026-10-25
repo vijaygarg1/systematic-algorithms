@@ -48,14 +48,12 @@ class VertexCoverFromMatching:
             w = Q[head]
             head = (head + 1)
             if (w < self.L):
-                t = 0
-                while (t < len(self.adj[w])):
+                for t in range(0, ((len(self.adj[w]) - 1)) + 1):
                     v = self.adj[w][t]
                     if ((self.matchL[w] != v) and (not inZ[(self.L + v)])):
                         inZ[(self.L + v)] = True
                         Q[tail] = (self.L + v)
                         tail = (tail + 1)
-                    t = (t + 1)
             else:
                 r = (w - self.L)
                 if ((self.matchR[r] != (0 - 1)) and (not inZ[self.matchR[r]])):

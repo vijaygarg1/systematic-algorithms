@@ -43,15 +43,12 @@ class ApproxSetCover:
         while (self.remaining > 0):
             bestIdx = 0
             bestCover = (0 - 1)
-            s = 0
-            while (s < self.m):
+            for s in range(0, ((self.m - 1)) + 1):
                 if (self.cnt[s] > bestCover):
                     bestCover = self.cnt[s]
                     bestIdx = s
-                s = (s + 1)
             self.C[bestIdx] = True
-            k = 0
-            while (k < len(self.mem[bestIdx])):
+            for k in range(0, ((len(self.mem[bestIdx]) - 1)) + 1):
                 e = self.mem[bestIdx][k]
                 if (not self.covered[e]):
                     self.covered[e] = True
@@ -60,7 +57,6 @@ class ApproxSetCover:
                     while (t < len(self.inc[e])):
                         self.cnt[self.inc[e][t]] = (self.cnt[self.inc[e][t]] - 1)
                         t = (t + 1)
-                k = (k + 1)
         return self.C
 
 

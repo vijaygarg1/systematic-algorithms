@@ -9,26 +9,28 @@ public class LLPBFS {
   int[] G;
   int j;
 
-  private boolean forbidden(int j) {
+  private boolean _forbidden0(int j) {
     int t1 = Integer.MAX_VALUE;
     for (int i : pre[j]) {
+      if (!((G[i] < Integer.MAX_VALUE))) continue;
       int _v = (G[i] + 1);
       if (_v < t1) t1 = _v;
     }
-    if (!((G[j] > t1))) return false;
-    return true;
+    return (G[j] > t1);
   }
 
-  private void advance() {
+  private void _advance0() {
     int t2 = Integer.MAX_VALUE;
-    for (int i : pre[j]) t2 = Math.min(t2, (G[i] + 1));
+    for (int i : pre[j]) { if (!((G[i] < Integer.MAX_VALUE))) continue; t2 = Math.min(t2, (G[i] + 1)); }
     G[j] = t2;
   }
 
-  public void LLPBFS(int[][] pre, int[] G) {
+  public int[] LLPBFS(int[][] pre) {
     this.pre = pre;
-    this.G = G;
     this.n = pre.length;
+    this.G = new int[n];
+    for (int i = 0; i < n; i++) this.G[i] = Integer.MAX_VALUE;
+    G[0] = 0;
     {
       // dependList (Algorithm LLP-Sequential): dep[r] holds
       // every index whose guard reads a cell written at r.
@@ -52,13 +54,14 @@ public class LLPBFS {
       }
       while (_qh != _qt) {
         int j = _q[_qh]; _qh = _qh + 1 == n + 1 ? 0 : _qh + 1; _inq[j] = false;
-        if (!forbidden(j)) continue;
-        this.j = j; advance();
+        if (!_forbidden0(j)) continue;
+        this.j = j; _advance0();
         for (int _x : _dep[j]) if (!_inq[_x]) {
           _inq[_x] = true; _q[_qt] = _x; _qt = _qt + 1 == n + 1 ? 0 : _qt + 1;
         }
       }
     }
+    return G;
   }
 
   public static void main(String[] args) {

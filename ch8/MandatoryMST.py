@@ -4,8 +4,8 @@ mandatory edge closes a cycle with previously committed mandatory
 edges; equivalently, when M itself is not acyclic.  Composed onto
 LLP-Kruskal via predicate conjunction:
 [ LLP-Kruskal(E, w, G) && MandatoryMST(M, G) ].
-Calls the sibling UnionFind program (`UnionFind.find(parent, x)`,
-`UnionFind.union(parent, rank, x, y)`) instead of keeping its own
+Calls the sibling UnionFind program (`UnionFind.Find(parent, x)`,
+`UnionFind.Union(parent, rank, x, y)`) instead of keeping its own
 copy of find/union -- same multi-file treatment as Kruskal.llp. This
 makes MandatoryMST.java a multi-file program: it requires
 UnionFind.java alongside it to compile (see JAVA_MULTI_FILE in
@@ -17,15 +17,15 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class UnionFind:
-    def find(self, parent, x):
+    def Find(self, parent, x):
         n = len(parent)
         if (parent[x] != x):
-            parent[x] = self.find(parent, parent[x])
+            parent[x] = self.Find(parent, parent[x])
         return parent[x]
 
-    def union(self, parent, rank, x, y):
-        rx = self.find(parent, x)
-        ry = self.find(parent, y)
+    def Union(self, parent, rank, x, y):
+        rx = self.Find(parent, x)
+        ry = self.Find(parent, y)
         if (rx == ry):
             return False
         if (rank[rx] < rank[ry]):
@@ -53,10 +53,10 @@ class MandatoryMST:
             _changed = False
             for j in range(0, ((self.n - 1)) + 1):
                 if (self.M[j] and (not self.G[j])):
-                    if (UnionFind().find(self.parent, self.u[j]) == UnionFind().find(self.parent, self.v[j])):
+                    if (UnionFind().Find(self.parent, self.u[j]) == UnionFind().Find(self.parent, self.v[j])):
                         return None
                     self.G[j] = True
-                    UnionFind().union(self.parent, self.rank, self.u[j], self.v[j])
+                    UnionFind().Union(self.parent, self.rank, self.u[j], self.v[j])
                     _changed = True
         return self.G
 

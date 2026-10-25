@@ -14,7 +14,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class Boruvka:
-    def mst(self, n, U, V, W):
+    def Boruvka(self, n, U, V, W):
         self.n = n
         self.U = U
         self.V = V
@@ -91,6 +91,6 @@ if __name__ == '__main__':
     V = [0, 0, 1, 1]
     W = [0, 0, 0, 2]
     prog = Boruvka()
-    result = prog.mst(len(U), U, V, W)
+    result = prog.Boruvka(len(U), U, V, W)
     print(result)
 

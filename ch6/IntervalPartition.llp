@@ -1,31 +1,43 @@
-// IntervalPartition (bxx-greedy.tex, algo:interval-partition): for each
-// interval i (sorted by start time), reuse the earliest-free room via a
-// min-priority-queue Q of (finishTime, roomNumber) pairs -- extract-min
-// when Q is non-empty and its minimum finish time is <= s[i], else open
-// a new room -- matching the book's binary-heap algorithm exactly, not
-// a linear scan over existing rooms each iteration. Uses the heap<int>
-// builtin (-> java.util.PriorityQueue<int[]>, lexicographically ordered
-// by (finish, room) so ties reuse the lowest-numbered free room) instead
-// of hand-rolled heapPush/heapPop/heapify/greater.
+// Interval partitioning, as bxx-greedy.tex's Algorithm IntervalPartition
+// states it:
+//
+//   var Q: min-priority queue of (finishTime, roomNumber), initially empty
+//       numRooms: int, initially 0
+//   for i := 1 to n:
+//     if Q is not empty and Q.min().finishTime <= s[i]:
+//       room[i] := Q.extract-min().roomNumber    // reuse earliest-free room
+//     else:
+//       numRooms := numRooms + 1                 // allocate a new room
+//       room[i] := numRooms
+//     Q.insert(f[i], room[i])                    // busy until f[i]
+//   return room, numRooms
+//
+// Intervals arrive sorted by start time. The heap is keyed by finish
+// time, so its minimum is the room that frees up earliest.
+//
+// The loop is `for`, not `forall`: Q and numRooms both carry from one
+// iteration to the next.
+//
+// The book returns the pair (room, numRooms). LL returns one value, so
+// room is returned; numRooms is max(room) and so is recoverable from it.
+// Rooms are numbered from 1, as the book numbers them.
 
 class IntervalPartition {
-  int[] partition(int[] s, int[] f) {
+  int[] IntervalPartition(int[] s, int[] f) {
     int n = s.length;
-    int[] G = new int[n];
+    int[] room = new int[n];
     heap<int> Q = new heap<int>();
     int numRooms = 0;
-    forall j in [0..n-1] : {
-      int r = 0 - 1;
-      if (!Q.isEmpty() && Q.peekKey() <= s[j]) {
-        r = Q.peekValue();
+    for i in [0..n-1] : {
+      if (!Q.isEmpty() && Q.peekKey() <= s[i]) {
+        room[i] = Q.peekValue();        // reuse earliest-free room
         Q.removeMin();
       } else {
-        r = numRooms;
-        numRooms = numRooms + 1;
+        numRooms = numRooms + 1;        // allocate a new room
+        room[i] = numRooms;
       };
-      G[j] = r + 1;
-      Q.push(f[j], r);
-    };
-    return G;
+      Q.push(f[i], room[i]);            // that room is busy until f[i]
+    }
+    return room;
   }
 }

@@ -6,7 +6,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class Knapsack:
-    def solve(self, w, v, W):
+    def Knapsack(self, w, v, W):
         self.w = w
         self.v = v
         self.W = W
@@ -30,6 +30,6 @@ if __name__ == '__main__':
     v = [0, 0, 1, 1]
     W = 10
     prog = Knapsack()
-    result = prog.solve(w, v, W)
+    result = prog.Knapsack(w, v, W)
     print(result)
 

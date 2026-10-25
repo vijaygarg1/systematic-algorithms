@@ -47,16 +47,16 @@ public class LLPShortestPath {
 
   public int minCrossCut(int j, int[][] pre, int[][] w, int[] G, boolean[] fixed) {
     int best = Integer.MAX_VALUE;
-    int k = 0;
-    while ((k < pre[j].length)) {
-      int i = pre[j][k];
-      if (fixed[i]) {
-        int d = (G[i] + w[i][j]);
-        if ((d < best)) {
-          best = d;
+    for (int k = 0; k < pre[j].length; k++) {
+      {
+        int i = pre[j][k];
+        if (fixed[i]) {
+          int d = (G[i] + w[i][j]);
+          if ((d < best)) {
+            best = d;
+          }
         }
       }
-      k = (k + 1);
     }
     return best;
   }

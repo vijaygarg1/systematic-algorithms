@@ -50,7 +50,7 @@ class LLPLayering {
         _h += 1;
         _seen += 1;
         if ((() => { for (const i of this.pre[j]) { if ((this.G[j] <= this.G[i])) return true; } return false; })()) {
-            this.G[j] = Math.max(0, (() => { let _a = -2147483647, _s = false; for (const i of this.pre[j]) { const _v = (this.G[i] + 1); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })());
+            this.G[j] = (() => { let _a = -2147483647, _s = false; for (const i of this.pre[j]) { const _v = (this.G[i] + 1); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })();
         }
         for (const _x of _succ[j]) {
             _indeg[_x] -= 1;

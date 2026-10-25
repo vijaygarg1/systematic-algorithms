@@ -1,27 +1,41 @@
-// Sequential BFS distance from a source vertex (FIFO queue).
+// BFS-Traversal, exactly as bxx-graph.tex's Algorithm BFS-Traversal
+// states it:
+//
+//   var S: queue of int               // discovered but not yet explored
+//   S.enqueue(s); dist[s] := 0
+//   while not S.empty():
+//     j := S.dequeue()
+//     forall k in succ(j):
+//       if dist[k] > dist[j] + 1:
+//         dist[k] := dist[j] + 1; parent[k] := j; S.enqueue(k)
+//   return dist
+//
+// The book's `queue of int` is a list<int> here: add is enqueue and
+// removeFirst is dequeue, so the list is used strictly FIFO.
+//
+// parent is the BFS tree the book declares as a second output: parent[k]
+// is the vertex k was first reached from, and stays -1 for the source and
+// for anything unreachable. Only dist is returned, as the book returns.
 
 class BFSTraversal {
-  int[] traverse(set<int>[] succ, int s) {
+  int[] BFSTraversal(set<int>[] succ, int s) {
     int n = succ.length;
-    int[] G = new int[n];
-    forall i in [0..n-1] : G[i] = infinity;
-    G[s] = 0;
-    // FIFO queue simulated via an int[] with head/tail indices.
-    int[] Q = new int[n];
-    int head = 0;
-    int tail = 0;
-    Q[tail] = s;
-    tail = tail + 1;
-    while (head < tail) {
-      int j = Q[head];
-      head = head + 1;
-      forall k in succ[j] :
-        if (G[k] > G[j] + 1) {
-          G[k] = G[j] + 1;
-          Q[tail] = k;
-          tail = tail + 1;
+    int[] dist = new int[n];
+    int[] parent = new int[n];
+    forall i in [0..n-1] : dist[i] = infinity;
+    forall i in [0..n-1] : parent[i] = -1;
+    list<int> S;
+    S.add(s);
+    dist[s] = 0;
+    while (!S.isEmpty()) {
+      int j = S.removeFirst();
+      for k in succ[j] :
+        if (dist[k] > dist[j] + 1) {
+          dist[k] = dist[j] + 1;
+          parent[k] = j;
+          S.add(k);
         };
     };
-    return G;
+    return dist;
   }
 }

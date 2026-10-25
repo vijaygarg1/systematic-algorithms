@@ -39,12 +39,12 @@ class LLPWeightedVertexCover {
     int[] efill = new int[nv];
     int[][] inc = new int[nv][];
     boolean fresh = false;
-    forall e in [0..m-1] : {
+    for e in [0..m-1] : {
       edeg[eu[e]] = edeg[eu[e]] + 1;
       edeg[ev[e]] = edeg[ev[e]] + 1;
     };
     forall v in [0..nv-1] : inc[v] = new int[edeg[v]];
-    forall e in [0..m-1] : {
+    for e in [0..m-1] : {
       inc[eu[e]][efill[eu[e]]] = e;
       efill[eu[e]] = efill[eu[e]] + 1;
       inc[ev[e]][efill[ev[e]]] = e;

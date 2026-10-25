@@ -46,10 +46,8 @@ class LLPWeightedSetCover {
       advance : {
         double step = minRemainingBudget(x);
         G[x] = G[x] + step;
-        int t = 0;
-        while (t < inc[x].length) {
+        for t in [0..(inc[x].length) - 1] : {
           sp[inc[x][t]] = sp[inc[x][t]] + step;
-          t = t + 1;
         };
         fresh = false;
       };
@@ -100,7 +98,7 @@ class LLPWeightedSetCover {
   // Smallest remaining budget among the sets containing element e.
   double minRemainingBudget(int e) {
     double best = infinity;
-    forall s in inc[e] : {
+    for s in inc[e] : {
       double budget = w[s] - sp[s];
       if (budget < best) { best = budget; };
     };

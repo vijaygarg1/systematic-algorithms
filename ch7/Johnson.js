@@ -43,37 +43,34 @@
 
 
 class Dijkstra {
-  shortestPath(adj, aw, s) {
+  Dijkstra(adj, aw, s) {
     this.adj = adj;
     this.aw = aw;
     this.s = s;
     this.n = this.adj.length;
-    this.INF = 2147483647;
-    this.dist = new Array(this.n).fill(0);
+    this.d = new Array(this.n).fill(0);
     this.fixed = new Array(this.n).fill(false);
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        this.dist[i] = this.INF;
+        this.d[i] = 2147483647;
     }
-    this.dist[this.s] = 0;
+    this.d[this.s] = 0;
     let H = [];
-    this._heapPush(H, this.dist[this.s], this.s);
+    this._heapPush(H, this.d[this.s], this.s);
     while ((!(H.length === 0))) {
         let j = H[0][1];
         this._heapPop(H);
         if ((!this.fixed[j])) {
             this.fixed[j] = true;
-            let t = 0;
-            while ((t < this.adj[j].length)) {
+            for (let t = 0; t <= ((this.adj[j].length - 1)); t++) {
                 let k = this.adj[j][t];
-                if (((!this.fixed[k]) && ((this.dist[j] + this.aw[j][t]) < this.dist[k]))) {
-                    this.dist[k] = (this.dist[j] + this.aw[j][t]);
-                    this._heapPush(H, this.dist[k], k);
+                if (((!this.fixed[k]) && ((this.d[j] + this.aw[j][t]) < this.d[k]))) {
+                    this.d[k] = (this.d[j] + this.aw[j][t]);
+                    this._heapPush(H, this.d[k], k);
                 }
-                t = (t + 1);
             }
         }
     }
-    return this.dist;
+    return this.d;
   }
 
   // Binary min-heap of [key, value] pairs, ordered by key and
@@ -117,7 +114,7 @@ class Dijkstra {
 }
 
 class Johnson {
-  allPairs(adj, aw) {
+  Johnson(adj, aw) {
     this.adj = adj;
     this.aw = aw;
     this.n = this.adj.length;
@@ -127,14 +124,12 @@ class Johnson {
     while ((this.k < (this.n - 1))) {
         let changed = false;
         for (let i = 0; i <= ((this.n - 1)); i++) {
-            let t = 0;
-            while ((t < this.adj[i].length)) {
+            for (let t = 0; t <= ((this.adj[i].length - 1)); t++) {
                 let j = this.adj[i][t];
                 if (((this.dist[i] + this.aw[i][t]) < this.dist[j])) {
                     this.dist[j] = (this.dist[i] + this.aw[i][t]);
                     changed = true;
                 }
-                t = (t + 1);
             }
         }
         if (changed) {
@@ -145,12 +140,10 @@ class Johnson {
     }
     let negCycle = false;
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        let t = 0;
-        while ((t < this.adj[i].length)) {
+        for (let t = 0; t <= ((this.adj[i].length - 1)); t++) {
             if (((this.dist[i] + this.aw[i][t]) < this.dist[this.adj[i][t]])) {
                 negCycle = true;
             }
-            t = (t + 1);
         }
     }
     if (negCycle) {
@@ -165,15 +158,13 @@ class Johnson {
         awPrime[i] = new Array(this.adj[i].length).fill(0);
     }
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        let t = 0;
-        while ((t < this.adj[i].length)) {
+        for (let t = 0; t <= ((this.adj[i].length - 1)); t++) {
             awPrime[i][t] = this.reweight(this.aw[i][t], price[this.adj[i][t]], price[i]);
-            t = (t + 1);
         }
     }
     let D = Array.from({length: this.n}, () => new Array(this.n).fill(0));
     for (let u = 0; u <= ((this.n - 1)); u++) {
-        let distPrime = new Dijkstra().shortestPath(this.adj, awPrime, u);
+        let distPrime = new Dijkstra().Dijkstra(this.adj, awPrime, u);
         for (let v = 0; v <= ((this.n - 1)); v++) {
             D[u][v] = this.reweight(distPrime[v], price[u], price[v]);
         }
@@ -195,6 +186,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const adj = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]];
     const aw = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]];
     const prog = new Johnson();
-    const result = prog.allPairs(adj, aw);
+    const result = prog.Johnson(adj, aw);
     console.log(JSON.stringify(result));
 }

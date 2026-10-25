@@ -47,14 +47,12 @@ class LLPPrim {
       advance : {
         fixed[j] = true;
         C[j] = key[j];
-        int t = 0;
-        while (t < adj[j].length) {
+        for t in [0..(adj[j].length) - 1] : {
           int k = adj[j][t];
           if (!fixed[k] && aw[j][t] < key[k]) {
-            key[k] = aw[j][t];
-            parent[k] = j;
+          key[k] = aw[j][t];
+          parent[k] = j;
           };
-          t = t + 1;
         };
       };
     return C;

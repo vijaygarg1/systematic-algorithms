@@ -13,8 +13,7 @@ class LLPFractionalKnapsack {
   double[] LLPFractionalKnapsack(double[] v, double[] w, double W) {
     double[] G = 0.0;
     double[] S = new double[n + 1];
-    int i = 0;
-    while (i < n) { S[i + 1] = S[i] + w[i]; i = i + 1; };
+    for i in [0..n-1] : S[i + 1] = S[i] + w[i];   // S[j] = sum of w[k] for k < j
     forbidden (j in [0..n-1]) :
       G[j] < target(j)
     =>

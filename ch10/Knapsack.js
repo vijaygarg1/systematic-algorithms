@@ -7,7 +7,7 @@
 
 
 class Knapsack {
-  solve(w, v, W) {
+  Knapsack(w, v, W) {
     this.w = w;
     this.v = v;
     this.W = W;
@@ -39,6 +39,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const v = [0, 0, 1, 1];
     const W = 10;
     const prog = new Knapsack();
-    const result = prog.solve(w, v, W);
+    const result = prog.Knapsack(w, v, W);
     console.log(JSON.stringify(result));
 }

@@ -58,10 +58,8 @@ class LLPWeightedSetCover:
                 if (self.covered(x) and self.slackMin(x)):
                     step = self.minRemainingBudget(x)
                     self.G[x] = (self.G[x] + step)
-                    t = 0
-                    while (t < len(self.inc[x])):
+                    for t in range(0, ((len(self.inc[x]) - 1)) + 1):
                         self.sp[self.inc[x][t]] = (self.sp[self.inc[x][t]] + step)
-                        t = (t + 1)
                     self.fresh = False
                     _changed = True
         C = [False] * (self.m)

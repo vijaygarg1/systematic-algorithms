@@ -4,21 +4,17 @@ class ChainCoverFromMatching {
   int[] ChainCoverFromMatching(int[] matchPartner) {
     int n = matchPartner.length;
     int[] C = new int[n];
-    int i = 0;
-    while (i < n) {
+    for i in [0..(n) - 1] : {
       C[i] = i;
-      i = i + 1;
     };
     // Each matched (u, v) sets C[u] := v -- u is the top of its chain
     // (by uniqueness of u^-) and v is the bottom of its chain (by
     // uniqueness of v^+).  The two chains glue into one.
-    int u = 0;
-    while (u < n) {
+    for u in [0..(n) - 1] : {
       int v = matchPartner[u];
       if (v != 0 - 1) {
-        C[u] = v;
+      C[u] = v;
       };
-      u = u + 1;
     };
     parentPointerJumping(C);
     return C;
@@ -32,15 +28,13 @@ class ChainCoverFromMatching {
     boolean changed = true;
     while (changed) {
       changed = false;
-      int i = 0;
-      while (i < n) {
+      for i in [0..(n) - 1] : {
         int p = C[i];
         if (C[p] != p) {
-          C[i] = C[p];
-          changed = true;
+        C[i] = C[p];
+        changed = true;
         };
-        i = i + 1;
-      }
+      };
     }
   }
 }

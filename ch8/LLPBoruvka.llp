@@ -12,7 +12,7 @@
 // what progress stops on.
 
 class LLPBoruvka {
-  boolean[] mst(int n, int[] U, int[] V, int[] W) {
+  boolean[] LLPBoruvka(int n, int[] U, int[] V, int[] W) {
     boolean[] T = new boolean[U.length], active = new boolean[n];
     int[] G = new int[n], mweEdge = new int[n];
     double[] mweW = new double[n];
@@ -23,7 +23,7 @@ class LLPBoruvka {
       forall i in [0..n-1] : { mweEdge[i] = 0 - 1; mweW[i] = infinity; };
 
       // Cheapest edge leaving each still-active component.
-      forall e in [0..U.length-1] : {
+      for e in [0..U.length-1] : {
         int ru = find(U[e]), rv = find(V[e]);
         if (active[ru] && active[rv] && ru != rv) { relax(ru, e, W); relax(rv, e, W); };
       };

@@ -37,7 +37,7 @@
 // the "w[i][j] < INF" guards the matrix version needed are gone.
 
 class Johnson {
-  int[][] allPairs(int[][] adj, int[][] aw) {
+  int[][] Johnson(int[][] adj, int[][] aw) {
     int n = adj.length;
     int INF = infinity;
 
@@ -48,15 +48,13 @@ class Johnson {
     int k = 0;
     while (k < n - 1) {
       boolean changed = false;
-      forall i in [0..n-1] : {
-        int t = 0;
-        while (t < adj[i].length) {
+      for i in [0..n-1] : {
+        for t in [0..adj[i].length-1] : {
           int j = adj[i][t];
           if (dist[i] + aw[i][t] < dist[j]) {
             dist[j] = dist[i] + aw[i][t];
             changed = true;
           };
-          t = t + 1;
         };
       };
       if (changed) { k = k + 1; } else { k = n; }
@@ -64,12 +62,9 @@ class Johnson {
 
     // One more pass: any further relaxation means a negative cycle.
     boolean negCycle = false;
-    forall i in [0..n-1] : {
-      int t = 0;
-      while (t < adj[i].length) {
+    for i in [0..n-1] : {
+      for t in [0..adj[i].length-1] :
         if (dist[i] + aw[i][t] < dist[adj[i][t]]) { negCycle = true; };
-        t = t + 1;
-      };
     };
     if (negCycle) {
       return null;
@@ -80,18 +75,15 @@ class Johnson {
     forall v in [0..n-1] : price[v] = 0 - dist[v];
     int[][] awPrime = new int[n][];
     forall i in [0..n-1] : awPrime[i] = new int[adj[i].length];
-    forall i in [0..n-1] : {
-      int t = 0;
-      while (t < adj[i].length) {
+    for i in [0..n-1] : {
+      for t in [0..adj[i].length-1] :
         awPrime[i][t] = reweight(aw[i][t], price[adj[i][t]], price[i]);
-        t = t + 1;
-      };
     };
 
     // Step 4: Dijkstra from every source; undo the reweighting.
     int[][] D = new int[n][n];
     forall u in [0..n-1] : {
-      int[] distPrime = Dijkstra(adj, awPrime, u);
+      int[] distPrime = Dijkstra.Dijkstra(adj, awPrime, u);
       forall v in [0..n-1] :
         D[u][v] = reweight(distPrime[v], price[u], price[v]);
     };

@@ -24,15 +24,13 @@ class ApproxVertexCover {
     this.n = n;
     this.C = new Array(this.n).fill(false);
     this.m = this.eu.length;
-    this.e = 0;
-    while ((this.e < this.m)) {
-        let u = this.eu[this.e];
-        let v = this.ev[this.e];
+    for (let e = 0; e <= ((this.m - 1)); e++) {
+        let u = this.eu[e];
+        let v = this.ev[e];
         if (((!this.C[u]) && (!this.C[v]))) {
             this.C[u] = true;
             this.C[v] = true;
         }
-        this.e = (this.e + 1);
     }
     return this.C;
   }

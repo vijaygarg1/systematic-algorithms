@@ -6,15 +6,15 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class UnionFind:
-    def find(self, parent, x):
+    def Find(self, parent, x):
         n = len(parent)
         if (parent[x] != x):
-            parent[x] = self.find(parent, parent[x])
+            parent[x] = self.Find(parent, parent[x])
         return parent[x]
 
-    def union(self, parent, rank, x, y):
-        rx = self.find(parent, x)
-        ry = self.find(parent, y)
+    def Union(self, parent, rank, x, y):
+        rx = self.Find(parent, x)
+        ry = self.Find(parent, y)
         if (rx == ry):
             return False
         if (rank[rx] < rank[ry]):
@@ -32,6 +32,6 @@ if __name__ == '__main__':
     parent = [3, 1, 6, 1, 6, 3, 6, 4]
     x = 0
     prog = UnionFind()
-    result = prog.find(parent, x)
+    result = prog.Find(parent, x)
     print(result)
 

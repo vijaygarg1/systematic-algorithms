@@ -1,7 +1,7 @@
 // LLP-StableMarriage-Spec: the specification form of Gale-Shapley, exactly
 // as bxx-stableMatching.tex's Algorithm LLP-StableMarriage-Spec states it.
 //
-// Always    (j): z = mpref[j][G[j]]
+// Always       : z = mpref[j][G[j]]
 // Forbidden (j): exists i in [1..n] : exists k in [1..G[i]] :
 // (z = mpref[i][k]) and (rank[z][i] < rank[z][j])
 // Advance      : G[j] := G[j] + 1
@@ -38,7 +38,7 @@ public class LLPStableMarriageSpec {
     for (int i = 1; i <= n; i++) {
       boolean t2 = false;
       for (int k = 1; k <= G[i]; k++) {
-        if (((mpref[i][k] == z) && (rank[z][i] < rank[z][j]))) { t2 = true; break; }
+        if (((z == mpref[i][k]) && (rank[z][i] < rank[z][j]))) { t2 = true; break; }
       }
       if (t2) { t1 = true; break; }
     }

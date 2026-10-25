@@ -36,8 +36,8 @@ class LLPOptimalBinarySearchTree {
     // O((j-i)^2) instead of O(j-i), and the whole table O(n^4) instead of
     // the O(n^3) the book states.
     double s = 0.0;
-    forall l in [i..j] : s = s + p[l];
-    forall k in [i..j] : {
+    for l in [i..j] : s = s + p[l];
+    for k in [i..j] : {
       double leftCost = 0.0;
       if (k > i) { leftCost = G[i][k-1]; }
       double rightCost = 0.0;

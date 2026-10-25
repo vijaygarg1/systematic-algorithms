@@ -106,15 +106,13 @@ class LLPApproxKnapsack:
         picks = 0
         while (picks < nf):
             cand = (0 - 1)
-            t = 0
-            while (t < nf):
+            for t in range(0, ((nf - 1)) + 1):
                 if ((not used[t]) and (fw[t] <= room)):
                     if (cand < 0):
                         cand = t
                     else:
                         if ((fv[t] * fw[cand]) > (fv[cand] * fw[t])):
                             cand = t
-                t = (t + 1)
             if (cand < 0):
                 picks = nf
             else:

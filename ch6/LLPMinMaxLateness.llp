@@ -18,8 +18,9 @@ class LLPMinMaxLateness {
   int[] LLPMinMaxLateness(int[] t, int[] d) {
     int[] S = 0;
     int[] G = 0;
-    forall j in [1..n-1] : S[j] = S[j-1] + t[j-1];
+    for j in [1..n-1] : S[j] = S[j-1] + t[j-1];
     ensure (j in [0..n-1]) : G[j] >= S[j];
+    int lateness = max j in [0..n-1] : max(0, G[j] + t[j] - d[j]);
     return G;
   }
 }

@@ -32,21 +32,21 @@ public class HornSATFC {
       front = (front + 1);
       if ((!A[x])) {
         A[x] = true;
-        int k = 0;
-        while ((k < adj[x].length)) {
-          int ci = adj[x][k];
-          rem[ci] = (rem[ci] - 1);
-          if ((rem[ci] == 0)) {
-            if ((head[ci] < 0)) {
-              sat = false;
-            } else {
-              if ((!A[head[ci]])) {
-                queue[back] = head[ci];
-                back = (back + 1);
+        for (int k = 0; k < adj[x].length; k++) {
+          {
+            int ci = adj[x][k];
+            rem[ci] = (rem[ci] - 1);
+            if ((rem[ci] == 0)) {
+              if ((head[ci] < 0)) {
+                sat = false;
+              } else {
+                if ((!A[head[ci]])) {
+                  queue[back] = head[ci];
+                  back = (back + 1);
+                }
               }
             }
           }
-          k = (k + 1);
         }
       }
     }

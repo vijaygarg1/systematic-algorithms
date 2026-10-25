@@ -34,8 +34,7 @@ class HornSATFC:
             front = (front + 1)
             if (not self.A[x]):
                 self.A[x] = True
-                k = 0
-                while (k < len(self.adj[x])):
+                for k in range(0, ((len(self.adj[x]) - 1)) + 1):
                     ci = self.adj[x][k]
                     self.rem[ci] = (self.rem[ci] - 1)
                     if (self.rem[ci] == 0):
@@ -45,7 +44,6 @@ class HornSATFC:
                             if (not self.A[self.head[ci]]):
                                 queue[back] = self.head[ci]
                                 back = (back + 1)
-                    k = (k + 1)
         return self.A
 
 

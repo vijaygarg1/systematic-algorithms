@@ -25,7 +25,7 @@
 import java.util.*;
 
 public class Prim {
-  public int[] mst(int[][] adj, int[][] aw) {
+  public int[] Prim(int[][] adj, int[][] aw) {
     int n = adj.length;
     int[] d = new int[n];
     int[] parent = new int[n];
@@ -49,15 +49,15 @@ public class Prim {
       if ((!fixed[v])) {
         fixed[v] = true;
         count = (count + 1);
-        int t = 0;
-        while ((t < adj[v].length)) {
-          int k = adj[v][t];
-          if (((!fixed[k]) && (aw[v][t] < d[k]))) {
-            d[k] = aw[v][t];
-            parent[k] = v;
-            H.add(new int[]{d[k], k});
+        for (int t = 0; t < adj[v].length; t++) {
+          {
+            int k = adj[v][t];
+            if (((!fixed[k]) && (aw[v][t] < d[k]))) {
+              d[k] = aw[v][t];
+              parent[k] = v;
+              H.add(new int[]{d[k], k});
+            }
           }
-          t = (t + 1);
         }
       }
     }
@@ -68,7 +68,7 @@ public class Prim {
     int[][] adj = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     int[][] aw = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     Prim prog = new Prim();
-    int[] result = prog.mst(adj, aw);
+    int[] result = prog.Prim(adj, aw);
     System.out.println(Arrays.toString(result));
   }
 }

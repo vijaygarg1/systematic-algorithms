@@ -1,4 +1,19 @@
-"""Generic queue-based reachability from vertex 0.
+"""Traversal, as bxx-graph.tex's Algorithm Traversal states it:
+
+var S: set of int                 // discovered but not yet explored
+S.add(s); visited[s] := 1
+while not S.empty():
+j := S.removeAny(visited)
+forall k in succ(j):
+if visited[k] = 0: visited[k] := 1; S.add(k)
+return visited
+
+The book's S is a SET and removeAny may return any member -- that is the
+point of this algorithm: BFS-Traversal and DFS-Traversal are the same
+code with the order of removal pinned down. LL has no scalar set type
+with a "remove any" operation, so S is a list<int> here and removeFirst
+makes one concrete choice. Any other choice visits the same vertices;
+only the order differs, and the result (the reachable set) is the same.
 
 Auto-generated from Traversal.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -6,24 +21,20 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class Traversal:
-    def reach(self, succ):
+    def Traversal(self, succ, s):
         self.succ = succ
+        self.s = s
         self.n = len(self.succ)
-        self.G = [0] * (self.n)
-        self.Q = [0] * (self.n)
-        self.head = 0
-        self.tail = 0
-        self.G[0] = 1
-        self.Q[self.tail] = 0
-        self.tail = (self.tail + 1)
-        while (self.head < self.tail):
-            j = self.Q[self.head]
-            self.head = (self.head + 1)
+        self.visited = [0] * (self.n)
+        self.S = []
+        self.S.append(self.s)
+        self.visited[self.s] = 1
+        while (not (not self.S)):
+            j = self.S.pop(0)
             for k in self.succ[j]:
-                if (self.G[k] == 0):
-                    self.G[k] = 1
-                    self.Q[self.tail] = k
-                    self.tail = (self.tail + 1)
-        return self.G
+                if (self.visited[k] == 0):
+                    self.visited[k] = 1
+                    self.S.append(k)
+        return self.visited
 
 

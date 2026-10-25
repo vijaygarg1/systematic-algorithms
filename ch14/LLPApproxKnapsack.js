@@ -124,8 +124,7 @@ class LLPApproxKnapsack {
     let picks = 0;
     while ((picks < nf)) {
         let cand = (0 - 1);
-        let t = 0;
-        while ((t < nf)) {
+        for (let t = 0; t <= ((nf - 1)); t++) {
             if (((!used[t]) && (fw[t] <= room))) {
                 if ((cand < 0)) {
                     cand = t;
@@ -135,7 +134,6 @@ class LLPApproxKnapsack {
                     }
                 }
             }
-            t = (t + 1);
         }
         if ((cand < 0)) {
             picks = nf;

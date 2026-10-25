@@ -53,14 +53,14 @@ public class LLPDeltaStepping {
 
   public boolean relaxHeavy(int v, int[][] pre, int[][] w, boolean[][] isLight, int[] G, int delta) {
     boolean relaxed = false;
-    int k = 0;
-    while ((k < pre[v].length)) {
-      int u = pre[v][k];
-      if (((!isLight[u][v]) && ((G[u] + w[u][v]) < G[v]))) {
-        G[v] = (G[u] + w[u][v]);
-        relaxed = true;
+    for (int k = 0; k < pre[v].length; k++) {
+      {
+        int u = pre[v][k];
+        if (((!isLight[u][v]) && ((G[u] + w[u][v]) < G[v]))) {
+          G[v] = (G[u] + w[u][v]);
+          relaxed = true;
+        }
       }
-      k = (k + 1);
     }
     return relaxed;
   }

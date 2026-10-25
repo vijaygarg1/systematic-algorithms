@@ -1,7 +1,7 @@
 """Classical Kruskal MST: sort edges, union-find with rank and path-compression.
-Calls the sibling UnionFind program (`UnionFind.union(parent, rank, u, v)`,
+Calls the sibling UnionFind program (`UnionFind.Union(parent, rank, u, v)`,
 compiling to `new UnionFind().union(parent, rank, u, v)`) instead of
-keeping its own copy of find/union-by-rank -- UnionFind.union() already
+keeping its own copy of find/union-by-rank -- UnionFind.Union() already
 finds both roots internally and reports whether they were distinct, so
 Kruskal's main loop needs no separate find() call of its own. This makes
 Kruskal.java a multi-file program: it requires UnionFind.java alongside
@@ -14,15 +14,15 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class UnionFind:
-    def find(self, parent, x):
+    def Find(self, parent, x):
         n = len(parent)
         if (parent[x] != x):
-            parent[x] = self.find(parent, parent[x])
+            parent[x] = self.Find(parent, parent[x])
         return parent[x]
 
-    def union(self, parent, rank, x, y):
-        rx = self.find(parent, x)
-        ry = self.find(parent, y)
+    def Union(self, parent, rank, x, y):
+        rx = self.Find(parent, x)
+        ry = self.Find(parent, y)
         if (rx == ry):
             return False
         if (rank[rx] < rank[ry]):
@@ -37,7 +37,7 @@ class UnionFind:
 
 
 class Kruskal:
-    def mst(self, n, U, V, W):
+    def Kruskal(self, n, U, V, W):
         self.n = n
         self.U = U
         self.V = V
@@ -51,7 +51,7 @@ class Kruskal:
         chosen = 0
         e = 0
         while ((e < self.m) and (chosen < (self.n - 1))):
-            if UnionFind().union(self.parent, self.rank, self.U[e], self.V[e]):
+            if UnionFind().Union(self.parent, self.rank, self.U[e], self.V[e]):
                 self.T[e] = True
                 chosen = (chosen + 1)
             e = (e + 1)
@@ -63,6 +63,6 @@ if __name__ == '__main__':
     V = [0, 0, 1, 1]
     W = [0, 0, 0, 2]
     prog = Kruskal()
-    result = prog.mst(len(U), U, V, W)
+    result = prog.Kruskal(len(U), U, V, W)
     print(result)
 

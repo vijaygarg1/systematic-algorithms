@@ -1,11 +1,12 @@
 // LLP-StableMarriage: Gale-Shapley as a lattice-linear program, written
 // exactly as bxx-stableMatching.tex's Algorithm LLP-StableMarriage:
 //
-// Always    (i): z = mpref[i][G[i]]
-// Forbidden (i): (G[i] = 0) or ((partner[z] != null) and
+// Var          : partner: array[1..n] of int initially 0
+// Always       : z = mpref[i][G[i]]
+// Forbidden (i): (G[i] = 0) or ((partner[z] != 0) and
 // (rank[z][partner[z]] < rank[z][i]))
 // Advance      : G[i] := G[i] + 1;
-// if ((partner[z] = null) or (rank[z][i] < rank[z][partner[z]]))
+// if ((partner[z] = 0) or (rank[z][i] < rank[z][partner[z]]))
 // then partner[z] := i
 //
 // setBase(1) and the [0..n] declarations give the book's array[1..n]:
@@ -18,12 +19,15 @@
 // 0 means he has proposed to nobody, k that he is standing on his k-th
 // choice. LLPStableMarriageSpec.llp uses the same G.
 //
-// null is 0, which is not a woman because women are 1..n.
+// partner[z] = 0 means woman z is free: 0 is not a woman, because women
+// are 1..n. The book uses 0 here too.
 //
-// The one thing LL cannot say the book's way: its Always is a definition,
-// re-read wherever it appears, so the advance's z is the NEXT choice,
-// read after G[i] is incremented. LL's `always` binds once on entry to
-// each of forbidden and advance, so the advance re-reads it explicitly.
+// The book's Always is a definition, re-read wherever it appears, so the
+// advance's z is the NEXT choice -- read after G[i] is incremented. The
+// compiler now matches that: it binds the always variable on entry and
+// re-assigns it after any statement writing something the expression
+// reads, so no explicit re-read is written here (see _refresh_always in
+// llc.py).
 //
 // partner[z] is the best man who has proposed to z so far: redundant
 // state, recoverable from G in O(n), kept only so the guard costs O(1)

@@ -1,37 +1,48 @@
-// LLP-IntervalScheduling (bxx-greedy.tex, fig:activity): jobs sorted by
-// finish time, held in a doubly linked list (prevArr/nextArr). Job 0 is
-// always fixed initially. The book's two rules are written here as two
-// forbidden/advance clauses joined by `&&`, so they share one fixpoint:
-// every job is tested against both rules on each sweep. Rule 1 selects a
-// job whose list-predecessor has already finished by s[j]; rule 2 deletes
-// a job that its (selected) predecessor still overlaps, in O(1), via
-// next[prev[j]] := next[j]; prev[next[j]] := prev[j]. deleted[] records
-// the list removal that the book expresses by unlinking the node.
+// LLP-IntervalScheduling, as bxx-greedy.tex's Algorithm
+// LLP-IntervalScheduling states it. Jobs sit in a doubly linked list;
+// prev and next are the previous and next node.
+//
+//   Forbidden (j in [1..n]): !G[j] and f[prev[j]] <= s[j]
+//   Advance                : G[j] := true
+//   &&
+//   Forbidden (j in [1..n]): (j>1) and (next[prev[j]] = j)
+//                            and G[prev[j]] and s[j] < f[prev[j]]
+//   Advance                : next[prev[j]] := next[j]     // delete from
+//                            prev[next[j]] := prev[j]     // linked list
+//
+// next[prev[j]] = j is the "j is still in the list" test. Without it the
+// second rule never falsifies its own guard -- deleting j leaves prev[j]
+// untouched, so G[prev[j]] and s[j] < f[prev[j]] both stay true and j is
+// forbidden forever. (Verified: the version without it does not
+// terminate.) It is also what makes the book's own claim true, that
+// every job is touched at most twice.
+//
+// Rule 1 needs no index bound: G[0] is true from the start, so !G[j] is
+// false at j = 0 and the guard short-circuits before reaching f[prev[0]].
+//
+// The advance guards prev[next[j]] because next[n-1] is n, one past the
+// last slot: the book's list has a tail sentinel there, this one does not.
 
 class LLPIntervalScheduling {
   boolean[] LLPIntervalScheduling(int[] s, int[] f) {
     int n = s.length;
     boolean[] G = new boolean[n];
-    boolean[] deleted = new boolean[n];
-    int[] prevArr = new int[n];
-    int[] nextArr = new int[n];
-    forall i in [0..n-1] : prevArr[i] = i - 1;
-    forall i in [0..n-1] : nextArr[i] = i + 1;
+    int[] prev = new int[n];
+    int[] next = new int[n];
+    forall i in [0..n-1] : prev[i] = i - 1;
+    forall i in [0..n-1] : next[i] = i + 1;
     G[0] = true;
     forbidden (j in [0..n-1]) :
-      j > 0 && !deleted[j] && !G[j] && f[prevArr[j]] <= s[j]
+      !G[j] && f[prev[j]] <= s[j]
     =>
       advance : { G[j] = true; }
     &&
     forbidden (j in [0..n-1]) :
-      j > 0 && !deleted[j] && G[prevArr[j]] && s[j] < f[prevArr[j]]
+      j > 0 && next[prev[j]] == j && G[prev[j]] && s[j] < f[prev[j]]
     =>
       advance : {
-        deleted[j] = true;
-        int p = prevArr[j];
-        int nx = nextArr[j];
-        nextArr[p] = nx;
-        if (nx < n) { prevArr[nx] = p; }
+        next[prev[j]] = next[j];
+        if (next[j] < n) { prev[next[j]] = prev[j]; };
       };
     return G;
   }

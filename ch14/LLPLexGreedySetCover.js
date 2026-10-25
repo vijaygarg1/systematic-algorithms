@@ -57,10 +57,8 @@ class LLPLexGreedySetCover {
                     let e = this.mem[j][k];
                     if ((!this.covered[e])) {
                         this.covered[e] = true;
-                        let t = 0;
-                        while ((t < this.inc[e].length)) {
+                        for (let t = 0; t <= ((this.inc[e].length - 1)); t++) {
                             this.cnt[this.inc[e][t]] = (this.cnt[this.inc[e][t]] - 1);
-                            t = (t + 1);
                         }
                     }
                     k = (k + 1);
@@ -103,8 +101,7 @@ class LLPLexGreedySetCover {
 
   bestAt(e) {
     let win = (0 - 1);
-    let k = 0;
-    while ((k < this.inc[e].length)) {
+    for (let k = 0; k <= ((this.inc[e].length - 1)); k++) {
         let s = this.inc[e][k];
         if ((!this.G[s])) {
             if ((win < 0)) {
@@ -115,7 +112,6 @@ class LLPLexGreedySetCover {
                 }
             }
         }
-        k = (k + 1);
     }
     return win;
   }

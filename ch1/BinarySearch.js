@@ -29,6 +29,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const A = [3, 1, 6, 1, 6, 3, 6, 4];
     const key = 0;
     const prog = new BinarySearch();
-    const result = prog.BinarySearch(A, key, 0, A.length);
+    const result = prog.BinarySearch(A, key, 0, A.length - 1);
     console.log(JSON.stringify(result));
 }

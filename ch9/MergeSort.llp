@@ -1,10 +1,10 @@
 // Parallel merge sort: recursive halves composed with `[ A [] B ]`.
 
 class MergeSort {
-  void sort(int lo, int hi, int[] G) {
+  void MergeSort(int lo, int hi, int[] G) {
     if (lo < hi) {
       int mid = (lo + hi) / 2;
-      [ sort(lo, mid, G) [] sort(mid+1, hi, G) ];
+      [ MergeSort(lo, mid, G) [] MergeSort(mid+1, hi, G) ];
       Merge(lo, mid, hi, G);
     }
   }

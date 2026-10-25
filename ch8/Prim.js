@@ -29,7 +29,7 @@
 
 
 class Prim {
-  mst(adj, aw) {
+  Prim(adj, aw) {
     this.adj = adj;
     this.aw = aw;
     this.n = this.adj.length;
@@ -53,15 +53,13 @@ class Prim {
         if ((!this.fixed[v])) {
             this.fixed[v] = true;
             count = (count + 1);
-            let t = 0;
-            while ((t < this.adj[v].length)) {
+            for (let t = 0; t <= ((this.adj[v].length - 1)); t++) {
                 let k = this.adj[v][t];
                 if (((!this.fixed[k]) && (this.aw[v][t] < this.d[k]))) {
                     this.d[k] = this.aw[v][t];
                     this.parent[k] = v;
                     this._heapPush(H, this.d[k], k);
                 }
-                t = (t + 1);
             }
         }
     }
@@ -114,6 +112,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const adj = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]];
     const aw = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]];
     const prog = new Prim();
-    const result = prog.mst(adj, aw);
+    const result = prog.Prim(adj, aw);
     console.log(JSON.stringify(result));
 }

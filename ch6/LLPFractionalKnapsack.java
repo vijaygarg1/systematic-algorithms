@@ -18,7 +18,6 @@ public class LLPFractionalKnapsack {
   double W;
   double[] G;
   double[] S;
-  int i;
   int j;
 
   private boolean _forbidden0(int j) {
@@ -37,10 +36,8 @@ public class LLPFractionalKnapsack {
     this.n = v.length;
     this.G = new double[n];
     this.S = new double[(n + 1)];
-    this.i = 0;
-    while ((i < n)) {
+    for (int i = 0; i < n; i++) {
       S[(i + 1)] = (S[i] + w[i]);
-      i = (i + 1);
     }
     {
       boolean changed = true;

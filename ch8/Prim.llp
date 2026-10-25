@@ -23,7 +23,7 @@
 // so could not meet O(m log n) on a sparse graph.
 
 class Prim {
-  int[] mst(int[][] adj, int[][] aw) {
+  int[] Prim(int[][] adj, int[][] aw) {
     int n = adj.length;
     int[] d = new int[n];
     int[] parent = new int[n];
@@ -42,16 +42,14 @@ class Prim {
       if (!fixed[v]) {
         fixed[v] = true;
         count = count + 1;
-        int t = 0;
-        while (t < adj[v].length) {
+        for t in [0..(adj[v].length) - 1] : {
           int k = adj[v][t];
           if (!fixed[k] && aw[v][t] < d[k]) {
-            d[k] = aw[v][t];
-            parent[k] = v;
-            H.push(d[k], k);
+          d[k] = aw[v][t];
+          parent[k] = v;
+          H.push(d[k], k);
           };
-          t = t + 1;
-        }
+        };
       }
     };
     return parent;

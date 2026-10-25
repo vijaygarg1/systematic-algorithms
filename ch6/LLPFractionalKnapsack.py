@@ -22,10 +22,8 @@ class LLPFractionalKnapsack:
         self.n = len(self.v)
         self.G = [0.0] * (self.n)
         self.S = [0.0] * ((self.n + 1))
-        self.i = 0
-        while (self.i < self.n):
-            self.S[(self.i + 1)] = (self.S[self.i] + self.w[self.i])
-            self.i = (self.i + 1)
+        for i in range(0, ((self.n - 1)) + 1):
+            self.S[(i + 1)] = (self.S[i] + self.w[i])
         _changed = True
         while _changed:
             _changed = False

@@ -26,7 +26,7 @@ class FPTASKnapsack {
     // the ones that can, as indices into the caller's arrays.
     int[] orig = new int[w.length];
     int nf = 0;
-    forall t in [0..w.length-1] : {
+    for t in [0..w.length-1] : {
       if (w[t] <= W) {
         orig[nf] = t;
         nf = nf + 1;
@@ -57,8 +57,8 @@ class FPTASKnapsack {
       int t = 0;
       while (t < nf) {
         if (!used[t] && fw[t] <= room) {
-          if (cand < 0) { cand = t; }
-          else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
+        if (cand < 0) { cand = t; }
+        else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
         };
         t = t + 1;
       };
@@ -92,13 +92,13 @@ class FPTASKnapsack {
     // unreachable, then each row is filled from the row above it.
     int[][] D = new int[nf + 1][Vp + 1];
     forall a in [0..nf] : forall b in [1..Vp] : D[a][b] = INF;
-    forall i in [1..nf] : forall p in [1..Vp] :
+    for i in [1..nf] : forall p in [1..Vp] :
       D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
 
     // Best reachable scaled profit -- the last q whose least weight still
     // fits -- then walk the rows back to recover the items that achieved it.
     int bp = 0;
-    forall q in [0..Vp] : {
+    for q in [0..Vp] : {
       if (D[nf][q] <= W) { bp = q; };
     };
     int i = nf;

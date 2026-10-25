@@ -28,14 +28,12 @@ class LLPPriceB {
 
   maxPricePred(j, pre, w, G) {
     let best = G[j];
-    let k = 0;
-    while ((k < pre[j].length)) {
+    for (let k = 0; k <= ((pre[j].length - 1)); k++) {
         let i = pre[j][k];
         let val = (G[i] - w[i][j]);
         if ((val > best)) {
             best = val;
         }
-        k = (k + 1);
     }
     return best;
   }

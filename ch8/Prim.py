@@ -29,7 +29,7 @@ import heapq
 
 
 class Prim:
-    def mst(self, adj, aw):
+    def Prim(self, adj, aw):
         self.adj = adj
         self.aw = aw
         self.n = len(self.adj)
@@ -51,14 +51,12 @@ class Prim:
             if (not self.fixed[v]):
                 self.fixed[v] = True
                 count = (count + 1)
-                t = 0
-                while (t < len(self.adj[v])):
+                for t in range(0, ((len(self.adj[v]) - 1)) + 1):
                     k = self.adj[v][t]
                     if ((not self.fixed[k]) and (self.aw[v][t] < self.d[k])):
                         self.d[k] = self.aw[v][t]
                         self.parent[k] = v
                         heapq.heappush(H, (self.d[k], k))
-                    t = (t + 1)
         return self.parent
 
 
@@ -66,6 +64,6 @@ if __name__ == '__main__':
     adj = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
     aw = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]]
     prog = Prim()
-    result = prog.mst(adj, aw)
+    result = prog.Prim(adj, aw)
     print(result)
 

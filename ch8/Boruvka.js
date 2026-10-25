@@ -15,7 +15,7 @@
 
 
 class Boruvka {
-  mst(n, U, V, W) {
+  Boruvka(n, U, V, W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -118,6 +118,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const V = [0, 0, 1, 1];
     const W = [0, 0, 0, 2];
     const prog = new Boruvka();
-    const result = prog.mst(U.length, U, V, W);
+    const result = prog.Boruvka(U.length, U, V, W);
     console.log(JSON.stringify(result));
 }

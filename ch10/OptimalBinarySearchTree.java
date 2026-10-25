@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class OptimalBinarySearchTree {
-  public double[][] solve(double[] prob) {
+  public double[][] OptimalBinarySearchTree(double[] prob) {
     int n = prob.length;
     double[][] dp = new double[n][n];
     double[][] s = new double[n][n];
@@ -42,7 +42,7 @@ public class OptimalBinarySearchTree {
   public static void main(String[] args) {
     double[] prob = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     OptimalBinarySearchTree prog = new OptimalBinarySearchTree();
-    double[][] result = prog.solve(prob);
+    double[][] result = prog.OptimalBinarySearchTree(prob);
     System.out.println(Arrays.deepToString(result));
   }
 }

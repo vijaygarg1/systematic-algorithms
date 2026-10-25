@@ -35,7 +35,7 @@ public class LLPBoruvka {
     G[j] = G[G[j]];
   }
 
-  public boolean[] mst(int n, int[] U, int[] V, int[] W) {
+  public boolean[] LLPBoruvka(int n, int[] U, int[] V, int[] W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -148,7 +148,7 @@ public class LLPBoruvka {
     int[] V = new int[] {0, 0, 1, 1};
     int[] W = new int[] {0, 0, 0, 2};
     LLPBoruvka prog = new LLPBoruvka();
-    boolean[] result = prog.mst(U.length, U, V, W);
+    boolean[] result = prog.LLPBoruvka(U.length, U, V, W);
     System.out.println(Arrays.toString(result));
   }
 }

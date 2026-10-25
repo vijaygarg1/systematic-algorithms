@@ -158,18 +158,18 @@ public class LLPApproxKnapsack {
     int picks = 0;
     while ((picks < nf)) {
       int cand = (0 - 1);
-      int t = 0;
-      while ((t < nf)) {
-        if (((!used[t]) && (fw[t] <= room))) {
-          if ((cand < 0)) {
-            cand = t;
-          } else {
-            if (((fv[t] * fw[cand]) > (fv[cand] * fw[t]))) {
+      for (int t = 0; t < nf; t++) {
+        {
+          if (((!used[t]) && (fw[t] <= room))) {
+            if ((cand < 0)) {
               cand = t;
+            } else {
+              if (((fv[t] * fw[cand]) > (fv[cand] * fw[t]))) {
+                cand = t;
+              }
             }
           }
         }
-        t = (t + 1);
       }
       if ((cand < 0)) {
         picks = nf;

@@ -10,16 +10,12 @@ class ChainCoverFromMatching:
         self.matchPartner = matchPartner
         self.n = len(self.matchPartner)
         self.C = [0] * (self.n)
-        self.i = 0
-        while (self.i < self.n):
-            self.C[self.i] = self.i
-            self.i = (self.i + 1)
-        u = 0
-        while (u < self.n):
+        for i in range(0, ((self.n - 1)) + 1):
+            self.C[i] = i
+        for u in range(0, ((self.n - 1)) + 1):
             v = self.matchPartner[u]
             if (v != (0 - 1)):
                 self.C[u] = v
-            u = (u + 1)
         self.parentPointerJumping(self.C)
         return self.C
 
@@ -28,13 +24,11 @@ class ChainCoverFromMatching:
         changed = True
         while changed:
             changed = False
-            i = 0
-            while (i < n):
+            for i in range(0, ((n - 1)) + 1):
                 p = C[i]
                 if (C[p] != p):
                     C[i] = C[p]
                     changed = True
-                i = (i + 1)
 
 
 if __name__ == '__main__':

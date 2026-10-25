@@ -13,7 +13,7 @@
 // even there the two sweeps over the recorded path are `forall`s.
 
 class TTC {
-  int[] assign(int[][] pref) {
+  int[] TTC(int[][] pref) {
     int n = pref.length;
     int[] house = new int[n];
     boolean[] fixed = new boolean[n];
@@ -61,7 +61,7 @@ class TTC {
       };
 
       // Step 3: implement the trades for every agent on a cycle this stage.
-      forall i in [0..n-1] : if (inCycle[i]) {
+      for i in [0..n-1] : if (inCycle[i]) {
         house[i] = pref[i][G[i]];
         fixed[i] = true;
         numFixed = numFixed + 1;

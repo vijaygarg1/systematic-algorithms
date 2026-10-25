@@ -19,7 +19,7 @@ class LLPConjunctiveDetection {
 
   boolean happenedBefore(int j, int[] G, int[][][] vc) {
     int n = G.length;
-    forall i in [0..n-1] : {
+    for i in [0..n-1] : {
       if (i != j && vc[i][G[i]][j] >= G[j]) {
         return true;
       };

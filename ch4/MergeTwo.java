@@ -5,7 +5,7 @@
 import java.util.*;
 
 public class MergeTwo {
-  public int[] merge(int[] B, int[] C) {
+  public int[] MergeTwo(int[] B, int[] C) {
     int m = B.length;
     int n = C.length;
     int[] D = new int[(m + n)];
@@ -39,7 +39,7 @@ public class MergeTwo {
     int[] B = new int[] {0, 0, 1, 2};
     int[] C = new int[] {0, 0, 1, 1};
     MergeTwo prog = new MergeTwo();
-    int[] result = prog.merge(B, C);
+    int[] result = prog.MergeTwo(B, C);
     System.out.println(Arrays.toString(result));
   }
 }

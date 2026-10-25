@@ -7,16 +7,18 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class LLPBFS:
-    def LLPBFS(self, pre, G):
+    def LLPBFS(self, pre):
         self.pre = pre
-        self.G = G
         self.n = len(self.pre)
+        self.G = [2147483647] * (self.n)
+        self.G[0] = 0
         _changed = True
         while _changed:
             _changed = False
             for j in range(0, ((self.n - 1)) + 1):
-                if (self.G[j] > min(((self.G[i] + 1) for i in self.pre[j]), default=2147483647)):
-                    self.G[j] = min(((self.G[i] + 1) for i in self.pre[j]), default=2147483647)
+                if (self.G[j] > min(((self.G[i] + 1) for i in self.pre[j] if (self.G[i] < 2147483647)), default=2147483647)):
+                    self.G[j] = min(((self.G[i] + 1) for i in self.pre[j] if (self.G[i] < 2147483647)), default=2147483647)
                     _changed = True
+        return self.G
 
 

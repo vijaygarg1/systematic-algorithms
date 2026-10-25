@@ -7,7 +7,7 @@
 
 
 class OptimalBinarySearchTree {
-  solve(prob) {
+  OptimalBinarySearchTree(prob) {
     this.prob = prob;
     this.n = this.prob.length;
     this.dp = Array.from({length: this.n}, () => new Array(this.n).fill(0.0));
@@ -44,6 +44,6 @@ if (typeof module !== 'undefined') module.exports = OptimalBinarySearchTree;
 if (typeof require !== 'undefined' && require.main === module) {
     const prob = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0];
     const prog = new OptimalBinarySearchTree();
-    const result = prog.solve(prob);
+    const result = prog.OptimalBinarySearchTree(prob);
     console.log(JSON.stringify(result));
 }

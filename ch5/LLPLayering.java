@@ -32,7 +32,7 @@ public class LLPLayering {
   }
 
   private void advance() {
-    int t2 = 0;
+    int t2 = Integer.MIN_VALUE;
     for (int i : pre[j]) t2 = Math.max(t2, (G[i] + 1));
     G[j] = t2;
   }

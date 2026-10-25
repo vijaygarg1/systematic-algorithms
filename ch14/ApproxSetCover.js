@@ -45,17 +45,14 @@ class ApproxSetCover {
     while ((this.remaining > 0)) {
         let bestIdx = 0;
         let bestCover = (0 - 1);
-        let s = 0;
-        while ((s < this.m)) {
+        for (let s = 0; s <= ((this.m - 1)); s++) {
             if ((this.cnt[s] > bestCover)) {
                 bestCover = this.cnt[s];
                 bestIdx = s;
             }
-            s = (s + 1);
         }
         this.C[bestIdx] = true;
-        let k = 0;
-        while ((k < this.mem[bestIdx].length)) {
+        for (let k = 0; k <= ((this.mem[bestIdx].length - 1)); k++) {
             let e = this.mem[bestIdx][k];
             if ((!this.covered[e])) {
                 this.covered[e] = true;
@@ -66,7 +63,6 @@ class ApproxSetCover {
                     t = (t + 1);
                 }
             }
-            k = (k + 1);
         }
     }
     return this.C;

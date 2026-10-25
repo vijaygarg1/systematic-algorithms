@@ -3,16 +3,16 @@
 import java.util.*;
 
 public class UnionFind {
-  public int find(int[] parent, int x) {
+  public int Find(int[] parent, int x) {
     if ((parent[x] != x)) {
-      parent[x] = find(parent, parent[x]);
+      parent[x] = Find(parent, parent[x]);
     }
     return parent[x];
   }
 
-  public boolean union(int[] parent, int[] rank, int x, int y) {
-    int rx = find(parent, x);
-    int ry = find(parent, y);
+  public boolean Union(int[] parent, int[] rank, int x, int y) {
+    int rx = Find(parent, x);
+    int ry = Find(parent, y);
     if ((rx == ry)) {
       return false;
     }
@@ -33,7 +33,7 @@ public class UnionFind {
     int[] parent = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     int x = 0;
     UnionFind prog = new UnionFind();
-    int result = prog.find(parent, x);
+    int result = prog.Find(parent, x);
     System.out.println(result);
   }
 }

@@ -23,13 +23,11 @@ class LLPPriceB:
 
     def maxPricePred(self, j, pre, w, G):
         best = G[j]
-        k = 0
-        while (k < len(pre[j])):
+        for k in range(0, ((len(pre[j]) - 1)) + 1):
             i = pre[j][k]
             val = (G[i] - w[i][j])
             if (val > best):
                 best = val
-            k = (k + 1)
         return best
 
 

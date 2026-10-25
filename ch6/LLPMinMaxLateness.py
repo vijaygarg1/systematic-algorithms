@@ -35,6 +35,7 @@ class LLPMinMaxLateness:
                 if (not (self.G[j] >= self.S[j])):
                     self.G[j] = self.S[j]
                     _changed = True
+        lateness = max((max(0, ((self.G[j] + self.t[j]) - self.d[j])) for j in range(0, ((self.n - 1)) + 1)), default=-2147483647)
         return self.G
 
 

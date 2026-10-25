@@ -1,12 +1,26 @@
-"""IntervalPartition (bxx-greedy.tex, algo:interval-partition): for each
-interval i (sorted by start time), reuse the earliest-free room via a
-min-priority-queue Q of (finishTime, roomNumber) pairs -- extract-min
-when Q is non-empty and its minimum finish time is <= s[i], else open
-a new room -- matching the book's binary-heap algorithm exactly, not
-a linear scan over existing rooms each iteration. Uses the heap<int>
-builtin (-> java.util.PriorityQueue<int[]>, lexicographically ordered
-by (finish, room) so ties reuse the lowest-numbered free room) instead
-of hand-rolled heapPush/heapPop/heapify/greater.
+"""Interval partitioning, as bxx-greedy.tex's Algorithm IntervalPartition
+states it:
+
+var Q: min-priority queue of (finishTime, roomNumber), initially empty
+numRooms: int, initially 0
+for i := 1 to n:
+if Q is not empty and Q.min().finishTime <= s[i]:
+room[i] := Q.extract-min().roomNumber    // reuse earliest-free room
+else:
+numRooms := numRooms + 1                 // allocate a new room
+room[i] := numRooms
+Q.insert(f[i], room[i])                    // busy until f[i]
+return room, numRooms
+
+Intervals arrive sorted by start time. The heap is keyed by finish
+time, so its minimum is the room that frees up earliest.
+
+The loop is `for`, not `forall`: Q and numRooms both carry from one
+iteration to the next.
+
+The book returns the pair (room, numRooms). LL returns one value, so
+room is returned; numRooms is max(room) and so is recoverable from it.
+Rooms are numbered from 1, as the book numbers them.
 
 Auto-generated from IntervalPartition.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -15,30 +29,28 @@ import heapq
 
 
 class IntervalPartition:
-    def partition(self, s, f):
+    def IntervalPartition(self, s, f):
         self.s = s
         self.f = f
         self.n = len(self.s)
-        self.G = [0] * (self.n)
+        self.room = [0] * (self.n)
         self.Q = []
         self.numRooms = 0
-        for j in range(0, ((self.n - 1)) + 1):
-            r = (0 - 1)
-            if ((not (not self.Q)) and (self.Q[0][0] <= self.s[j])):
-                r = self.Q[0][1]
+        for i in range(0, ((self.n - 1)) + 1):
+            if ((not (not self.Q)) and (self.Q[0][0] <= self.s[i])):
+                self.room[i] = self.Q[0][1]
                 heapq.heappop(self.Q)
             else:
-                r = self.numRooms
                 self.numRooms = (self.numRooms + 1)
-            self.G[j] = (r + 1)
-            heapq.heappush(self.Q, (self.f[j], r))
-        return self.G
+                self.room[i] = self.numRooms
+            heapq.heappush(self.Q, (self.f[i], self.room[i]))
+        return self.room
 
 
 if __name__ == '__main__':
     s = [0, 0, 1, 2]
     f = [0, 0, 1, 1]
     prog = IntervalPartition()
-    result = prog.partition(s, f)
+    result = prog.IntervalPartition(s, f)
     print(result)
 

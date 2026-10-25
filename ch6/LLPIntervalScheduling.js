@@ -1,13 +1,28 @@
 /*
- * LLP-IntervalScheduling (bxx-greedy.tex, fig:activity): jobs sorted by
- * finish time, held in a doubly linked list (prevArr/nextArr). Job 0 is
- * always fixed initially. The book's two rules are written here as two
- * forbidden/advance clauses joined by `&&`, so they share one fixpoint:
- * every job is tested against both rules on each sweep. Rule 1 selects a
- * job whose list-predecessor has already finished by s[j]; rule 2 deletes
- * a job that its (selected) predecessor still overlaps, in O(1), via
- * next[prev[j]] := next[j]; prev[next[j]] := prev[j]. deleted[] records
- * the list removal that the book expresses by unlinking the node.
+ * LLP-IntervalScheduling, as bxx-greedy.tex's Algorithm
+ * LLP-IntervalScheduling states it. Jobs sit in a doubly linked list;
+ * prev and next are the previous and next node.
+ *
+ * Forbidden (j in [1..n]): !G[j] and f[prev[j]] <= s[j]
+ * Advance                : G[j] := true
+ * &&
+ * Forbidden (j in [1..n]): (j>1) and (next[prev[j]] = j)
+ * and G[prev[j]] and s[j] < f[prev[j]]
+ * Advance                : next[prev[j]] := next[j]     // delete from
+ * prev[next[j]] := prev[j]     // linked list
+ *
+ * next[prev[j]] = j is the "j is still in the list" test. Without it the
+ * second rule never falsifies its own guard -- deleting j leaves prev[j]
+ * untouched, so G[prev[j]] and s[j] < f[prev[j]] both stay true and j is
+ * forbidden forever. (Verified: the version without it does not
+ * terminate.) It is also what makes the book's own claim true, that
+ * every job is touched at most twice.
+ *
+ * Rule 1 needs no index bound: G[0] is true from the start, so !G[j] is
+ * false at j = 0 and the guard short-circuits before reaching f[prev[0]].
+ *
+ * The advance guards prev[next[j]] because next[n-1] is n, one past the
+ * last slot: the book's list has a tail sentinel there, this one does not.
  *
  * Auto-generated from LLPIntervalScheduling.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
@@ -20,31 +35,27 @@ class LLPIntervalScheduling {
     this.f = f;
     this.n = this.s.length;
     this.G = new Array(this.n).fill(false);
-    this.deleted = new Array(this.n).fill(false);
-    this.prevArr = new Array(this.n).fill(0);
-    this.nextArr = new Array(this.n).fill(0);
+    this.prev = new Array(this.n).fill(0);
+    this.next_ = new Array(this.n).fill(0);
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        this.prevArr[i] = (i - 1);
+        this.prev[i] = (i - 1);
     }
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        this.nextArr[i] = (i + 1);
+        this.next_[i] = (i + 1);
     }
     this.G[0] = true;
     let _changed = true;
     while (_changed) {
         _changed = false;
         for (let j = 0; j <= ((this.n - 1)); j++) {
-            if (((((j > 0) && (!this.deleted[j])) && (!this.G[j])) && (this.f[this.prevArr[j]] <= this.s[j]))) {
+            if (((!this.G[j]) && (this.f[this.prev[j]] <= this.s[j]))) {
                 this.G[j] = true;
                 _changed = true;
             }
-            if (((((j > 0) && (!this.deleted[j])) && this.G[this.prevArr[j]]) && (this.s[j] < this.f[this.prevArr[j]]))) {
-                this.deleted[j] = true;
-                let p = this.prevArr[j];
-                let nx = this.nextArr[j];
-                this.nextArr[p] = nx;
-                if ((nx < this.n)) {
-                    this.prevArr[nx] = p;
+            if (((((j > 0) && (this.next_[this.prev[j]] === j)) && this.G[this.prev[j]]) && (this.s[j] < this.f[this.prev[j]]))) {
+                this.next_[this.prev[j]] = this.next_[j];
+                if ((this.next_[j] < this.n)) {
+                    this.prev[this.next_[j]] = this.prev[j];
                 }
                 _changed = true;
             }

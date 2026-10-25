@@ -46,15 +46,15 @@ public class VertexCoverFromMatching {
       int w = Q[head];
       head = (head + 1);
       if ((w < L)) {
-        int t = 0;
-        while ((t < adj[w].length)) {
-          int v = adj[w][t];
-          if (((matchL[w] != v) && (!inZ[(L + v)]))) {
-            inZ[(L + v)] = true;
-            Q[tail] = (L + v);
-            tail = (tail + 1);
+        for (int t = 0; t < adj[w].length; t++) {
+          {
+            int v = adj[w][t];
+            if (((matchL[w] != v) && (!inZ[(L + v)]))) {
+              inZ[(L + v)] = true;
+              Q[tail] = (L + v);
+              tail = (tail + 1);
+            }
           }
-          t = (t + 1);
         }
       } else {
         int r = (w - L);

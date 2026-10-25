@@ -1,7 +1,7 @@
 // Optimal BST: O(n³) DP over interval [i, j] picking the root r.
 
 class OptimalBinarySearchTree {
-  double[][] solve(double[] prob) {
+  double[][] OptimalBinarySearchTree(double[] prob) {
     int n = prob.length;
     double[][] dp = new double[n][n];
     double[][] s  = new double[n][n];
@@ -9,12 +9,12 @@ class OptimalBinarySearchTree {
       dp[i][i] = prob[i];
       s[i][i]  = prob[i];
     };
-    forall len in [1..n-1] :
+    for len in [1..n-1] :
       forall lo in [0..n-1-len] : {
         int hi = lo + len;
         s[lo][hi] = s[lo][hi - 1] + prob[hi];
         dp[lo][hi] = infinity;
-        forall r in [lo..hi] : {
+        for r in [lo..hi] : {
           double left  = 0.0;
           double right = 0.0;
           if (r > lo) {

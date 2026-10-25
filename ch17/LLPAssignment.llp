@@ -38,7 +38,7 @@ class LLPAssignment {
     if (fresh) { return; };
     forall i in [0..n-1] : { itemInJ[i] = false; partner[i] = 0 - 1; };
     forall b in [0..m-1] : bidderInB[b] = false;
-    forall b in [0..m-1] : tryMatch(b, new boolean[n]);
+    for b in [0..m-1] : tryMatch(b, new boolean[n]);
     int u = firstUnmatched();
     if (u < m) { reach(u); };
     fresh = true;
@@ -49,7 +49,7 @@ class LLPAssignment {
   // best surplus outside J.
   void raiseJ() {
     int delta = infinity;
-    forall b in [0..m-1] : {
+    for b in [0..m-1] : {
       if (bidderInB[b]) {
         int drop = bestSurplus(b) - bestOutside(b);
         if (drop < delta) { delta = drop; };
@@ -62,7 +62,7 @@ class LLPAssignment {
   // The lowest bidder the matching leaves unmatched, or m when the matching
   // is already perfect.
   int firstUnmatched() {
-    forall b in [0..m-1] : {
+    for b in [0..m-1] : {
       if (!(exists i in [0..n-1] : partner[i] == b)) { return b; };
     };
     return m;
@@ -73,7 +73,7 @@ class LLPAssignment {
   // bestSurplus restricted to the items outside J.
   int bestOutside(int b) {
     int best = 0 - infinity;
-    forall i in [0..n-1] : {
+    for i in [0..n-1] : {
       if (!itemInJ[i] && v[b][i] - G[i] > best) { best = v[b][i] - G[i]; };
     };
     return best;
@@ -84,7 +84,7 @@ class LLPAssignment {
     if (bidderInB[b]) { return; };
     bidderInB[b] = true;
     int best = bestSurplus(b);
-    forall i in [0..n-1] :
+    for i in [0..n-1] :
       if (v[b][i] - G[i] == best && !itemInJ[i]) {
         itemInJ[i] = true;
         if (partner[i] != 0 - 1) { reach(partner[i]); }

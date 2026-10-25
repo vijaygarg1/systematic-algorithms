@@ -64,14 +64,12 @@ class LLPDeltaStepping {
 
   relaxHeavy(v, pre, w, isLight, G, delta) {
     let relaxed = false;
-    let k = 0;
-    while ((k < pre[v].length)) {
+    for (let k = 0; k <= ((pre[v].length - 1)); k++) {
         let u = pre[v][k];
         if (((!isLight[u][v]) && ((G[u] + w[u][v]) < G[v]))) {
             G[v] = (G[u] + w[u][v]);
             relaxed = true;
         }
-        k = (k + 1);
     }
     return relaxed;
   }

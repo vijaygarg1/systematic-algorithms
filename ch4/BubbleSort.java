@@ -3,11 +3,12 @@
 import java.util.*;
 
 public class BubbleSort {
-  public void sort(int[] A) {
+  public void BubbleSort(int[] A) {
+    int n = A.length;
     boolean found = true;
     while (found) {
       found = false;
-      for (int j = 0; j < (A.length - 1); j++) {
+      for (int j = 0; j <= (n - 2); j++) {
         {
           if ((A[j] > A[(j + 1)])) {
             found = true;
@@ -21,7 +22,7 @@ public class BubbleSort {
   public static void main(String[] args) {
     int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     BubbleSort prog = new BubbleSort();
-    prog.sort(A);
+    prog.BubbleSort(A);
     System.out.println(Arrays.toString(A));
   }
 }

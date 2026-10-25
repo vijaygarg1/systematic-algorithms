@@ -13,12 +13,10 @@ class LLPPriceB {
 
   int maxPricePred(int j, int[][] pre, int[][] w, int[] G) {
     int best = G[j];
-    int k = 0;
-    while (k < pre[j].length) {
+    for k in [0..(pre[j].length) - 1] : {
       int i = pre[j][k];
       int val = G[i] - w[i][j];
       if (val > best) { best = val; };
-      k = k + 1;
     };
     return best;
   }

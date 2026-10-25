@@ -67,15 +67,13 @@ class LLPPrim {
         }
         this.fixed[j] = true;
         this.C[j] = this.key[j];
-        let t = 0;
-        while ((t < this.adj[j].length)) {
+        for (let t = 0; t <= ((this.adj[j].length - 1)); t++) {
             let k = this.adj[j][t];
             if (((!this.fixed[k]) && (this.aw[j][t] < this.key[k]))) {
                 this.key[k] = this.aw[j][t];
                 this._heapPush(_container, this.key[k], k);
                 this.parent[k] = j;
             }
-            t = (t + 1);
         }
     }
     return this.C;

@@ -1,30 +1,18 @@
-// LLP-Dijkstra, matching bxx-sp-llp-dijkstra.tex Algorithm LLP-Dijkstra
-// (fig:alg-llp-dijk). The lattice points are PAIRS (fixed, G): a vertex is
-// settled by flipping fixed[j], and distances only ever decrease. The
-// predicate has two clauses -- every discovered vertex is settled, and the
-// shortest-path recurrence holds.
+// LLP-Dijkstra: forbidden when j is not yet fixed and its distance is
+// finite; the advance fixes j and relaxes every edge out of it. The
+// setContainer line gives the LLP loop a priority queue keyed on G[j],
+// so the forbidden index chosen is always the closest unfixed vertex --
+// which is exactly Dijkstra's greedy choice.
 //
-// The forbidden index is the cheapest unsettled discovered vertex. The
-// minimality is not tested here: setContainer(PriorityQueue, G[j], min)
-// holds the
-// candidate indices in a min-heap keyed by G, so the index offered to the
-// guard is already the smallest one, and all that remains to check is that
-// it is unsettled and discovered. That is the same division of labour as
-// the classical Dijkstra of Algorithm Dijkstra, whose heap of (j, c) pairs
-// supplies the vertex and whose `if not fixed[j]` supplies the rest.
-//
-// Lowering G[k] in the advance pushes k back onto the heap with its new
-// key, exactly as the classical algorithm does H.add(k, d[k]); the stale
-// entry is discarded when it surfaces and the guard rejects it. Each edge
-// contributes at most one push, so the whole loop runs in O(m log n).
-//
-// Completeness of this cheap guard needs non-negative weights: it never
-// looks at settled vertices, so it is a valid detector of a violated
-// recurrence only while every settled vertex has had its out-edges relaxed
-// and carries a key no larger than any unsettled one (Lemma lem:dijk).
+// The book writes the weight as w(i,j), with parentheses, to say that it
+// comes from the edge and not from an n x n array -- an array would cost
+// Theta(n^2) to build before Dijkstra's own O(m log n) could start. So the
+// edges arrive as two parallel ragged arrays: adj[j] lists j's successors
+// and aw[j][t] is the weight of the edge j -> adj[j][t]. Both are O(m).
+// Dijkstra.llp and LLPJohnson.llp use the same pair.
 
 class LLPDijkstra {
-  double[] LLPDijkstra(set<int>[] adj, double[][] w) {
+  double[] LLPDijkstra(int[][] adj, double[][] aw) {
     double[] G = infinity;
     boolean[] fixed = false;
     setContainer(PriorityQueue, G[j], min);
@@ -32,9 +20,10 @@ class LLPDijkstra {
     forbidden (j in [0..n-1]) : !fixed[j] && G[j] < infinity =>
       advance : {
         fixed[j] = true;
-        forall k in adj[j] : {
+        for t in [0..adj[j].length-1] : {
+          int k = adj[j][t];
           if (!fixed[k]) {
-            double cand = G[j] + w[j][k];
+            double cand = G[j] + aw[j][t];
             if (cand < G[k]) { G[k] = cand; }
           }
         };

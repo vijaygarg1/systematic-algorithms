@@ -18,7 +18,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class TTC:
-    def assign(self, pref):
+    def TTC(self, pref):
         self.pref = pref
         self.n = len(self.pref)
         self.house = [0] * (self.n)
@@ -67,6 +67,6 @@ class TTC:
 if __name__ == '__main__':
     pref = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
     prog = TTC()
-    result = prog.assign(pref)
+    result = prog.TTC(pref)
     print(result)
 

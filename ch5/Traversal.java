@@ -1,29 +1,39 @@
-// Generic queue-based reachability from vertex 0.
+// Traversal, as bxx-graph.tex's Algorithm Traversal states it:
+//
+// var S: set of int                 // discovered but not yet explored
+// S.add(s); visited[s] := 1
+// while not S.empty():
+// j := S.removeAny(visited)
+// forall k in succ(j):
+// if visited[k] = 0: visited[k] := 1; S.add(k)
+// return visited
+//
+// The book's S is a SET and removeAny may return any member -- that is the
+// point of this algorithm: BFS-Traversal and DFS-Traversal are the same
+// code with the order of removal pinned down. LL has no scalar set type
+// with a "remove any" operation, so S is a list<int> here and removeFirst
+// makes one concrete choice. Any other choice visits the same vertices;
+// only the order differs, and the result (the reachable set) is the same.
 
 import java.util.*;
 
 public class Traversal {
-  public int[] reach(int[][] succ) {
+  public int[] Traversal(int[][] succ, int s) {
     int n = succ.length;
-    int[] G = new int[n];
-    int[] Q = new int[n];
-    int head = 0;
-    int tail = 0;
-    G[0] = 1;
-    Q[tail] = 0;
-    tail = (tail + 1);
-    while ((head < tail)) {
-      int j = Q[head];
-      head = (head + 1);
+    int[] visited = new int[n];
+    LinkedList<Integer> S = new LinkedList<>();
+    S.add(s);
+    visited[s] = 1;
+    while ((!S.isEmpty())) {
+      int j = S.removeFirst();
       for (int k : succ[j]) {
-        if ((G[k] == 0)) {
-          G[k] = 1;
-          Q[tail] = k;
-          tail = (tail + 1);
+        if ((visited[k] == 0)) {
+          visited[k] = 1;
+          S.add(k);
         }
       }
     }
-    return G;
+    return visited;
   }
 
   public static void main(String[] args) {

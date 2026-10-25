@@ -40,6 +40,7 @@ class LLPMinMaxLateness {
             }
         }
     }
+    let lateness = (() => { let _a = -2147483647, _s = false; for (let j = 0; j <= ((this.n - 1)); j++) { const _v = Math.max(0, ((this.G[j] + this.t[j]) - this.d[j])); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })();
     return this.G;
   }
 }

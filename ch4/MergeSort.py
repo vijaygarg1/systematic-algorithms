@@ -7,7 +7,7 @@ MergeSort.java a multi-file program: it needs MergeTwo.java alongside
 it to compile (see JAVA_MULTI_FILE in validate-site.py and the
 `javaRequires` demo-spec field in llp.js).
 
-An earlier version sorted G[lo..hi] in place and carried its own
+An earlier version sorted G[low..high] in place and carried its own
 26-line two-pointer merge, duplicating MergeTwo.llp.
 
 The parallel companion is MergeSortPar in progs-divideConquer/, which
@@ -21,7 +21,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class MergeTwo:
-    def merge(self, B, C):
+    def MergeTwo(self, B, C):
         self.B = B
         self.C = C
         self.m = len(self.B)
@@ -50,21 +50,21 @@ class MergeTwo:
 
 
 class MergeSort:
-    def sort(self, A, lo, hi):
+    def MergeSort(self, A, low, high):
         n = len(A)
-        if (lo < hi):
-            mid = int((lo + hi) / 2)
-            B = self.sort(A, lo, mid)
-            C = self.sort(A, (mid + 1), hi)
-            return MergeTwo().merge(B, C)
+        if (low < high):
+            mid = int((low + high) / 2)
+            B = self.MergeSort(A, low, mid)
+            C = self.MergeSort(A, (mid + 1), high)
+            return MergeTwo().MergeTwo(B, C)
         single = [0] * (1)
-        single[0] = A[lo]
+        single[0] = A[low]
         return single
 
 
 if __name__ == '__main__':
     A = [3, 1, 6, 1, 6, 3, 6, 4]
     prog = MergeSort()
-    result = prog.sort(A, 0, len(A) - 1)
+    result = prog.MergeSort(A, 0, len(A) - 1)
     print(result)
 

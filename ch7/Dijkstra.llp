@@ -23,31 +23,28 @@
 // and so cannot meet the book's bound on a sparse graph.
 
 class Dijkstra {
-  int[] shortestPath(int[][] adj, int[][] aw, int s) {
+  int[] Dijkstra(int[][] adj, int[][] aw, int s) {
     int n = adj.length;
-    int INF = infinity;
-    int[] dist = new int[n];
+    int[] d = new int[n];
     boolean[] fixed = new boolean[n];
-    forall i in [0..n-1] : dist[i] = INF;
-    dist[s] = 0;
+    forall i in [0..n-1] : d[i] = infinity;
+    d[s] = 0;
     heap<int> H = new heap<int>();
-    H.push(dist[s], s);
+    H.push(d[s], s);
     while (!H.isEmpty()) {
       int j = H.peekValue();
       H.removeMin();
       if (!fixed[j]) {
         fixed[j] = true;
-        int t = 0;
-        while (t < adj[j].length) {
+        for t in [0..adj[j].length-1] : {
           int k = adj[j][t];
-          if (!fixed[k] && dist[j] + aw[j][t] < dist[k]) {
-            dist[k] = dist[j] + aw[j][t];
-            H.push(dist[k], k);
+          if (!fixed[k] && d[j] + aw[j][t] < d[k]) {
+            d[k] = d[j] + aw[j][t];
+            H.push(d[k], k);
           };
-          t = t + 1;
         }
       }
     };
-    return dist;
+    return d;
   }
 }

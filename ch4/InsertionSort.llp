@@ -1,17 +1,14 @@
 // Insertion sort: walk each new element down to its place.
 
 class InsertionSort {
-  void sort(int[] A) {
-    forall i in [1..A.length-1] : {
+  void InsertionSort(int[] A) {
+    int n = A.length;
+    for i in [1..n-1] : {
       int j = i - 1;
-      boolean done = false;
-      while (j >= 0 && !done) {
-        if (A[j] <= A[j + 1]) {
-          done = true;
-        } else {
-          swap(A[j], A[j + 1]);
-          j = j - 1;
-        }
+      while (j >= 0) {
+        if (A[j] <= A[j + 1]) { break; };
+        swap(A[j], A[j + 1]);
+        j = j - 1;
       };
     }
   }

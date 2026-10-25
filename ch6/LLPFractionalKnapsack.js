@@ -23,10 +23,8 @@ class LLPFractionalKnapsack {
     this.n = this.v.length;
     this.G = new Array(this.n).fill(0.0);
     this.S = new Array((this.n + 1)).fill(0.0);
-    this.i = 0;
-    while ((this.i < this.n)) {
-        this.S[(this.i + 1)] = (this.S[this.i] + this.w[this.i]);
-        this.i = (this.i + 1);
+    for (let i = 0; i <= ((this.n - 1)); i++) {
+        this.S[(i + 1)] = (this.S[i] + this.w[i]);
     }
     let _changed = true;
     while (_changed) {

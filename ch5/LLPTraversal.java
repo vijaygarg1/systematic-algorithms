@@ -8,24 +8,23 @@ public class LLPTraversal {
   boolean[] G;
   int j;
 
-  private boolean forbidden(int j) {
-    if (!((!G[j]))) return false;
+  private boolean _forbidden0(int j) {
     boolean t1 = false;
     for (int i : pre[j]) {
       if (G[i]) { t1 = true; break; }
     }
-    if (!(t1)) return false;
-    return true;
+    return ((!G[j]) && t1);
   }
 
-  private void advance() {
+  private void _advance0() {
     G[j] = true;
   }
 
-  public void LLPTraversal(int[][] pre, boolean[] G) {
+  public boolean[] LLPTraversal(int[][] pre) {
     this.pre = pre;
-    this.G = G;
     this.n = pre.length;
+    this.G = new boolean[n];
+    G[0] = true;
     {
       // dependList (Algorithm LLP-Sequential): dep[r] holds
       // every index whose guard reads a cell written at r.
@@ -49,13 +48,14 @@ public class LLPTraversal {
       }
       while (_qh != _qt) {
         int j = _q[_qh]; _qh = _qh + 1 == n + 1 ? 0 : _qh + 1; _inq[j] = false;
-        if (!forbidden(j)) continue;
-        this.j = j; advance();
+        if (!_forbidden0(j)) continue;
+        this.j = j; _advance0();
         for (int _x : _dep[j]) if (!_inq[_x]) {
           _inq[_x] = true; _q[_qt] = _x; _qt = _qt + 1 == n + 1 ? 0 : _qt + 1;
         }
       }
     }
+    return G;
   }
 
   public static void main(String[] args) {

@@ -52,10 +52,10 @@ public class LLPLexGreedySetCover {
       int e = mem[j][k];
       if ((!covered[e])) {
         covered[e] = true;
-        int t = 0;
-        while ((t < inc[e].length)) {
-          cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
-          t = (t + 1);
+        for (int t = 0; t < inc[e].length; t++) {
+          {
+            cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
+          }
         }
       }
       k = (k + 1);
@@ -122,19 +122,19 @@ public class LLPLexGreedySetCover {
 
   public int bestAt(int e) {
     int win = (0 - 1);
-    int k = 0;
-    while ((k < inc[e].length)) {
-      int s = inc[e][k];
-      if ((!G[s])) {
-        if ((win < 0)) {
-          win = s;
-        } else {
-          if ((cnt[s] > cnt[win])) {
+    for (int k = 0; k < inc[e].length; k++) {
+      {
+        int s = inc[e][k];
+        if ((!G[s])) {
+          if ((win < 0)) {
             win = s;
+          } else {
+            if ((cnt[s] > cnt[win])) {
+              win = s;
+            }
           }
         }
       }
-      k = (k + 1);
     }
     return win;
   }

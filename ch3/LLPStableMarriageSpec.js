@@ -2,7 +2,7 @@
  * LLP-StableMarriage-Spec: the specification form of Gale-Shapley, exactly
  * as bxx-stableMatching.tex's Algorithm LLP-StableMarriage-Spec states it.
  *
- * Always    (j): z = mpref[j][G[j]]
+ * Always       : z = mpref[j][G[j]]
  * Forbidden (j): exists i in [1..n] : exists k in [1..G[i]] :
  * (z = mpref[i][k]) and (rank[z][i] < rank[z][j])
  * Advance      : G[j] := G[j] + 1
@@ -40,7 +40,7 @@ class LLPStableMarriageSpec {
         _changed = false;
         for (let j = 1; j <= (this.n); j++) {
             let z = this.mpref[j][this.G[j]];
-            if ((() => { for (let i = 1; i <= (this.n); i++) { if ((() => { for (let k = 1; k <= (this.G[i]); k++) { if (((this.mpref[i][k] === z) && (this.rank[z][i] < this.rank[z][j]))) return true; } return false; })()) return true; } return false; })()) {
+            if ((() => { for (let i = 1; i <= (this.n); i++) { if ((() => { for (let k = 1; k <= (this.G[i]); k++) { if (((z === this.mpref[i][k]) && (this.rank[z][i] < this.rank[z][j]))) return true; } return false; })()) return true; } return false; })()) {
                 this.G[j] = (this.G[j] + 1);
                 _changed = true;
             }

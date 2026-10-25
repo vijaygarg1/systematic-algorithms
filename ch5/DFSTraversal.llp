@@ -1,31 +1,51 @@
-// Recursive DFS recording discovery and finish times.
+// DFS-Traversal, as bxx-graph.tex's Algorithm DFS-Traversal states it:
+//
+//   var tick: int initially 1
+//   function DFS(j):
+//     visited[j] := 1
+//     discovered[j] := tick; tick := tick + 1
+//     for k in succ(j):
+//       if visited[k] = 0: parent[k] := j; DFS(k)
+//     finished[j] := tick; tick := tick + 1
+//   DFS(s)
+//
+// The book's DFS(j) closes over visited/parent/discovered/finished/tick;
+// LL has no closures, so DFS takes them as parameters.
+//
+// tick is the book's `var tick: int initially 1`, a counter shared by every
+// DFS call. A plain `int tick` would be local to the entry method and
+// invisible to DFS (verified: the generated Java does not compile), so it
+// travels as a one-slot array -- the standard way to pass a mutable scalar.
+//
+// The book declares four outputs (visited, parent, discovered, finished);
+// LL returns one value, so discovered is returned and the rest stay
+// internal, exactly as they are computed here.
 
 class DFSTraversal {
-  int[] traverse(set<int>[] succ) {
+  int[] DFSTraversal(set<int>[] succ, int s) {
     int n = succ.length;
-    int[] G = new int[n];
+    int[] visited = new int[n];
     int[] parent = new int[n];
     int[] discovered = new int[n];
     int[] finished = new int[n];
     forall i in [0..n-1] : parent[i] = -1;
-    int[] t = new int[1];
-    t[0] = 1;
-    visit(0, succ, G, parent, discovered, finished, t);
+    int[] tick = new int[1];
+    tick[0] = 1;
+    DFS(s, succ, visited, parent, discovered, finished, tick);
     return discovered;
   }
 
-  // Recursive aux: visits j, then descends into unvisited neighbours.
-  void visit(int j, set<int>[] succ, int[] G, int[] parent,
-             int[] discovered, int[] finished, int[] t) {
-    G[j] = 1;
-    discovered[j] = t[0];
-    t[0] = t[0] + 1;
-    forall k in succ[j] :
-      if (G[k] == 0) {
+  void DFS(int j, set<int>[] succ, int[] visited, int[] parent,
+           int[] discovered, int[] finished, int[] tick) {
+    visited[j] = 1;
+    discovered[j] = tick[0];
+    tick[0] = tick[0] + 1;
+    for k in succ[j] :
+      if (visited[k] == 0) {
         parent[k] = j;
-        visit(k, succ, G, parent, discovered, finished, t);
+        DFS(k, succ, visited, parent, discovered, finished, tick);
       };
-    finished[j] = t[0];
-    t[0] = t[0] + 1;
+    finished[j] = tick[0];
+    tick[0] = tick[0] + 1;
   }
 }

@@ -7,7 +7,7 @@
 // it to compile (see JAVA_MULTI_FILE in validate-site.py and the
 // `javaRequires` demo-spec field in llp.js).
 //
-// An earlier version sorted G[lo..hi] in place and carried its own
+// An earlier version sorted G[low..high] in place and carried its own
 // 26-line two-pointer merge, duplicating MergeTwo.llp.
 //
 // The parallel companion is MergeSortPar in progs-divideConquer/, which
@@ -18,22 +18,22 @@
 import java.util.*;
 
 public class MergeSort {
-  public int[] sort(int[] A, int lo, int hi) {
-    if ((lo < hi)) {
-      int mid = ((lo + hi) / 2);
-      int[] B = sort(A, lo, mid);
-      int[] C = sort(A, (mid + 1), hi);
-      return new MergeTwo().merge(B, C);
+  public int[] MergeSort(int[] A, int low, int high) {
+    if ((low < high)) {
+      int mid = ((low + high) / 2);
+      int[] B = MergeSort(A, low, mid);
+      int[] C = MergeSort(A, (mid + 1), high);
+      return new MergeTwo().MergeTwo(B, C);
     }
     int[] single = new int[1];
-    single[0] = A[lo];
+    single[0] = A[low];
     return single;
   }
 
   public static void main(String[] args) {
     int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     MergeSort prog = new MergeSort();
-    int[] result = prog.sort(A, 0, A.length - 1);
+    int[] result = prog.MergeSort(A, 0, A.length - 1);
     System.out.println(Arrays.toString(result));
   }
 }

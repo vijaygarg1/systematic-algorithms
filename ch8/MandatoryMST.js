@@ -5,8 +5,8 @@
  * edges; equivalently, when M itself is not acyclic.  Composed onto
  * LLP-Kruskal via predicate conjunction:
  * [ LLP-Kruskal(E, w, G) && MandatoryMST(M, G) ].
- * Calls the sibling UnionFind program (`UnionFind.find(parent, x)`,
- * `UnionFind.union(parent, rank, x, y)`) instead of keeping its own
+ * Calls the sibling UnionFind program (`UnionFind.Find(parent, x)`,
+ * `UnionFind.Union(parent, rank, x, y)`) instead of keeping its own
  * copy of find/union -- same multi-file treatment as Kruskal.llp. This
  * makes MandatoryMST.java a multi-file program: it requires
  * UnionFind.java alongside it to compile (see JAVA_MULTI_FILE in
@@ -18,17 +18,17 @@
 
 
 class UnionFind {
-  find(parent, x) {
+  Find(parent, x) {
     let n = parent.length;
     if ((parent[x] !== x)) {
-        parent[x] = this.find(parent, parent[x]);
+        parent[x] = this.Find(parent, parent[x]);
     }
     return parent[x];
   }
 
-  union(parent, rank, x, y) {
-    let rx = this.find(parent, x);
-    let ry = this.find(parent, y);
+  Union(parent, rank, x, y) {
+    let rx = this.Find(parent, x);
+    let ry = this.Find(parent, y);
     if ((rx === ry)) {
         return false;
     }
@@ -60,11 +60,11 @@ class MandatoryMST {
         _changed = false;
         for (let j = 0; j <= ((this.n - 1)); j++) {
             if ((this.M[j] && (!this.G[j]))) {
-                if ((new UnionFind().find(this.parent, this.u[j]) === new UnionFind().find(this.parent, this.v[j]))) {
+                if ((new UnionFind().Find(this.parent, this.u[j]) === new UnionFind().Find(this.parent, this.v[j]))) {
                     return null;
                 }
                 this.G[j] = true;
-                new UnionFind().union(this.parent, this.rank, this.u[j], this.v[j]);
+                new UnionFind().Union(this.parent, this.rank, this.u[j], this.v[j]);
                 _changed = true;
             }
         }

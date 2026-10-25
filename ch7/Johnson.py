@@ -43,36 +43,33 @@ import heapq
 
 
 class Dijkstra:
-    def shortestPath(self, adj, aw, s):
+    def Dijkstra(self, adj, aw, s):
         self.adj = adj
         self.aw = aw
         self.s = s
         self.n = len(self.adj)
-        self.INF = 2147483647
-        self.dist = [0] * (self.n)
+        self.d = [0] * (self.n)
         self.fixed = [False] * (self.n)
         for i in range(0, ((self.n - 1)) + 1):
-            self.dist[i] = self.INF
-        self.dist[self.s] = 0
+            self.d[i] = 2147483647
+        self.d[self.s] = 0
         H = []
-        heapq.heappush(H, (self.dist[self.s], self.s))
+        heapq.heappush(H, (self.d[self.s], self.s))
         while (not (not H)):
             j = H[0][1]
             heapq.heappop(H)
             if (not self.fixed[j]):
                 self.fixed[j] = True
-                t = 0
-                while (t < len(self.adj[j])):
+                for t in range(0, ((len(self.adj[j]) - 1)) + 1):
                     k = self.adj[j][t]
-                    if ((not self.fixed[k]) and ((self.dist[j] + self.aw[j][t]) < self.dist[k])):
-                        self.dist[k] = (self.dist[j] + self.aw[j][t])
-                        heapq.heappush(H, (self.dist[k], k))
-                    t = (t + 1)
-        return self.dist
+                    if ((not self.fixed[k]) and ((self.d[j] + self.aw[j][t]) < self.d[k])):
+                        self.d[k] = (self.d[j] + self.aw[j][t])
+                        heapq.heappush(H, (self.d[k], k))
+        return self.d
 
 
 class Johnson:
-    def allPairs(self, adj, aw):
+    def Johnson(self, adj, aw):
         self.adj = adj
         self.aw = aw
         self.n = len(self.adj)
@@ -82,24 +79,20 @@ class Johnson:
         while (self.k < (self.n - 1)):
             changed = False
             for i in range(0, ((self.n - 1)) + 1):
-                t = 0
-                while (t < len(self.adj[i])):
+                for t in range(0, ((len(self.adj[i]) - 1)) + 1):
                     j = self.adj[i][t]
                     if ((self.dist[i] + self.aw[i][t]) < self.dist[j]):
                         self.dist[j] = (self.dist[i] + self.aw[i][t])
                         changed = True
-                    t = (t + 1)
             if changed:
                 self.k = (self.k + 1)
             else:
                 self.k = self.n
         negCycle = False
         for i in range(0, ((self.n - 1)) + 1):
-            t = 0
-            while (t < len(self.adj[i])):
+            for t in range(0, ((len(self.adj[i]) - 1)) + 1):
                 if ((self.dist[i] + self.aw[i][t]) < self.dist[self.adj[i][t]]):
                     negCycle = True
-                t = (t + 1)
         if negCycle:
             return None
         price = [0] * (self.n)
@@ -109,13 +102,11 @@ class Johnson:
         for i in range(0, ((self.n - 1)) + 1):
             awPrime[i] = [0] * (len(self.adj[i]))
         for i in range(0, ((self.n - 1)) + 1):
-            t = 0
-            while (t < len(self.adj[i])):
+            for t in range(0, ((len(self.adj[i]) - 1)) + 1):
                 awPrime[i][t] = self.reweight(self.aw[i][t], price[self.adj[i][t]], price[i])
-                t = (t + 1)
         D = [[0] * (self.n) for _ in range(self.n)]
         for u in range(0, ((self.n - 1)) + 1):
-            distPrime = Dijkstra().shortestPath(self.adj, awPrime, u)
+            distPrime = Dijkstra().Dijkstra(self.adj, awPrime, u)
             for v in range(0, ((self.n - 1)) + 1):
                 D[u][v] = self.reweight(distPrime[v], price[u], price[v])
         return D
@@ -130,6 +121,6 @@ if __name__ == '__main__':
     adj = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
     aw = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]]
     prog = Johnson()
-    result = prog.allPairs(adj, aw)
+    result = prog.Johnson(adj, aw)
     print(result)
 

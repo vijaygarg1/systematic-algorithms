@@ -11,7 +11,7 @@
 import java.util.*;
 
 public class Boruvka {
-  public boolean[] mst(int n, int[] U, int[] V, int[] W) {
+  public boolean[] Boruvka(int n, int[] U, int[] V, int[] W) {
     int m = U.length;
     int treeEdges = 0;
     boolean[] T = new boolean[m];
@@ -115,7 +115,7 @@ public class Boruvka {
     int[] V = new int[] {0, 0, 1, 1};
     int[] W = new int[] {0, 0, 0, 2};
     Boruvka prog = new Boruvka();
-    boolean[] result = prog.mst(U.length, U, V, W);
+    boolean[] result = prog.Boruvka(U.length, U, V, W);
     System.out.println(Arrays.toString(result));
   }
 }

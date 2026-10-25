@@ -64,14 +64,12 @@ class LLPPrim:
                 continue
             self.fixed[j] = True
             self.C[j] = self.key[j]
-            t = 0
-            while (t < len(self.adj[j])):
+            for t in range(0, ((len(self.adj[j]) - 1)) + 1):
                 k = self.adj[j][t]
                 if ((not self.fixed[k]) and (self.aw[j][t] < self.key[k])):
                     self.key[k] = self.aw[j][t]
                     heapq.heappush(_container, (self.key[k], k))
                     self.parent[k] = j
-                t = (t + 1)
         return self.C
 
 

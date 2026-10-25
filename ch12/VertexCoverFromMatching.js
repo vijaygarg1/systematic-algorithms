@@ -54,15 +54,13 @@ class VertexCoverFromMatching {
         let w = Q[head];
         head = (head + 1);
         if ((w < this.L)) {
-            let t = 0;
-            while ((t < this.adj[w].length)) {
+            for (let t = 0; t <= ((this.adj[w].length - 1)); t++) {
                 let v = this.adj[w][t];
                 if (((this.matchL[w] !== v) && (!inZ[(this.L + v)]))) {
                     inZ[(this.L + v)] = true;
                     Q[tail] = (this.L + v);
                     tail = (tail + 1);
                 }
-                t = (t + 1);
             }
         } else {
             let r = (w - this.L);

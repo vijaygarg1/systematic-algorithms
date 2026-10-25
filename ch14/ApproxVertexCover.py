@@ -23,14 +23,12 @@ class ApproxVertexCover:
         self.n = n
         self.C = [False] * (self.n)
         self.m = len(self.eu)
-        self.e = 0
-        while (self.e < self.m):
-            u = self.eu[self.e]
-            v = self.ev[self.e]
+        for e in range(0, ((self.m - 1)) + 1):
+            u = self.eu[e]
+            v = self.ev[e]
             if ((not self.C[u]) and (not self.C[v])):
                 self.C[u] = True
                 self.C[v] = True
-            self.e = (self.e + 1)
         return self.C
 
 

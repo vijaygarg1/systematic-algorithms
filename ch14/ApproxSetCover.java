@@ -39,28 +39,28 @@ public class ApproxSetCover {
     while ((remaining > 0)) {
       int bestIdx = 0;
       int bestCover = (0 - 1);
-      int s = 0;
-      while ((s < m)) {
-        if ((cnt[s] > bestCover)) {
-          bestCover = cnt[s];
-          bestIdx = s;
-        }
-        s = (s + 1);
-      }
-      C[bestIdx] = true;
-      int k = 0;
-      while ((k < mem[bestIdx].length)) {
-        int e = mem[bestIdx][k];
-        if ((!covered[e])) {
-          covered[e] = true;
-          remaining = (remaining - 1);
-          int t = 0;
-          while ((t < inc[e].length)) {
-            cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
-            t = (t + 1);
+      for (int s = 0; s < m; s++) {
+        {
+          if ((cnt[s] > bestCover)) {
+            bestCover = cnt[s];
+            bestIdx = s;
           }
         }
-        k = (k + 1);
+      }
+      C[bestIdx] = true;
+      for (int k = 0; k < mem[bestIdx].length; k++) {
+        {
+          int e = mem[bestIdx][k];
+          if ((!covered[e])) {
+            covered[e] = true;
+            remaining = (remaining - 1);
+            int t = 0;
+            while ((t < inc[e].length)) {
+              cnt[inc[e][t]] = (cnt[inc[e][t]] - 1);
+              t = (t + 1);
+            }
+          }
+        }
       }
     }
     return C;

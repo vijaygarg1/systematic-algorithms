@@ -1,13 +1,27 @@
 /*
- * IntervalPartition (bxx-greedy.tex, algo:interval-partition): for each
- * interval i (sorted by start time), reuse the earliest-free room via a
- * min-priority-queue Q of (finishTime, roomNumber) pairs -- extract-min
- * when Q is non-empty and its minimum finish time is <= s[i], else open
- * a new room -- matching the book's binary-heap algorithm exactly, not
- * a linear scan over existing rooms each iteration. Uses the heap<int>
- * builtin (-> java.util.PriorityQueue<int[]>, lexicographically ordered
- * by (finish, room) so ties reuse the lowest-numbered free room) instead
- * of hand-rolled heapPush/heapPop/heapify/greater.
+ * Interval partitioning, as bxx-greedy.tex's Algorithm IntervalPartition
+ * states it:
+ *
+ * var Q: min-priority queue of (finishTime, roomNumber), initially empty
+ * numRooms: int, initially 0
+ * for i := 1 to n:
+ * if Q is not empty and Q.min().finishTime <= s[i]:
+ * room[i] := Q.extract-min().roomNumber    // reuse earliest-free room
+ * else:
+ * numRooms := numRooms + 1                 // allocate a new room
+ * room[i] := numRooms
+ * Q.insert(f[i], room[i])                    // busy until f[i]
+ * return room, numRooms
+ *
+ * Intervals arrive sorted by start time. The heap is keyed by finish
+ * time, so its minimum is the room that frees up earliest.
+ *
+ * The loop is `for`, not `forall`: Q and numRooms both carry from one
+ * iteration to the next.
+ *
+ * The book returns the pair (room, numRooms). LL returns one value, so
+ * room is returned; numRooms is max(room) and so is recoverable from it.
+ * Rooms are numbered from 1, as the book numbers them.
  *
  * Auto-generated from IntervalPartition.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
@@ -15,26 +29,24 @@
 
 
 class IntervalPartition {
-  partition(s, f) {
+  IntervalPartition(s, f) {
     this.s = s;
     this.f = f;
     this.n = this.s.length;
-    this.G = new Array(this.n).fill(0);
+    this.room = new Array(this.n).fill(0);
     this.Q = [];
     this.numRooms = 0;
-    for (let j = 0; j <= ((this.n - 1)); j++) {
-        let r = (0 - 1);
-        if (((!(this.Q.length === 0)) && (this.Q[0][0] <= this.s[j]))) {
-            r = this.Q[0][1];
+    for (let i = 0; i <= ((this.n - 1)); i++) {
+        if (((!(this.Q.length === 0)) && (this.Q[0][0] <= this.s[i]))) {
+            this.room[i] = this.Q[0][1];
             this._heapPop(this.Q);
         } else {
-            r = this.numRooms;
             this.numRooms = (this.numRooms + 1);
+            this.room[i] = this.numRooms;
         }
-        this.G[j] = (r + 1);
-        this._heapPush(this.Q, this.f[j], r);
+        this._heapPush(this.Q, this.f[i], this.room[i]);
     }
-    return this.G;
+    return this.room;
   }
 
   // Binary min-heap of [key, value] pairs, ordered by key and
@@ -83,6 +95,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const s = [0, 0, 1, 2];
     const f = [0, 0, 1, 1];
     const prog = new IntervalPartition();
-    const result = prog.partition(s, f);
+    const result = prog.IntervalPartition(s, f);
     console.log(JSON.stringify(result));
 }

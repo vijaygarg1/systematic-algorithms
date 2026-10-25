@@ -7,7 +7,7 @@
 import java.util.*;
 
 public class ThreeWayPartition {
-  public int[] partition(int[] A, int pivot, int low, int high) {
+  public int[] ThreeWayPartition(int[] A, int pivot, int low, int high) {
     int p = low;
     int q = low;
     int k = high;
@@ -35,7 +35,7 @@ public class ThreeWayPartition {
     int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     int pivot = 5;
     ThreeWayPartition prog = new ThreeWayPartition();
-    int[] result = prog.partition(A, pivot, 0, A.length);
+    int[] result = prog.ThreeWayPartition(A, pivot, 0, A.length);
     System.out.println(Arrays.toString(result));
   }
 }

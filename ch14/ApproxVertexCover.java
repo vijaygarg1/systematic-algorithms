@@ -17,15 +17,15 @@ public class ApproxVertexCover {
   public boolean[] ApproxVertexCover(int[] eu, int[] ev, int n) {
     boolean[] C = new boolean[n];
     int m = eu.length;
-    int e = 0;
-    while ((e < m)) {
-      int u = eu[e];
-      int v = ev[e];
-      if (((!C[u]) && (!C[v]))) {
-        C[u] = true;
-        C[v] = true;
+    for (int e = 0; e < m; e++) {
+      {
+        int u = eu[e];
+        int v = ev[e];
+        if (((!C[u]) && (!C[v]))) {
+          C[u] = true;
+          C[v] = true;
+        }
       }
-      e = (e + 1);
     }
     return C;
   }

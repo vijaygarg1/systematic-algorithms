@@ -47,14 +47,12 @@ class LLPDeltaStepping {
 
   boolean relaxHeavy(int v, int[][] pre, int[][] w, boolean[][] isLight, int[] G, int delta) {
     boolean relaxed = false;
-    int k = 0;
-    while (k < pre[v].length) {
+    for k in [0..(pre[v].length) - 1] : {
       int u = pre[v][k];
       if (!isLight[u][v] && G[u] + w[u][v] < G[v]) {
-        G[v] = G[u] + w[u][v];
-        relaxed = true;
+      G[v] = G[u] + w[u][v];
+      relaxed = true;
       };
-      k = k + 1;
     };
     return relaxed;
   }

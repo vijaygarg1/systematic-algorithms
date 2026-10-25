@@ -2,18 +2,18 @@
 
 class UnionFind {
   // Find the root of x's set, applying path compression.
-  int find(int[] parent, int x) {
+  int Find(int[] parent, int x) {
     if (parent[x] != x) {
-      parent[x] = find(parent, parent[x]);
+      parent[x] = Find(parent, parent[x]);
     };
     return parent[x];
   }
 
   // Union the sets containing x and y by rank.  Returns true iff a
   // merge actually happened (false if already in the same set).
-  boolean union(int[] parent, int[] rank, int x, int y) {
-    int rx = find(parent, x);
-    int ry = find(parent, y);
+  boolean Union(int[] parent, int[] rank, int x, int y) {
+    int rx = Find(parent, x);
+    int ry = Find(parent, y);
     if (rx == ry) {
       return false;
     };

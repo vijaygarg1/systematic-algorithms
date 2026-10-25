@@ -58,10 +58,10 @@ public class LLPWeightedSetCover {
   private void _advance0() {
     double step = minRemainingBudget(x);
     G[x] = (G[x] + step);
-    int t = 0;
-    while ((t < inc[x].length)) {
-      sp[inc[x][t]] = (sp[inc[x][t]] + step);
-      t = (t + 1);
+    for (int t = 0; t < inc[x].length; t++) {
+      {
+        sp[inc[x][t]] = (sp[inc[x][t]] + step);
+      }
     }
     fresh = false;
   }

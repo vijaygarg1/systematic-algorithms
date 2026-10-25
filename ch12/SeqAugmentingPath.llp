@@ -21,7 +21,7 @@ class SeqAugmentingPath {
     int[] S = new int[m];
     forall j in [0..n-1] : G[j] = 0;
     forall k in [0..m-1] : S[k] = 0 - 1;
-    forall j in [0..n-1] : {
+    for j in [0..n-1] : {
       boolean[] seen = new boolean[m];
       if (alternatingPath(j, adj, S, seen)) {
         G[j] = 1;

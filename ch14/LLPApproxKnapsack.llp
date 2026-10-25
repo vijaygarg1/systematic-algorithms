@@ -60,7 +60,7 @@ class LLPApproxKnapsack {
   // The largest scaled profit whose least weight still fits in the knapsack.
   int bestProfit() {
     int best = 0;
-    forall q in [0..Vp] : {
+    for q in [0..Vp] : {
       if (D[nf][q] <= W) { best = q; };
     };
     return best;
@@ -70,7 +70,7 @@ class LLPApproxKnapsack {
   int[] feasible(int[] w, int W) {
     int[] idx = new int[w.length];
     int c = 0;
-    forall t in [0..w.length-1] : {
+    for t in [0..w.length-1] : {
       if (w[t] <= W) {
         idx[c] = t;
         c = c + 1;
@@ -103,13 +103,11 @@ class LLPApproxKnapsack {
     int picks = 0;
     while (picks < nf) {
       int cand = 0 - 1;
-      int t = 0;
-      while (t < nf) {
+      for t in [0..(nf) - 1] : {
         if (!used[t] && fw[t] <= room) {
-          if (cand < 0) { cand = t; }
-          else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
+        if (cand < 0) { cand = t; }
+        else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
         };
-        t = t + 1;
       };
       if (cand < 0) { picks = nf; } else {
         used[cand] = true;

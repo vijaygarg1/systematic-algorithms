@@ -22,6 +22,6 @@ if __name__ == '__main__':
     A = [3, 1, 6, 1, 6, 3, 6, 4]
     key = 0
     prog = BinarySearch()
-    result = prog.BinarySearch(A, key, 0, len(A))
+    result = prog.BinarySearch(A, key, 0, len(A) - 1)
     print(result)
 

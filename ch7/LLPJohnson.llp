@@ -12,35 +12,30 @@
 // COMBINED all-pairs method -- this reweighting followed by Dijkstra from
 // every source -- which this program does not do; its output is the price
 // vector, as the algorithm box's KwOut says.
+//
+// Written inline, as Algorithm LLP-Johnson states it:
+//   Forbidden (j in [0..n-1]): exists i in pre(j): G[j] < G[i] - w(i,j)
+//   Advance : forall k: G[k] := max(0, max { G[i] - w(i,k) | i in pre(k) })
+//
+// The book's "exists i in pre(j) ... w(i,j)" is spelled over POSITIONS
+// here: pre[j][t] is the t-th predecessor of j and pw[j][t] the weight of
+// that edge. Both are O(m); an n x n weight matrix would cost Theta(n^2)
+// before the algorithm started (see the note in the chapter-7 Dijkstra
+// section on why the book writes w(i,j) and not w[i,j]).
+//
+// max over an empty range is the identity -INF, so a vertex with no
+// predecessors takes max(0, -INF) = 0 -- which is the book's max(0, ...)
+// with no special case.
 
 class LLPJohnson {
   int[] LLPJohnson(int[][] pre, int[][] pw) {
     int[] G = 0;
-    forbidden (j in [0..n-1]) : reducedNegative(j) =>
+    forbidden (j in [0..n-1]) :
+      exists t in [0..pre[j].length-1] : G[j] < G[pre[j][t]] - pw[j][t]
+    =>
       advance :
-        forall k in [0..n-1] : G[k] = raised(k);
+        forall k in [0..n-1] :
+          G[k] = max(0, max t in [0..pre[k].length-1] : G[pre[k][t]] - pw[k][t]);
     return G;
-  }
-
-  // Some edge into j is still negative under the current prices.
-  boolean reducedNegative(int j) {
-    int t = 0;
-    while (t < pre[j].length) {
-      if (G[j] < G[pre[j][t]] - pw[j][t]) { return true; };
-      t = t + 1;
-    };
-    return false;
-  }
-
-  // G[k] raised to the largest price any edge into k demands.
-  int raised(int k) {
-    int best = G[k];
-    int t = 0;
-    while (t < pre[k].length) {
-      int cand = G[pre[k][t]] - pw[k][t];
-      if (cand > best) { best = cand; };
-      t = t + 1;
-    };
-    return best;
   }
 }

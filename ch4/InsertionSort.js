@@ -7,19 +7,17 @@
 
 
 class InsertionSort {
-  sort(A) {
+  InsertionSort(A) {
     this.A = A;
     this.n = this.A.length;
-    for (let i = 1; i <= ((this.A.length - 1)); i++) {
+    for (let i = 1; i <= ((this.n - 1)); i++) {
         let j = (i - 1);
-        let done = false;
-        while (((j >= 0) && (!done))) {
+        while ((j >= 0)) {
             if ((this.A[j] <= this.A[(j + 1)])) {
-                done = true;
-            } else {
-                const _sw1 = this.A[j]; this.A[j] = this.A[(j + 1)]; this.A[(j + 1)] = _sw1;
-                j = (j - 1);
+                break;
             }
+            const _sw1 = this.A[j]; this.A[j] = this.A[(j + 1)]; this.A[(j + 1)] = _sw1;
+            j = (j - 1);
         }
     }
   }
@@ -30,6 +28,6 @@ if (typeof module !== 'undefined') module.exports = InsertionSort;
 if (typeof require !== 'undefined' && require.main === module) {
     const A = [3, 1, 6, 1, 6, 3, 6, 4];
     const prog = new InsertionSort();
-    prog.sort(A);
+    prog.InsertionSort(A);
     console.log(JSON.stringify(A));
 }

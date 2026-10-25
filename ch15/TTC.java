@@ -15,7 +15,7 @@
 import java.util.*;
 
 public class TTC {
-  public int[] assign(int[][] pref) {
+  public int[] TTC(int[][] pref) {
     int n = pref.length;
     int[] house = new int[n];
     boolean[] fixed = new boolean[n];
@@ -78,7 +78,7 @@ public class TTC {
   public static void main(String[] args) {
     int[][] pref = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     TTC prog = new TTC();
-    int[] result = prog.assign(pref);
+    int[] result = prog.TTC(pref);
     System.out.println(Arrays.toString(result));
   }
 }

@@ -36,17 +36,33 @@
 // LLPLexMatchVertexCover.llp: this program's only parameter is 2D, so
 // there is no 1D-array-length fallback for the compiler's usual
 // n-from-array-length inference.
+//
+// Written as the book's `ensure`, not as the forbidden/advance pair it
+// desugars to, matching Algorithm LLP-FloydWarshall:
+//     for k := 1 to n:
+//       ensure (i,j in [1..n]): G[i,j] <= G[i,k] + G[k,j]
+//
+// G is double, as the book's "matrix of real" says. That is what lets the
+// ensure stand bare: an unreachable pair holds infinity, and IEEE gives
+// infinity + infinity = infinity, so the guard is false there. With int
+// the same sum overflows MAX_VALUE to a large negative and the guard
+// fires on unreachable pairs -- the defect LLPBFS.llp had, which is why
+// the int version needed explicit `!= infinity` tests.
+//
+// G stays a matrix, and the book keeps brackets for it: all-pairs output
+// is Theta(n^2) by definition. Only the edge weight is the accessor
+// w(i,j) -- see the note in the chapter-7 Dijkstra section.
+
 class LLPFloydWarshall {
-  int[][] LLPFloydWarshall(int[][] A) {
-    int n = A.length;
-    int[][] G = new int[n][n];
+  double[][] LLPFloydWarshall(double[][] A) {
     int k = 0;
+    int n = A.length;
+    double[][] G = new double[n][n];
     forall i in [0..n-1] :
       forall j in [0..n-1] :
         G[i][j] = A[i][j];
     while (k < n) {
-      forbidden(i,j) : G[i][k] != infinity && G[k][j] != infinity && G[i][j] > G[i][k] + G[k][j]
-        => advance : G[i][j] = G[i][k] + G[k][j];
+      ensure (i,j in [0..n-1]) : G[i][j] <= G[i][k] + G[k][j];
       k = k + 1;
     };
     return G;

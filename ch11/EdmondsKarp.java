@@ -1,155 +1,77 @@
 // Classical Edmonds-Karp maximum flow: Ford-Fulkerson with the augmenting
 // path chosen by BREADTH-first search, so each augmentation uses a path
 // with the fewest arcs. That single change is what bounds the number of
-// augmentations by O(nm) and makes the running time independent of the
+// augmentations by O(VE) and makes the running time independent of the
 // capacities.
-//
-// REPRESENTATION. The graph arrives as an edge list -- U[i], V[i], C[i]
-// for edge i -- and is turned into the standard PAIRED-ARC structure:
-// input edge i becomes arcs 2i (forward, capacity C[i]) and 2i+1
-// (reverse, capacity 0), adj[u] holds the ARC INDICES leaving u, and
-// head[e] is the arc's head. The reverse of arc e is
-// rev(e) = e + 1 - 2 * (e % 2)
-// (LL has no ^, so the usual e^1 is spelled out), which is what makes
-// "cancel the reverse arc first" an O(1) step.
-//
-// This replaces a capacity/flow MATRIX, and here the bound depends on it.
-// The book's O(n m^2) is O(nm) augmentations times O(m) per BFS. A matrix
-// makes every BFS scan all n candidate heads per vertex -- Theta(n^2)
-// whatever m is -- so the program would run in O(n^3 m), which equals the
-// book's bound only when m = Theta(n^2). On a sparse graph that is a
-// factor of n worse than the O(n m^2) printed beside it. The book writes
-// f(u,v) and c_f(u,v) throughout, never f[u,v]: a function of an edge,
-// not a matrix lookup.
-//
-// FLOW CONVENTION. flow stays NON-NEGATIVE -- a flow function, not an
-// antisymmetric skew matrix -- which is the book's own convention: its
-// inner loop reads `x := min(delta, f(v,u))`, cancels that much reverse
-// flow first, and only puts the remainder on (u,v). The matching residual
-// capacity is therefore
-// residual(e) = cap[e] - flow[e] + flow[rev(e)].
-//
-// The BFS carries its own queue q with head/tail indices and leaves the
-// path in parentArc[], as a chain of arcs running back from t to s.
-//
-// The returned array is indexed by INPUT edge: result[i] is the flow on
-// edge i, which is flow on arc 2i.
 
 import java.util.*;
 
 public class EdmondsKarp {
-  public int[] EdmondsKarp(int n, int[] U, int[] V, int[] C, int s, int t) {
-    int m = U.length;
-    int[] head = new int[(2 * m)];
-    int[] cap = new int[(2 * m)];
-    int[] flow = new int[(2 * m)];
-    for (int i = 0; i < m; i++) {
-      {
-        head[(2 * i)] = V[i];
-        cap[(2 * i)] = C[i];
-        head[((2 * i) + 1)] = U[i];
-        cap[((2 * i) + 1)] = 0;
-      }
+  public int[][] maxflow(int[][] c, int s, int t) {
+    int n = c.length;
+    int[][] f = new int[n][n];
+    int[] parent = new int[n];
+    while ((findAugmentingPath(c, f, s, t, parent) == 1)) {
+      augment(f, s, t, parent, bottleneck(c, f, s, t, parent));
     }
-    int[] deg = new int[n];
-    for (int i = 0; i < m; i++) {
-      {
-        deg[U[i]] = (deg[U[i]] + 1);
-        deg[V[i]] = (deg[V[i]] + 1);
-      }
-    }
-    int[][] adj = new int[n][];
-    for (int u = 0; u < n; u++) {
-      adj[u] = new int[deg[u]];
-    }
-    int[] fill = new int[n];
-    for (int i = 0; i < m; i++) {
-      {
-        adj[U[i]][fill[U[i]]] = (2 * i);
-        fill[U[i]] = (fill[U[i]] + 1);
-        adj[V[i]][fill[V[i]]] = ((2 * i) + 1);
-        fill[V[i]] = (fill[V[i]] + 1);
-      }
-    }
-    int[] parentArc = new int[n];
-    while ((findAugmentingPath(n, adj, head, cap, flow, s, t, parentArc) == 1)) {
-      augment(head, cap, flow, s, t, parentArc, bottleneck(head, cap, flow, s, t, parentArc));
-    }
-    int[] result = new int[m];
-    for (int i = 0; i < m; i++) {
-      result[i] = flow[(2 * i)];
-    }
-    return result;
+    return f;
   }
 
-  public int rev(int e) {
-    return ((e + 1) - (2 * (e % 2)));
-  }
-
-  public int residual(int[] cap, int[] flow, int e) {
-    return ((cap[e] - flow[e]) + flow[rev(e)]);
-  }
-
-  public int bottleneck(int[] head, int[] cap, int[] flow, int s, int v, int[] parentArc) {
+  public int bottleneck(int[][] c, int[][] f, int s, int v, int[] parent) {
     if ((v == s)) {
       return Integer.MAX_VALUE;
     }
-    int e = parentArc[v];
-    return Math.min(residual(cap, flow, e), bottleneck(head, cap, flow, s, head[rev(e)], parentArc));
+    return Math.min(residual(c, f, parent[v], v), bottleneck(c, f, s, parent[v], parent));
   }
 
-  public void augment(int[] head, int[] cap, int[] flow, int s, int v, int[] parentArc, int b) {
+  public void augment(int[][] f, int s, int v, int[] parent, int b) {
     if ((v == s)) {
       return;
     }
-    int e = parentArc[v];
-    int x = Math.min(b, flow[rev(e)]);
-    if ((x > 0)) {
-      flow[rev(e)] = (flow[rev(e)] - x);
-    }
-    if ((b > x)) {
-      flow[e] = (flow[e] + (b - x));
-    }
-    augment(head, cap, flow, s, head[rev(e)], parentArc, b);
+    int u = parent[v];
+    f[u][v] = (f[u][v] + b);
+    f[v][u] = (f[v][u] - b);
+    augment(f, s, u, parent, b);
   }
 
-  public int findAugmentingPath(int n, int[][] adj, int[] head, int[] cap, int[] flow, int s, int t, int[] parentArc) {
-    boolean[] seen = new boolean[n];
-    int[] q = new int[n];
+  public int findAugmentingPath(int[][] c, int[][] f, int s, int t, int[] parent) {
+    boolean[] seen = new boolean[c.length];
+    int[] q = new int[c.length];
     q[0] = s;
     seen[s] = true;
-    return bfs(adj, head, cap, flow, t, parentArc, seen, q, 0, 1);
+    parent[s] = s;
+    return bfs(c, f, t, parent, seen, q, 0, 1);
   }
 
-  public int bfs(int[][] adj, int[] head, int[] cap, int[] flow, int t, int[] parentArc, boolean[] seen, int[] q, int qh, int qt) {
-    if ((qh >= qt)) {
+  public int bfs(int[][] c, int[][] f, int t, int[] parent, boolean[] seen, int[] q, int head, int tail) {
+    if ((head >= tail)) {
       return 0;
     }
-    int u = q[qh];
+    int u = q[head];
     if ((u == t)) {
       return 1;
     }
-    for (int z = 0; z < adj[u].length; z++) {
+    for (int v = 0; v < c.length; v++) {
       {
-        int e = adj[u][z];
-        int v = head[e];
-        if (((!seen[v]) && (residual(cap, flow, e) > 0))) {
+        if (((!seen[v]) && (residual(c, f, u, v) > 0))) {
           seen[v] = true;
-          parentArc[v] = e;
-          q[qt] = v;
-          qt = (qt + 1);
+          parent[v] = u;
+          q[tail] = v;
+          tail = (tail + 1);
         }
       }
     }
-    return bfs(adj, head, cap, flow, t, parentArc, seen, q, (qh + 1), qt);
+    return bfs(c, f, t, parent, seen, q, (head + 1), tail);
+  }
+
+  public int residual(int[][] c, int[][] f, int u, int v) {
+    return (c[u][v] - f[u][v]);
   }
 
   public static void main(String[] args) {
-    int[] U = new int[] {0, 0, 1, 2};
-    int[] V = new int[] {0, 0, 1, 1};
-    int[] C = new int[] {0, 0, 0, 2};
+    int[][] c = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     EdmondsKarp prog = new EdmondsKarp();
-    int[] result = prog.EdmondsKarp(U.length, U, V, C, 0, 1);
-    System.out.println(Arrays.toString(result));
+    int[][] result = prog.maxflow(c, 0, 1);
+    System.out.println(Arrays.deepToString(result));
   }
 }

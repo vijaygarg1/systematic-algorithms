@@ -3,14 +3,11 @@
 // only SEVEN recursive multiplications instead of the obvious eight, which
 // is what drops the exponent from 3 to log2(7) ~ 2.81. The saving comes
 // from M1..M7 below: each is one product of sums, and the four output
-// quadrants are recovered from them by addition alone.
-//
-// Sizes are assumed to be powers of two, so every split is exact.
 
 import java.util.*;
 
 public class Strassen {
-  public int[][] Strassen(int[][] A, int[][] B) {
+  public int[][] multiply(int[][] A, int[][] B) {
     int n = A.length;
     if ((n == 1)) {
       int[][] C1 = new int[1][1];
@@ -26,13 +23,13 @@ public class Strassen {
     int[][] B12 = quadrant(B, 0, h, h);
     int[][] B21 = quadrant(B, h, 0, h);
     int[][] B22 = quadrant(B, h, h, h);
-    int[][] M1 = Strassen(add(A11, A22), add(B11, B22));
-    int[][] M2 = Strassen(add(A21, A22), B11);
-    int[][] M3 = Strassen(A11, sub(B12, B22));
-    int[][] M4 = Strassen(A22, sub(B21, B11));
-    int[][] M5 = Strassen(add(A11, A12), B22);
-    int[][] M6 = Strassen(sub(A21, A11), add(B11, B12));
-    int[][] M7 = Strassen(sub(A12, A22), add(B21, B22));
+    int[][] M1 = multiply(add(A11, A22), add(B11, B22));
+    int[][] M2 = multiply(add(A21, A22), B11);
+    int[][] M3 = multiply(A11, sub(B12, B22));
+    int[][] M4 = multiply(A22, sub(B21, B11));
+    int[][] M5 = multiply(add(A11, A12), B22);
+    int[][] M6 = multiply(sub(A21, A11), add(B11, B12));
+    int[][] M7 = multiply(sub(A12, A22), add(B21, B22));
     int[][] C11 = add(sub(add(M1, M4), M5), M7);
     int[][] C12 = add(M3, M5);
     int[][] C21 = add(M2, M4);
@@ -92,7 +89,7 @@ public class Strassen {
     int[][] A = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     int[][] B = new int[][] {{0, 7, 6, 5, 4, 3, 2, 1}, {1, 0, 7, 6, 5, 4, 3, 2}, {2, 1, 0, 7, 6, 5, 4, 3}, {3, 2, 1, 0, 7, 6, 5, 4}, {4, 3, 2, 1, 0, 7, 6, 5}, {5, 4, 3, 2, 1, 0, 7, 6}, {6, 5, 4, 3, 2, 1, 0, 7}, {7, 6, 5, 4, 3, 2, 1, 0}};
     Strassen prog = new Strassen();
-    int[][] result = prog.Strassen(A, B);
+    int[][] result = prog.multiply(A, B);
     System.out.println(Arrays.deepToString(result));
   }
 }

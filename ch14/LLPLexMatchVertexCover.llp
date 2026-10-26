@@ -1,14 +1,4 @@
 // LLP parallel 2-approximation for Vertex Cover: pick every endpoint of a lex-minimal uncovered edge.
-//
-// Edges are ordered by (min(u,v), max(u,v)), and the lex-least uncovered edge
-// incident to a vertex u is always {u, minNbr(u)}, where minNbr(u) is u's
-// smallest uncovered neighbour: a neighbour y < u contributes the key (y, u)
-// and a neighbour y > u the key (u, y), so in both cases the smallest index
-// wins. An edge is therefore lex-minimal among the edges touching it exactly
-// when it is the lex-least edge at BOTH of its endpoints, which is what
-// isLexMin below tests with two O(n) scans. Testing it directly -- "no smaller
-// uncovered edge touches i or j" -- costs an O(n^2) scan over all edge pairs
-// per candidate, so the predicate alone dominated the whole run.
 
 class LLPLexMatchVertexCover {
   boolean[] LLPLexMatchVertexCover(int[][] adj) {

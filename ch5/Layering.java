@@ -1,49 +1,43 @@
-// Layering, as bxx-graph.tex's Algorithm Layering states it:
-//
-// var Q: queue of int                       // initially empty
-// indeg[j] := |pre(j)| for all j
-// forall j in V: if indeg[j] = 0: G[j] := 0; Q.enqueue(j)
-// while not Q.empty():
-// j := Q.dequeue()
-// forall k in succ(j):
-// indeg[k] := indeg[k] - 1
-// if indeg[k] = 0: G[k] := 1 + max_{i in pre(k)} G[i]; Q.enqueue(k)
-// return G
-//
-// Kahn's algorithm: a vertex gets its layer once every predecessor has
-// one. The book's `queue of int` is a list<int> -- add is enqueue,
-// removeFirst is dequeue.
+// Classical in-degree zero queue algorithm for DAG layering.
 
 import java.util.*;
 
 public class Layering {
-  public int[] Layering(int[][] pre, int[][] succ) {
+  public int[] layer(int[][] pre, int[][] succ) {
     int n = pre.length;
     int[] G = new int[n];
     int[] indeg = new int[n];
     for (int j = 0; j < n; j++) {
-      indeg[j] = pre[j].length;
+      for (int i : pre[j]) {
+        indeg[j] = (indeg[j] + 1);
+      }
     }
-    LinkedList<Integer> Q = new LinkedList<>();
+    int[] Q = new int[n];
+    int head = 0;
+    int tail = 0;
     for (int j = 0; j < n; j++) {
       if ((indeg[j] == 0)) {
         G[j] = 0;
-        Q.add(j);
+        Q[tail] = j;
+        tail = (tail + 1);
       }
     }
-    while ((!Q.isEmpty())) {
-      int j = Q.removeFirst();
+    while ((head < tail)) {
+      int j = Q[head];
+      head = (head + 1);
       for (int k : succ[j]) {
         {
           indeg[k] = (indeg[k] - 1);
           if ((indeg[k] == 0)) {
-            int t1 = Integer.MIN_VALUE;
+            int best = 0;
             for (int i : pre[k]) {
-              int _v = G[i];
-              if (_v > t1) t1 = _v;
+              if (((G[i] + 1) > best)) {
+                best = (G[i] + 1);
+              }
             }
-            G[k] = (1 + t1);
-            Q.add(k);
+            G[k] = best;
+            Q[tail] = k;
+            tail = (tail + 1);
           }
         }
       }

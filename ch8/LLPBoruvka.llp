@@ -1,18 +1,8 @@
 // LLP-Boruvka: Boruvka's minimum spanning tree with the component
 // contraction done by LLP pointer jumping instead of recursion.
-//
-// Each round every active component finds its cheapest outgoing edge,
-// points at the component on the other end, and then the guard below
-// jumps those pointers until each chain collapses to one representative:
-// forbidden when G[j] is not yet its own component's root, advance by
-// following one more link. Mutual choices are broken by keeping the lower
-// index as the root, which is what pointTo decides.
-//
-// A round that merges nothing means the graph is disconnected, which is
-// what progress stops on.
 
 class LLPBoruvka {
-  boolean[] LLPBoruvka(int n, int[] U, int[] V, int[] W) {
+  boolean[] mst(int n, int[] U, int[] V, int[] W) {
     boolean[] T = new boolean[U.length], active = new boolean[n];
     int[] G = new int[n], mweEdge = new int[n];
     double[] mweW = new double[n];
@@ -23,7 +13,7 @@ class LLPBoruvka {
       forall i in [0..n-1] : { mweEdge[i] = 0 - 1; mweW[i] = infinity; };
 
       // Cheapest edge leaving each still-active component.
-      for e in [0..U.length-1] : {
+      forall e in [0..U.length-1] : {
         int ru = find(U[e]), rv = find(V[e]);
         if (active[ru] && active[rv] && ru != rv) { relax(ru, e, W); relax(rv, e, W); };
       };

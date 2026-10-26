@@ -1,33 +1,18 @@
 // Classical divide-and-conquer closest pair of points.
-//
-// Px and Py hold the coordinates, indexed by point number, with the points
-// numbered in increasing x order. Ys lists this subproblem's point numbers
-// in increasing y order, which is what lets the strip scan stop after a
-// constant number of neighbours. G is the running answer: G[0] the best
-// SQUARED distance (squared, so no sqrt is ever needed), G[1] and G[2] the
-// two points achieving it.
-//
-// The recursive worker is named ClosestPairOn rather than overloading
-// ClosestPair on arity. Java tolerates the overload, but Python does not:
-// the second `def ClosestPair` simply replaces the first, so the generated
-// ClosestPair.py called the 6-argument body with 5 arguments and died with
-// "missing 1 required positional argument: 'G'". The entry point keeps the
-// book's algorithm name; ClosestPairOn is the same function over an
-// explicit index range lo..hi with the running answer G threaded through.
 
 class ClosestPair {
-  double[] ClosestPair(int lo, int hi, double[] Px, double[] Py, int[] Ys) {
+  double[] find(int lo, int hi, double[] Px, double[] Py, int[] Ys) {
     double[] G = new double[3];
     G[0] = infinity; G[1] = 0 - 1; G[2] = 0 - 1;
-    ClosestPairOn(lo, hi, Px, Py, Ys, G);
+    ClosestPair(lo, hi, Px, Py, Ys, G);
     return G;
   }
 
-  void ClosestPairOn(int lo, int hi, double[] Px, double[] Py, int[] Ys, double[] G) {
+  void ClosestPair(int lo, int hi, double[] Px, double[] Py, int[] Ys, double[] G) {
     if (hi <= lo) { return; };
     // Three points or fewer: compare every pair and stop recursing.
     if (hi - lo <= 2) {
-      for i in [lo..hi - 1] : {
+      forall i in [lo..hi - 1] : {
         int j = i + 1;
         while (j <= hi) { check(i, j, Px, Py, G); j = j + 1; };
       };
@@ -56,8 +41,8 @@ class ClosestPair {
       };
       k = k + 1;
     };
-    ClosestPairOn(lo, mid, Px, Py, Ls, G);
-    ClosestPairOn(mid + 1, hi, Px, Py, Rs, G);
+    ClosestPair(lo, mid, Px, Py, Ls, G);
+    ClosestPair(mid + 1, hi, Px, Py, Rs, G);
 
     // The strip: points whose x is within the current best distance of the
     // dividing line. Comparing squared x-gaps against G[0] keeps it exact.
@@ -74,7 +59,7 @@ class ClosestPair {
       k = k + 1;
     };
 
-    for a in [0..m-1] : {
+    forall a in [0..m-1] : {
       int b = a + 1;
       int limit = a + 15;
       while (b < m && b <= limit) { check(strip[a], strip[b], Px, Py, G); b = b + 1; };

@@ -1,12 +1,8 @@
 """Classical Kruskal MST: sort edges, union-find with rank and path-compression.
-Calls the sibling UnionFind program (`UnionFind.Union(parent, rank, u, v)`,
+Calls the sibling UnionFind program (`UnionFind.union(parent, rank, u, v)`,
 compiling to `new UnionFind().union(parent, rank, u, v)`) instead of
-keeping its own copy of find/union-by-rank -- UnionFind.Union() already
+keeping its own copy of find/union-by-rank -- UnionFind.union() already
 finds both roots internally and reports whether they were distinct, so
-Kruskal's main loop needs no separate find() call of its own. This makes
-Kruskal.java a multi-file program: it requires UnionFind.java alongside
-it to compile (see JAVA_MULTI_FILE in validate-site.py and the
-`javaRequires` demo-spec field in llp.js).
 
 Auto-generated from Kruskal.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -14,15 +10,15 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class UnionFind:
-    def Find(self, parent, x):
+    def find(self, parent, x):
         n = len(parent)
         if (parent[x] != x):
-            parent[x] = self.Find(parent, parent[x])
+            parent[x] = self.find(parent, parent[x])
         return parent[x]
 
-    def Union(self, parent, rank, x, y):
-        rx = self.Find(parent, x)
-        ry = self.Find(parent, y)
+    def union(self, parent, rank, x, y):
+        rx = self.find(parent, x)
+        ry = self.find(parent, y)
         if (rx == ry):
             return False
         if (rank[rx] < rank[ry]):
@@ -37,7 +33,7 @@ class UnionFind:
 
 
 class Kruskal:
-    def Kruskal(self, n, U, V, W):
+    def mst(self, n, U, V, W):
         self.n = n
         self.U = U
         self.V = V
@@ -51,7 +47,7 @@ class Kruskal:
         chosen = 0
         e = 0
         while ((e < self.m) and (chosen < (self.n - 1))):
-            if UnionFind().Union(self.parent, self.rank, self.U[e], self.V[e]):
+            if UnionFind().union(self.parent, self.rank, self.U[e], self.V[e]):
                 self.T[e] = True
                 chosen = (chosen + 1)
             e = (e + 1)
@@ -63,6 +59,6 @@ if __name__ == '__main__':
     V = [0, 0, 1, 1]
     W = [0, 0, 0, 2]
     prog = Kruskal()
-    result = prog.Kruskal(len(U), U, V, W)
+    result = prog.mst(len(U), U, V, W)
     print(result)
 

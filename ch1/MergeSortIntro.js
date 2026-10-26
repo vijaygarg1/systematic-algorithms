@@ -4,9 +4,6 @@
  * Merge copies the range into a scratch array B and then walks the two
  * halves back into A; its two leftover-copy loops are one line each, as
  * the book prints them. B is sized to the sub-range, not to all of A:
- * allocating and copying the whole array on every one of the Theta(n)
- * merge calls costs Theta(n^2) by itself, which swamps the O(n log n) the
- * merging achieves.
  *
  * Auto-generated from MergeSortIntro.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.

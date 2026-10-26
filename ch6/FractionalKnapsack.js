@@ -14,14 +14,17 @@ class FractionalKnapsack {
     this.n = this.v.length;
     this.x = new Array(this.n).fill(0.0);
     this.rem = this.W;
-    for (let i = 0; i <= ((this.n - 1)); i++) {
-        if ((this.w[i] <= this.rem)) {
-            this.x[i] = 1.0;
-            this.rem = (this.rem - this.w[i]);
+    this.done = false;
+    this.i = 0;
+    while (((this.i < this.n) && (!this.done))) {
+        if ((this.w[this.i] <= this.rem)) {
+            this.x[this.i] = 1.0;
+            this.rem = (this.rem - this.w[this.i]);
         } else {
-            this.x[i] = (this.rem / this.w[i]);
-            break;
+            this.x[this.i] = (this.rem / this.w[this.i]);
+            this.done = true;
         }
+        this.i = (this.i + 1);
     }
     return this.x;
   }

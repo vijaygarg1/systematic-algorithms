@@ -6,18 +6,18 @@ public class ChainCoverFromMatching {
   public int[] ChainCoverFromMatching(int[] matchPartner) {
     int n = matchPartner.length;
     int[] C = new int[n];
-    for (int i = 0; i < n; i++) {
-      {
-        C[i] = i;
-      }
+    int i = 0;
+    while ((i < n)) {
+      C[i] = i;
+      i = (i + 1);
     }
-    for (int u = 0; u < n; u++) {
-      {
-        int v = matchPartner[u];
-        if ((v != (0 - 1))) {
-          C[u] = v;
-        }
+    int u = 0;
+    while ((u < n)) {
+      int v = matchPartner[u];
+      if ((v != (0 - 1))) {
+        C[u] = v;
       }
+      u = (u + 1);
     }
     parentPointerJumping(C);
     return C;
@@ -28,14 +28,14 @@ public class ChainCoverFromMatching {
     boolean changed = true;
     while (changed) {
       changed = false;
-      for (int i = 0; i < n; i++) {
-        {
-          int p = C[i];
-          if ((C[p] != p)) {
-            C[i] = C[p];
-            changed = true;
-          }
+      int i = 0;
+      while ((i < n)) {
+        int p = C[i];
+        if ((C[p] != p)) {
+          C[i] = C[p];
+          changed = true;
         }
+        i = (i + 1);
       }
     }
   }

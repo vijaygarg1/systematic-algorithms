@@ -5,10 +5,6 @@
  * forbidden / advance pair drives every G[j] up to a common value that
  * satisfies all r congruences simultaneously.
  *
- * The advance jumps G[j] forward by multiples of m[j] until x^2 ≡ a[j].
- * In the worst case one walks the period of m[j] (cost O(m[j]) per
- * advance); for prime m[j] the two square roots can be precomputed.
- *
  * Auto-generated from ParQuadCRT.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
  */

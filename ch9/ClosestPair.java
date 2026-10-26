@@ -1,33 +1,18 @@
 // Classical divide-and-conquer closest pair of points.
-//
-// Px and Py hold the coordinates, indexed by point number, with the points
-// numbered in increasing x order. Ys lists this subproblem's point numbers
-// in increasing y order, which is what lets the strip scan stop after a
-// constant number of neighbours. G is the running answer: G[0] the best
-// SQUARED distance (squared, so no sqrt is ever needed), G[1] and G[2] the
-// two points achieving it.
-//
-// The recursive worker is named ClosestPairOn rather than overloading
-// ClosestPair on arity. Java tolerates the overload, but Python does not:
-// the second `def ClosestPair` simply replaces the first, so the generated
-// ClosestPair.py called the 6-argument body with 5 arguments and died with
-// "missing 1 required positional argument: 'G'". The entry point keeps the
-// book's algorithm name; ClosestPairOn is the same function over an
-// explicit index range lo..hi with the running answer G threaded through.
 
 import java.util.*;
 
 public class ClosestPair {
-  public double[] ClosestPair(int lo, int hi, double[] Px, double[] Py, int[] Ys) {
+  public double[] find(int lo, int hi, double[] Px, double[] Py, int[] Ys) {
     double[] G = new double[3];
     G[0] = Double.POSITIVE_INFINITY;
     G[1] = (0 - 1);
     G[2] = (0 - 1);
-    ClosestPairOn(lo, hi, Px, Py, Ys, G);
+    ClosestPair(lo, hi, Px, Py, Ys, G);
     return G;
   }
 
-  public void ClosestPairOn(int lo, int hi, double[] Px, double[] Py, int[] Ys, double[] G) {
+  public void ClosestPair(int lo, int hi, double[] Px, double[] Py, int[] Ys, double[] G) {
     if ((hi <= lo)) {
       return;
     }
@@ -62,8 +47,8 @@ public class ClosestPair {
       }
       k = (k + 1);
     }
-    ClosestPairOn(lo, mid, Px, Py, Ls, G);
-    ClosestPairOn((mid + 1), hi, Px, Py, Rs, G);
+    ClosestPair(lo, mid, Px, Py, Ls, G);
+    ClosestPair((mid + 1), hi, Px, Py, Rs, G);
     int[] strip = new int[n];
     int m = 0;
     k = 0;
@@ -104,7 +89,7 @@ public class ClosestPair {
     double[] Py = new double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     int[] Ys = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     ClosestPair prog = new ClosestPair();
-    double[] result = prog.ClosestPair(0, Ys.length - 1, Px, Py, Ys);
+    double[] result = prog.find(0, Ys.length - 1, Px, Py, Ys);
     System.out.println(Arrays.toString(result));
   }
 }

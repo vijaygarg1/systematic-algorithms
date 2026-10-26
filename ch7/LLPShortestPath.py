@@ -27,12 +27,14 @@ class LLPShortestPath:
 
     def minCrossCut(self, j, pre, w, G, fixed):
         best = 2147483647
-        for k in range(0, ((len(pre[j]) - 1)) + 1):
+        k = 0
+        while (k < len(pre[j])):
             i = pre[j][k]
             if fixed[i]:
                 d = (G[i] + w[i][j])
                 if (d < best):
                     best = d
+            k = (k + 1)
         return best
 
 

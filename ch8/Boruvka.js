@@ -4,18 +4,13 @@
  * added at once, so the number of components at least halves per round
  * and O(log n) rounds suffice.
  *
- * T marks the chosen edges; cid[v] is the representative of v's component,
- * recomputed each round by flooding the edges already in T. A round that
- * adds no edge means the graph is disconnected, which is what progress
- * stops on -- otherwise the loop would spin forever below n-1 edges.
- *
  * Auto-generated from Boruvka.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
  */
 
 
 class Boruvka {
-  Boruvka(n, U, V, W) {
+  mst(n, U, V, W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -118,6 +113,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const V = [0, 0, 1, 1];
     const W = [0, 0, 0, 2];
     const prog = new Boruvka();
-    const result = prog.Boruvka(U.length, U, V, W);
+    const result = prog.mst(U.length, U, V, W);
     console.log(JSON.stringify(result));
 }

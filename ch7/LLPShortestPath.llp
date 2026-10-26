@@ -16,12 +16,14 @@ class LLPShortestPath {
 
   int minCrossCut(int j, int[][] pre, int[][] w, int[] G, boolean[] fixed) {
     int best = infinity;
-    for k in [0..(pre[j].length) - 1] : {
+    int k = 0;
+    while (k < pre[j].length) {
       int i = pre[j][k];
       if (fixed[i]) {
-      int d = G[i] + w[i][j];
-      if (d < best) { best = d; }
+        int d = G[i] + w[i][j];
+        if (d < best) { best = d; }
       };
+      k = k + 1;
     };
     return best;
   }

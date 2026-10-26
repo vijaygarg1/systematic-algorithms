@@ -2,26 +2,20 @@
 // uncovered edge, matching bxx-approximate.tex Algorithm
 // ApproxVertexCover. The book's input is the edge set E, and the loop
 // walks it once, which is what makes the algorithm O(|E|).
-//
-// The book's "remove all edges incident to u or v from E'" needs no
-// bookkeeping: an edge is still in E' exactly when neither of its
-// endpoints has been taken into C, so the test below is that membership
-// test. Taking the edge set rather than an n x n adjacency matrix is
-// what keeps this O(|E|) -- a matrix forces every pass to scan all n^2
-// cells no matter how few edges exist, and reading the input alone would
-// already be Theta(n^2).
 
 class ApproxVertexCover {
   boolean[] ApproxVertexCover(int[] eu, int[] ev, int n) {
     boolean[] C = new boolean[n];
     int m = eu.length;
-    for e in [0..(m) - 1] : {
+    int e = 0;
+    while (e < m) {
       int u = eu[e];
       int v = ev[e];
       if (!C[u] && !C[v]) {
-      C[u] = true;
-      C[v] = true;
+        C[u] = true;
+        C[v] = true;
       };
+      e = e + 1;
     };
     return C;
   }

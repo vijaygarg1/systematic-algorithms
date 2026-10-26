@@ -1,18 +1,5 @@
 // LLP-MinMaxLate: schedule jobs (sorted by deadline) by raising each start
 // time G[j] to the prefix sum of earlier processing times.
-//
-// The targets are the prefix sums S[j] = t[0] + ... + t[j-1], and they are
-// built once in a left-to-right scan rather than written inline as
-// `sum i in [0..j-1] : t[i]`.  Written inline, that reduction is an O(j)
-// loop the guard re-runs for every j -- and the advance runs it a second
-// time -- so the program costs O(n^2) even though every target is already
-// known from the one before it.  Computing them in a single scan is what
-// makes the stated O(n) bound (Section 6.3, "a left-to-right scan") true
-// of this program and not just of the algorithm it encodes.
-//
-// The deadlines d are the sort order of the input, not something the
-// predicate reads: j's target depends only on the processing times ahead
-// of it in that order.
 
 import java.util.*;
 
@@ -54,12 +41,6 @@ public class LLPMinMaxLateness {
         }
       }
     }
-    int t1 = Integer.MIN_VALUE;
-    for (int j = 0; j < n; j++) {
-      int _v = Math.max(0, ((G[j] + t[j]) - d[j]));
-      if (_v > t1) t1 = _v;
-    }
-    int lateness = t1;
     return G;
   }
 

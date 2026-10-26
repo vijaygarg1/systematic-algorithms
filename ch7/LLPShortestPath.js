@@ -32,7 +32,8 @@ class LLPShortestPath {
 
   minCrossCut(j, pre, w, G, fixed) {
     let best = 2147483647;
-    for (let k = 0; k <= ((pre[j].length - 1)); k++) {
+    let k = 0;
+    while ((k < pre[j].length)) {
         let i = pre[j][k];
         if (fixed[i]) {
             let d = (G[i] + w[i][j]);
@@ -40,6 +41,7 @@ class LLPShortestPath {
                 best = d;
             }
         }
+        k = (k + 1);
     }
     return best;
   }

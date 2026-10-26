@@ -7,17 +7,17 @@
 
 
 class UnionFind {
-  Find(parent, x) {
+  find(parent, x) {
     let n = parent.length;
     if ((parent[x] !== x)) {
-        parent[x] = this.Find(parent, parent[x]);
+        parent[x] = this.find(parent, parent[x]);
     }
     return parent[x];
   }
 
-  Union(parent, rank, x, y) {
-    let rx = this.Find(parent, x);
-    let ry = this.Find(parent, y);
+  union(parent, rank, x, y) {
+    let rx = this.find(parent, x);
+    let ry = this.find(parent, y);
     if ((rx === ry)) {
         return false;
     }
@@ -41,6 +41,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const parent = [3, 1, 6, 1, 6, 3, 6, 4];
     const x = 0;
     const prog = new UnionFind();
-    const result = prog.Find(parent, x);
+    const result = prog.find(parent, x);
     console.log(JSON.stringify(result));
 }

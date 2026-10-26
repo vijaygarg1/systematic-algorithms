@@ -2,21 +2,6 @@
 // mu = eps*L/nf, then solve the scaled problem exactly by a profit-indexed
 // DP. Rounding loses at most eps*OPT, so the whole thing is polynomial in
 // nf and 1/eps.
-//
-// L is a 2-approximation lower bound on OPT -- the better of a density-greedy
-// solution and the most profitable single item -- rather than the maximum
-// profit M. Two consequences: scaling by L still loses only nf*mu = eps*L
-// <= eps*OPT, and since OPT <= 2L no feasible solution can have scaled
-// profit above 2*nf/eps, so the profit axis is capped there. That axis is
-// O(nf/eps) wide instead of the O(nf^2/eps) that scaling by M forces, which
-// is what takes the table (and the running time) from O(nf^3/eps) to
-// O(nf^2/eps).
-//
-// D[i][p] = least total weight of a subset of the first i feasible items
-// whose scaled profit is at least p, with D[i][0] = 0 and every other
-// cell starting at INF. The answer is the largest p with D[nf][p] <= W;
-// the traceback then walks the rows back, taking item i exactly when
-// including it is what made row i cheaper than row i-1.
 
 class FPTASKnapsack {
   boolean[] FPTASKnapsack(int[] w, int[] v, int W, int epsNum, int epsDen) {
@@ -26,7 +11,7 @@ class FPTASKnapsack {
     // the ones that can, as indices into the caller's arrays.
     int[] orig = new int[w.length];
     int nf = 0;
-    for t in [0..w.length-1] : {
+    forall t in [0..w.length-1] : {
       if (w[t] <= W) {
         orig[nf] = t;
         nf = nf + 1;
@@ -57,8 +42,8 @@ class FPTASKnapsack {
       int t = 0;
       while (t < nf) {
         if (!used[t] && fw[t] <= room) {
-        if (cand < 0) { cand = t; }
-        else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
+          if (cand < 0) { cand = t; }
+          else { if (fv[t] * fw[cand] > fv[cand] * fw[t]) { cand = t; } };
         };
         t = t + 1;
       };
@@ -92,13 +77,13 @@ class FPTASKnapsack {
     // unreachable, then each row is filled from the row above it.
     int[][] D = new int[nf + 1][Vp + 1];
     forall a in [0..nf] : forall b in [1..Vp] : D[a][b] = INF;
-    for i in [1..nf] : forall p in [1..Vp] :
+    forall i in [1..nf] : forall p in [1..Vp] :
       D[i][p] = min(D[i - 1][p], fw[i - 1] + D[i - 1][max(0, p - vPrime[i - 1])]);
 
     // Best reachable scaled profit -- the last q whose least weight still
     // fits -- then walk the rows back to recover the items that achieved it.
     int bp = 0;
-    for q in [0..Vp] : {
+    forall q in [0..Vp] : {
       if (D[nf][q] <= W) { bp = q; };
     };
     int i = nf;

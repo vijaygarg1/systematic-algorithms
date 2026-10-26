@@ -10,7 +10,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class ThreeWayPartition:
-    def ThreeWayPartition(self, A, pivot, low, high):
+    def partition(self, A, pivot, low, high):
         self.A = A
         self.pivot = pivot
         self.low = low
@@ -40,6 +40,6 @@ if __name__ == '__main__':
     A = [3, 1, 6, 1, 6, 3, 6, 4]
     pivot = 5
     prog = ThreeWayPartition()
-    result = prog.ThreeWayPartition(A, pivot, 0, len(A))
+    result = prog.partition(A, pivot, 0, len(A))
     print(result)
 

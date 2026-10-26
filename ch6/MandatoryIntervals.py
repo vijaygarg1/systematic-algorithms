@@ -1,8 +1,8 @@
-"""Mandatory: composition program forcing the intervals in subset S
-into the schedule.  Halts with "infeasible" (returns null) when two
-mandatory intervals overlap.  Composed onto LLP-IntervalScheduling
-via predicate conjunction:
-[ LLP-IntervalScheduling(s, f, G) && Mandatory(S, G) ].
+"""Mandatory-Intervals: interval scheduling when subset S must appear in the answer.
+Returns null ("infeasible") exactly when two mandatory intervals overlap.
+Intervals arrive indexed in finish-time order.
+NOT a conjunct on LLP-IntervalScheduling: that composition rejects feasible
+instances (interval 0=[0,2) optional, 1=[1,3) mandatory). Three phases instead.
 
 Auto-generated from MandatoryIntervals.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -15,17 +15,30 @@ class MandatoryIntervals:
         self.f = f
         self.S = S
         self.n = len(self.s)
-        self.G = [False] * (self.n)
-        _changed = True
-        while _changed:
-            _changed = False
-            for j in range(0, ((self.n - 1)) + 1):
-                if (self.S[j] and (not self.G[j])):
-                    if any((self.G[k] and self.overlap(j, k, self.s, self.f)) for k in range(0, ((self.n - 1)) + 1)):
+        self.sel = [False] * (self.n)
+        for j in range(0, ((self.n - 1)) + 1):
+            if self.S[j]:
+                for k in range(0, ((self.n - 1)) + 1):
+                    if ((self.S[k] and (k != j)) and self.overlap(j, k, self.s, self.f)):
                         return None
-                    self.G[j] = True
-                    _changed = True
-        return self.G
+                self.sel[j] = True
+        cand = [False] * (self.n)
+        for j in range(0, ((self.n - 1)) + 1):
+            if (not self.S[j]):
+                ok = True
+                for k in range(0, ((self.n - 1)) + 1):
+                    if (self.S[k] and self.overlap(j, k, self.s, self.f)):
+                        ok = False
+                cand[j] = ok
+        chosen = False
+        lastFinish = 0
+        for j in range(0, ((self.n - 1)) + 1):
+            if cand[j]:
+                if ((not chosen) or (self.s[j] >= lastFinish)):
+                    self.sel[j] = True
+                    lastFinish = self.f[j]
+                    chosen = True
+        return self.sel
 
     def overlap(self, j, k, s, f):
         return ((s[j] < f[k]) and (s[k] < f[j]))

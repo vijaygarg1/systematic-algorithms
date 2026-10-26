@@ -39,7 +39,8 @@ class HornSATFC {
         front = (front + 1);
         if ((!this.A[x])) {
             this.A[x] = true;
-            for (let k = 0; k <= ((this.adj[x].length - 1)); k++) {
+            let k = 0;
+            while ((k < this.adj[x].length)) {
                 let ci = this.adj[x][k];
                 this.rem[ci] = (this.rem[ci] - 1);
                 if ((this.rem[ci] === 0)) {
@@ -52,6 +53,7 @@ class HornSATFC {
                         }
                     }
                 }
+                k = (k + 1);
             }
         }
     }

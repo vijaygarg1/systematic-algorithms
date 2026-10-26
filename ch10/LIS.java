@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class LIS {
-  public int[] LIS(int[] A) {
+  public int[] solve(int[] A) {
     int n = A.length;
     int[] dp = new int[n];
     for (int i = 0; i < n; i++) {
@@ -22,7 +22,7 @@ public class LIS {
   public static void main(String[] args) {
     int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     LIS prog = new LIS();
-    int[] result = prog.LIS(A);
+    int[] result = prog.solve(A);
     System.out.println(Arrays.toString(result));
   }
 }

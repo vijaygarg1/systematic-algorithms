@@ -3,10 +3,6 @@
 // to the smallest non-negative root of x^2 ≡ a[j] (mod m[j]); the
 // forbidden / advance pair drives every G[j] up to a common value that
 // satisfies all r congruences simultaneously.
-//
-// The advance jumps G[j] forward by multiples of m[j] until x^2 ≡ a[j].
-// In the worst case one walks the period of m[j] (cost O(m[j]) per
-// advance); for prime m[j] the two square roots can be precomputed.
 
 int[] ParQuadCRT(int[] m, int[] a, int[] roots) {
   int[] G = 0;

@@ -1,47 +1,7 @@
-// LLP Horn SAT, matching bxx-horn.tex Algorithm LLP-HornSAT. head[c] is
-// the consequent variable of clause c, or -1 if clause c is a pure
-// negative (goal) clause. The book's two rules are written here as two
-// forbidden/advance clauses joined by &&, so they share one fixpoint.
-
-// Earlier version of this file (kept for reference, not used): had no
-// representation for a goal clause at all -- every clause was assumed
-// to have a positive head variable -- so rule 2 (UNSAT detection) was
-// entirely missing, and n was derived as head.length (the number of
-// clauses, not variables).
-//
-// class LLPHornSAT {
-//   boolean[] LLPHornSAT(int[][] body, int[] head) {
-//     int n = head.length;
-//     boolean[] G = new boolean[n];
-//     forbidden (j) : hornImplied(j, G, body, head) =>
-//       advance : G[j] = true;
-//     return G;
-//   }
-//
-//   boolean hornImplied(int j, boolean[] G, int[][] body, int[] head) {
-//     if (G[j]) {
-//       return false;
-//     };
-//     int c = 0;
-//     while (c < body.length) {
-//       if (head[c] == j) {
-//         boolean allTrue = true;
-//         int k = 0;
-//         while (k < body[c].length) {
-//           if (!G[body[c][k]]) {
-//             allTrue = false;
-//           };
-//           k = k + 1;
-//         };
-//         if (allTrue) {
-//           return true;
-//         }
-//       };
-//       c = c + 1;
-//     };
-//     return false;
-//   }
-// }
+// LLP Horn SAT (bxx-horn.tex Alg LLP-HornSAT). head[c] = clause c's consequent
+// variable, or -1 for a pure negative (goal) clause. forbidden ranges over
+// VARIABLES, not clauses; goal clauses are checked once after the least model,
+// since violating one cannot be repaired by raising G.
 
 class LLPHornSAT {
   boolean[] LLPHornSAT(int[][] body, int[] head, int n) {
@@ -53,10 +13,10 @@ class LLPHornSAT {
     int[] hcount = new int[n];
     int[][] byHead = new int[n][];
     int[] hfill = new int[n];
-    for c in [0..body.length-1] :
+    forall c in [0..body.length-1] :
       if (head[c] >= 0) { hcount[head[c]] = hcount[head[c]] + 1; };
     forall v in [0..n-1] : byHead[v] = new int[hcount[v]];
-    for c in [0..body.length-1] :
+    forall c in [0..body.length-1] :
       if (head[c] >= 0) {
         byHead[head[c]][hfill[head[c]]] = c;
         hfill[head[c]] = hfill[head[c]] + 1;

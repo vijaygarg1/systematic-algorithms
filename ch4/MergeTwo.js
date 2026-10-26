@@ -9,7 +9,7 @@
 
 
 class MergeTwo {
-  MergeTwo(B, C) {
+  merge(B, C) {
     this.B = B;
     this.C = C;
     this.m = this.B.length;
@@ -48,6 +48,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const B = [0, 0, 1, 2];
     const C = [0, 0, 1, 1];
     const prog = new MergeTwo();
-    const result = prog.MergeTwo(B, C);
+    const result = prog.merge(B, C);
     console.log(JSON.stringify(result));
 }

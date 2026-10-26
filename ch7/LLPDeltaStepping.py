@@ -3,14 +3,6 @@ This algorithm has complex control flow (repeat/until, set comprehensions)
 beyond the standard forbidden/advance pattern.
 The forbidden predicates are:
 forbidden_L(v): exists (u,v) in E_light : G[u] + w[u][v] < G[v]
-forbidden_H(v): exists (u,v) in E_heavy : G[u] + w[u][v] < G[v]
-
-Source vertex `s`: missing from the parameter list entirely in an
-earlier version of this file (a compile error -- `G[s] = 0;` referenced
-an undefined variable), caught by validate-site.py's Java-compile check.
-Added as an explicit parameter, matching the sibling algorithm in this
-same chapter/family, LLPShortestPath, which takes the identical
-`int s` for the same role (its own initial relaxed vertex).
 
 Auto-generated from LLPDeltaStepping.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -54,11 +46,13 @@ class LLPDeltaStepping:
 
     def relaxHeavy(self, v, pre, w, isLight, G, delta):
         relaxed = False
-        for k in range(0, ((len(pre[v]) - 1)) + 1):
+        k = 0
+        while (k < len(pre[v])):
             u = pre[v][k]
             if ((not isLight[u][v]) and ((G[u] + w[u][v]) < G[v])):
                 G[v] = (G[u] + w[u][v])
                 relaxed = True
+            k = (k + 1)
         return relaxed
 
 

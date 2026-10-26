@@ -3,7 +3,7 @@
 import java.util.*;
 
 public class Knapsack {
-  public int[][] Knapsack(int[] w, int[] v, int W) {
+  public int[][] solve(int[] w, int[] v, int W) {
     int n = (w.length - 1);
     int[][] G = new int[(n + 1)][(W + 1)];
     for (int c = 0; c <= W; c++) {
@@ -29,7 +29,7 @@ public class Knapsack {
     int[] v = new int[] {0, 0, 1, 1};
     int W = 10;
     Knapsack prog = new Knapsack();
-    int[][] result = prog.Knapsack(w, v, W);
+    int[][] result = prog.solve(w, v, W);
     System.out.println(Arrays.deepToString(result));
   }
 }

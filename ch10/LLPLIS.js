@@ -4,8 +4,6 @@
  * `ensure` over their maximum says exactly that, so the forbidden
  * predicate and the advance are read off B rather than restated.
  * pre(j) = {i < j : A[i] < A[j]}, so priority(j) = j settles each index
- * in one advance -- the schedule the book's `fixed` array records, an
- * efficiency choice rather than part of the predicate.
  *
  * Auto-generated from LLPLIS.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.

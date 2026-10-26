@@ -1,10 +1,8 @@
 """LLP-Kruskal: edge-inclusion lattice driven by union-find.
-Calls the sibling UnionFind program (`UnionFind.Find(parent, x)`,
-`UnionFind.Union(parent, rank, x, y)`) instead of keeping its own
+Calls the sibling UnionFind program (`UnionFind.find(parent, x)`,
+`UnionFind.union(parent, rank, x, y)`) instead of keeping its own
 copy of find/union -- same multi-file treatment as Kruskal.llp. This
 makes LLPKruskal.java a multi-file program: it requires UnionFind.java
-alongside it to compile (see JAVA_MULTI_FILE in validate-site.py and
-the `javaRequires` demo-spec field in llp.js).
 
 Auto-generated from LLPKruskal.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -12,15 +10,15 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class UnionFind:
-    def Find(self, parent, x):
+    def find(self, parent, x):
         n = len(parent)
         if (parent[x] != x):
-            parent[x] = self.Find(parent, parent[x])
+            parent[x] = self.find(parent, parent[x])
         return parent[x]
 
-    def Union(self, parent, rank, x, y):
-        rx = self.Find(parent, x)
-        ry = self.Find(parent, y)
+    def union(self, parent, rank, x, y):
+        rx = self.find(parent, x)
+        ry = self.find(parent, y)
         if (rx == ry):
             return False
         if (rank[rx] < rank[ry]):
@@ -46,9 +44,9 @@ class LLPKruskal:
         while _changed:
             _changed = False
             for j in range(0, ((self.n - 1)) + 1):
-                if ((not self.G[j]) and (UnionFind().Find(self.parent, self.u[j]) != UnionFind().Find(self.parent, self.v[j]))):
+                if ((not self.G[j]) and (UnionFind().find(self.parent, self.u[j]) != UnionFind().find(self.parent, self.v[j]))):
                     self.G[j] = True
-                    UnionFind().Union(self.parent, self.rank, self.u[j], self.v[j])
+                    UnionFind().union(self.parent, self.rank, self.u[j], self.v[j])
                     _changed = True
         return self.G
 

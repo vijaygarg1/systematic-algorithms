@@ -3,13 +3,6 @@
 // two-element vector (a, b); forbidden picks any entry strictly larger
 // than another, and advance replaces it by its remainder mod the smaller
 // (or by the smaller itself when it divides exactly, so entries stay at
-// least 1). At termination G[0] = G[1] = gcd(a, b).
-//
-// Each advance replaces G[j] by G[j] mod G[i] < G[i] <= G[j], which at
-// least halves it, so the algorithm performs O(log(min(a,b))) advances --
-// the bound the chapter states. `n` has to be set explicitly, as in
-// LLPExtGCD: it is normally inferred from an array *parameter*'s length,
-// but G is locally allocated rather than passed in.
 
 import java.util.*;
 

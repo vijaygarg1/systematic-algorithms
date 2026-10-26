@@ -63,14 +63,14 @@ public class LLPPriceB {
 
   public int maxPricePred(int j, int[][] pre, int[][] w, int[] G) {
     int best = G[j];
-    for (int k = 0; k < pre[j].length; k++) {
-      {
-        int i = pre[j][k];
-        int val = (G[i] - w[i][j]);
-        if ((val > best)) {
-          best = val;
-        }
+    int k = 0;
+    while ((k < pre[j].length)) {
+      int i = pre[j][k];
+      int val = (G[i] - w[i][j]);
+      if ((val > best)) {
+        best = val;
       }
+      k = (k + 1);
     }
     return best;
   }

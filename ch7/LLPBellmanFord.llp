@@ -1,28 +1,17 @@
 // LLP-BellmanFord: when some G[j] is improvable, run one Jacobi-style relaxation.
 // The advance leaves G[0] alone -- the source distance is pinned at 0 -- and
 // recomputes every other G[k] from its predecessors, as in the book's box.
-//
-// The book writes the weight as w(i,j), with parentheses, to say that it
-// comes from the edge and not from an n x n array -- an array would cost
-// Theta(n^2) to build before Bellman-Ford's own O(nm) could start. So the
-// edges arrive as two parallel ragged arrays: pre[j] lists j's predecessors
-// and pw[j][t] is the weight of the edge pre[j][t] -> j. Both are O(m).
-// LLPJohnson.llp uses the same pair.
-//
-// G is double, so an unreached predecessor contributes infinity + w =
-// infinity under IEEE arithmetic and never wins the min. (The int version
-// of this pattern overflows instead -- see LLPBFS.llp.)
 
 class LLPBellmanFord {
-  double[] LLPBellmanFord(int[][] pre, int[][] pw) {
+  double[] LLPBellmanFord(set<int>[] pre, int[][] w) {
     double[] G = infinity;
     G[0] = 0;
     forbidden (j in [0..n-1]) :
-      exists t in [0..pre[j].length-1] : G[j] > G[pre[j][t]] + pw[j][t]
+      exists i in pre[j] : G[j] > G[i] + w[i][j]
     =>
       advance :
         forall k in [1..n-1] :
-          G[k] = min t in [0..pre[k].length-1] : G[pre[k][t]] + pw[k][t];
+          G[k] = min i in pre[k] : G[i] + w[i][k];
     return G;
   }
 }

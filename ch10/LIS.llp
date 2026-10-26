@@ -1,12 +1,12 @@
 // Classical O(n²) LIS DP.
 
 class LIS {
-  int[] LIS(int[] A) {
+  int[] solve(int[] A) {
     int n = A.length;
     int[] dp = new int[n];
     forall i in [0..n-1] : dp[i] = 1;
-    for i in [1..n-1] :
-      for j in [0..i-1] :
+    forall i in [1..n-1] :
+      forall j in [0..i-1] :
         if (A[j] < A[i]) {
           dp[i] = max(dp[i], dp[j] + 1);
         };

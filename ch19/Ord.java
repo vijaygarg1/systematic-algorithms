@@ -10,10 +10,10 @@ public class Ord {
     int k = 1;
     int i = 0;
     while ((i < s)) {
-      for (int j = 0; j < e[i]; j++) {
-        {
-          k = (k * p[i]);
-        }
+      int j = 0;
+      while ((j < e[i])) {
+        k = (k * p[i]);
+        j = (j + 1);
       }
       i = (i + 1);
     }

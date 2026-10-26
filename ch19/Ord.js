@@ -18,8 +18,10 @@ class Ord {
     let k = 1;
     let i = 0;
     while ((i < this.s)) {
-        for (let j = 0; j <= ((this.e[i] - 1)); j++) {
+        let j = 0;
+        while ((j < this.e[i])) {
             k = (k * this.p[i]);
+            j = (j + 1);
         }
         i = (i + 1);
     }

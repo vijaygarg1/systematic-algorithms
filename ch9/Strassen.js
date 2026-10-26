@@ -4,9 +4,6 @@
  * only SEVEN recursive multiplications instead of the obvious eight, which
  * is what drops the exponent from 3 to log2(7) ~ 2.81. The saving comes
  * from M1..M7 below: each is one product of sums, and the four output
- * quadrants are recovered from them by addition alone.
- *
- * Sizes are assumed to be powers of two, so every split is exact.
  *
  * Auto-generated from Strassen.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
@@ -14,7 +11,7 @@
 
 
 class Strassen {
-  Strassen(A, B) {
+  multiply(A, B) {
     this.n = A.length;
     if ((this.n === 1)) {
         let C1 = Array.from({length: 1}, () => new Array(1).fill(0));
@@ -30,13 +27,13 @@ class Strassen {
     let B12 = this.quadrant(B, 0, h, h);
     let B21 = this.quadrant(B, h, 0, h);
     let B22 = this.quadrant(B, h, h, h);
-    let M1 = this.Strassen(this.add(A11, A22), this.add(B11, B22));
-    let M2 = this.Strassen(this.add(A21, A22), B11);
-    let M3 = this.Strassen(A11, this.sub(B12, B22));
-    let M4 = this.Strassen(A22, this.sub(B21, B11));
-    let M5 = this.Strassen(this.add(A11, A12), B22);
-    let M6 = this.Strassen(this.sub(A21, A11), this.add(B11, B12));
-    let M7 = this.Strassen(this.sub(A12, A22), this.add(B21, B22));
+    let M1 = this.multiply(this.add(A11, A22), this.add(B11, B22));
+    let M2 = this.multiply(this.add(A21, A22), B11);
+    let M3 = this.multiply(A11, this.sub(B12, B22));
+    let M4 = this.multiply(A22, this.sub(B21, B11));
+    let M5 = this.multiply(this.add(A11, A12), B22);
+    let M6 = this.multiply(this.sub(A21, A11), this.add(B11, B12));
+    let M7 = this.multiply(this.sub(A12, A22), this.add(B21, B22));
     let C11 = this.add(this.sub(this.add(M1, M4), M5), M7);
     let C12 = this.add(M3, M5);
     let C21 = this.add(M2, M4);
@@ -97,6 +94,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const A = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]];
     const B = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]];
     const prog = new Strassen();
-    const result = prog.Strassen(A, B);
+    const result = prog.multiply(A, B);
     console.log(JSON.stringify(result));
 }

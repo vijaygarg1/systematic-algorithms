@@ -1,7 +1,7 @@
-// LLP Horn SAT, matching bxx-horn.tex Algorithm LLP-HornSAT. head[c] is
-// the consequent variable of clause c, or -1 if clause c is a pure
-// negative (goal) clause. The book's two rules are written here as two
-// forbidden/advance clauses joined by &&, so they share one fixpoint.
+// LLP Horn SAT (bxx-horn.tex Alg LLP-HornSAT). head[c] = clause c's consequent
+// variable, or -1 for a pure negative (goal) clause. forbidden ranges over
+// VARIABLES, not clauses; goal clauses are checked once after the least model,
+// since violating one cannot be repaired by raising G.
 
 import java.util.*;
 

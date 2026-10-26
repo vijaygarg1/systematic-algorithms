@@ -30,20 +30,22 @@ class HornSATFC {
       front = front + 1;
       if (!A[x]) {
         A[x] = true;
-        for k in [0..(adj[x].length) - 1] : {
+        int k = 0;
+        while (k < adj[x].length) {
           int ci = adj[x][k];
           rem[ci] = rem[ci] - 1;
           if (rem[ci] == 0) {
-          if (head[ci] < 0) {
-          sat = false;
-          } else {
-          if (!A[head[ci]]) {
-          queue[back] = head[ci];
-          back = back + 1;
-          }
-          }
+            if (head[ci] < 0) {
+              sat = false;
+            } else {
+              if (!A[head[ci]]) {
+                queue[back] = head[ci];
+                back = back + 1;
+              }
+            }
           };
-        };
+          k = k + 1;
+        }
       }
     };
     return A;

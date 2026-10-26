@@ -1,57 +1,8 @@
-// Companion-only program: the book presents LLP-FloydWarshall only as
-// LaTeX pseudocode (bxx-sp-llp-apsp.tex's algorithm box), never as a
-// compilable .llp file -- there is no book/lang/progs-shortestPath/
-// counterpart to sync from. See COMPANION_ONLY_STEMS in
-// sync-code-from-lang.py: this file must be preserved there or a sync
-// run will silently delete it (as happened once already).
-//
-// Matches the book's staged formulation (bxx-sp-llp-apsp.tex): the
-// intermediate vertex k is processed in n sequential stages k = 0, ...,
-// n-1, each stage realizing the book's ensure(i,j): G[i][j] <= G[i][k] +
-// G[k][j] as a forbidden/advance pair over (i,j), rather than resolving
-// `exists k`/`min k` over all k at once (the old, unordered "ensure" cost
-// an extra factor of n -- see the book's complexity paragraph).
-//
-// Placement matters for the compiler: forbidden/advance owns its own
-// (i,j) domain scan internally (a while(changed) fixpoint), so it must
-// sit directly in the k-stage's body, NOT nested inside an explicit
-// forall i / forall j of the same indices -- that would re-run the whole
-// O(n^2) fixpoint once per (i,j) pair, i.e. O(n^5). Within a stage the
-// fixpoint itself costs only two O(n^2) passes (one that applies updates,
-// one that confirms none remain), since G[i][k] and G[k][j] are fixed
-// for the duration of stage k (the book's correctness argument) -- so
-// nothing cascades and the whole program is O(n^3), matching classical
-// FloydWarshall.
-//
-// k must be declared as a field (a plain top-level decl, before any
-// other statement) rather than as a `forall k in [0..n-1]` loop variable
-// or a locally-scoped `int k = 0;` introduced after other statements --
-// the compiler only promotes top-of-body declarations to instance
-// fields, and forbidden/advance's generated helper methods can only see
-// fields (and their own declared indices i, j), not enclosing-loop
-// locals. An out-of-place `int k` here silently fails to compile with
-// "cannot find symbol: k" inside the generated helpers.
-//
-// n is likewise bound explicitly for the same reason documented in
-// LLPLexMatchVertexCover.llp: this program's only parameter is 2D, so
-// there is no 1D-array-length fallback for the compiler's usual
-// n-from-array-length inference.
-//
-// Written as the book's `ensure`, not as the forbidden/advance pair it
-// desugars to, matching Algorithm LLP-FloydWarshall:
-//     for k := 1 to n:
-//       ensure (i,j in [1..n]): G[i,j] <= G[i,k] + G[k,j]
-//
-// G is double, as the book's "matrix of real" says. That is what lets the
-// ensure stand bare: an unreachable pair holds infinity, and IEEE gives
-// infinity + infinity = infinity, so the guard is false there. With int
-// the same sum overflows MAX_VALUE to a large negative and the guard
-// fires on unreachable pairs -- the defect LLPBFS.llp had, which is why
-// the int version needed explicit `!= infinity` tests.
-//
-// G stays a matrix, and the book keeps brackets for it: all-pairs output
-// is Theta(n^2) by definition. Only the edge weight is the accessor
-// w(i,j) -- see the note in the chapter-7 Dijkstra section.
+// Companion-only: book shows LLP-FloydWarshall only as LaTeX pseudocode,
+// no .llp counterpart to sync from -- see COMPANION_ONLY_STEMS in
+// sync-code-from-lang.py or a sync run will delete this file.
+// k stages the intermediate vertex 0..n-1; each stage's forbidden/advance
+// (i,j) fixpoint must sit directly in the k-stage body, not nested inside
 
 class LLPFloydWarshall {
   double[][] LLPFloydWarshall(double[][] A) {

@@ -3,14 +3,6 @@ matching bxx-housing.tex Algorithm TTC exactly: each stage (1) every
 unfixed agent advances its wish pointer past houses already owned by
 fixed agents, building the top-choice graph; (2) ALL node-disjoint
 cycles in that graph are found at once (every unfixed node has
-out-degree 1, so each agent either lies on a cycle or on a tail
-leading into one); (3) every agent on ANY cycle this stage trades
-and is fixed -- not a single pointer-chasing walk that resolves one
-cycle at a time and rebuilds the whole graph for each one.
-
-Steps 1 and 3 are `forall`s, since each agent is handled independently
-of the others; only the walk of step 2 is inherently sequential, and
-even there the two sweeps over the recorded path are `forall`s.
 
 Auto-generated from TTC.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -18,7 +10,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class TTC:
-    def TTC(self, pref):
+    def assign(self, pref):
         self.pref = pref
         self.n = len(self.pref)
         self.house = [0] * (self.n)
@@ -67,6 +59,6 @@ class TTC:
 if __name__ == '__main__':
     pref = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
     prog = TTC()
-    result = prog.TTC(pref)
+    result = prog.assign(pref)
     print(result)
 

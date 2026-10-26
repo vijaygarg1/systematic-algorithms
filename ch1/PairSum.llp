@@ -2,8 +2,8 @@
 
 int PairSum(int[] A, int target) {
   int count = 0;
-  for i in [0..A.length-1] : {
-    for j in [i + 1..A.length-1] : {
+  forall i in [0..A.length-1] : {
+    forall j in [i + 1..A.length-1] : {
       if (A[i] + A[j] == target) { count = count + 1; };
     };
   };

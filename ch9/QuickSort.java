@@ -3,14 +3,14 @@
 import java.util.*;
 
 public class QuickSort {
-  public void QuickSort(int lo, int hi, int[] G) {
+  public void sort(int lo, int hi, int[] G) {
     if ((lo < hi)) {
       int p = Partition(lo, hi, G);
       /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
-      QuickSort(lo, (p - 1), G);
+      sort(lo, (p - 1), G);
       // branch 1
-      QuickSort((p + 1), hi, G);
+      sort((p + 1), hi, G);
     }
   }
 
@@ -36,7 +36,7 @@ public class QuickSort {
   public static void main(String[] args) {
     int[] G = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     QuickSort prog = new QuickSort();
-    prog.QuickSort(0, G.length - 1, G);
+    prog.sort(0, G.length - 1, G);
     System.out.println(Arrays.toString(G));
   }
 }

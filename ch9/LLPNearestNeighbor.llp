@@ -9,7 +9,7 @@ class LLPNearestNeighbor {
 
   double nearestDist(double[] px, double[] py, int j) {
     double best = infinity;
-    for k in [0..px.length-1] : {
+    forall k in [0..px.length-1] : {
       if (k != j) {
         double d = dist(px, py, j, k);
         if (d < best) { best = d; }

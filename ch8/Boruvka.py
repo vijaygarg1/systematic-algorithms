@@ -3,18 +3,13 @@ component picks its own cheapest outgoing edge and all those edges are
 added at once, so the number of components at least halves per round
 and O(log n) rounds suffice.
 
-T marks the chosen edges; cid[v] is the representative of v's component,
-recomputed each round by flooding the edges already in T. A round that
-adds no edge means the graph is disconnected, which is what progress
-stops on -- otherwise the loop would spin forever below n-1 edges.
-
 Auto-generated from Boruvka.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
 """
 
 
 class Boruvka:
-    def Boruvka(self, n, U, V, W):
+    def mst(self, n, U, V, W):
         self.n = n
         self.U = U
         self.V = V
@@ -91,6 +86,6 @@ if __name__ == '__main__':
     V = [0, 0, 1, 1]
     W = [0, 0, 0, 2]
     prog = Boruvka()
-    result = prog.Boruvka(len(U), U, V, W)
+    result = prog.mst(len(U), U, V, W)
     print(result)
 

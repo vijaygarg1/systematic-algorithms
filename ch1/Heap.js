@@ -7,17 +7,17 @@
 
 
 class Heap {
-  BuildHeap(A, n) {
+  build(A, n) {
     this.A = A;
     this.n = n;
     this.i = (Math.trunc(this.n / 2) - 1);
     while ((this.i >= 0)) {
-        this.Heapify(this.A, this.i, this.n);
+        this.heapify(this.A, this.i, this.n);
         this.i = (this.i - 1);
     }
   }
 
-  Heapify(A, i, n) {
+  heapify(A, i, n) {
     let smallest = i;
     let left = ((2 * i) + 1);
     let right = ((2 * i) + 2);
@@ -29,11 +29,11 @@ class Heap {
     }
     if ((smallest !== i)) {
         const _sw1 = A[i]; A[i] = A[smallest]; A[smallest] = _sw1;
-        this.Heapify(A, smallest, n);
+        this.heapify(A, smallest, n);
     }
   }
 
-  HeapInsert(A, key, n) {
+  insert(A, key, n) {
     n = (n + 1);
     let i = (n - 1);
     while (((i > 0) && (A[Math.trunc((i - 1) / 2)] > key))) {
@@ -44,14 +44,14 @@ class Heap {
     return n;
   }
 
-  HeapExtractMin(A, n) {
+  extractMin(A, n) {
     if ((n < 1)) {
         return (-2147483648);
     }
     let min_ = A[0];
     A[0] = A[(n - 1)];
     n = (n - 1);
-    this.Heapify(A, 0, n);
+    this.heapify(A, 0, n);
     return min_;
   }
 }
@@ -61,6 +61,6 @@ if (typeof module !== 'undefined') module.exports = Heap;
 if (typeof require !== 'undefined' && require.main === module) {
     const A = [3, 1, 6, 1, 6, 3, 6, 4];
     const prog = new Heap();
-    prog.BuildHeap(A, A.length);
+    prog.build(A, A.length);
     console.log(JSON.stringify(A));
 }

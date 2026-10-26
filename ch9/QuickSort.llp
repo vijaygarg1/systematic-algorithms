@@ -1,10 +1,10 @@
 // Parallel quicksort: parallel-composed recursive partitions.
 
 class QuickSort {
-  void QuickSort(int lo, int hi, int[] G) {
+  void sort(int lo, int hi, int[] G) {
     if (lo < hi) {
       int p = Partition(lo, hi, G);
-      [ QuickSort(lo, p - 1, G) [] QuickSort(p + 1, hi, G) ];
+      [ sort(lo, p - 1, G) [] sort(p + 1, hi, G) ];
     }
   }
 

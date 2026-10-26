@@ -1,21 +1,55 @@
-// Mandatory: composition program forcing the intervals in subset S
-// into the schedule.  Halts with "infeasible" (returns null) when two
-// mandatory intervals overlap.  Composed onto LLP-IntervalScheduling
-// via predicate conjunction:
-//   [ LLP-IntervalScheduling(s, f, G) && Mandatory(S, G) ].
+// Mandatory-Intervals: interval scheduling when subset S must appear in the answer.
+// Returns null ("infeasible") exactly when two mandatory intervals overlap.
+// Intervals arrive indexed in finish-time order.
+// NOT a conjunct on LLP-IntervalScheduling: that composition rejects feasible
+// instances (interval 0=[0,2) optional, 1=[1,3) mandatory). Three phases instead.
 
 class MandatoryIntervals {
   boolean[] MandatoryIntervals(int[] s, int[] f, boolean[] S) {
     int n = s.length;
-    boolean[] G = false;
-    forbidden (j in [0..n-1]) : S[j] && !G[j] =>
-      advance : {
-        if (exists k in [0..n-1] : G[k] && overlap(j, k, s, f)) {
-          return null;
+    boolean[0..n-1] sel = false;
+
+    // Phase 1: infeasible iff two mandatory intervals overlap; reserve the rest.
+    for j in [0..n-1] : {
+      if (S[j]) {
+        for k in [0..n-1] : {
+          if (S[k] && k != j && overlap(j, k, s, f)) {
+            return null;
+          };
         };
-        G[j] = true;
+        sel[j] = true;
       };
-    return G;
+    };
+
+    // Phase 2: an optional interval conflicting with a mandatory one can never
+    // be selected, so only the survivors are candidates.
+    boolean[0..n-1] cand = false;
+    for j in [0..n-1] : {
+      if (!S[j]) {
+        boolean ok = true;
+        for k in [0..n-1] : {
+          if (S[k] && overlap(j, k, s, f)) {
+            ok = false;
+          };
+        };
+        cand[j] = ok;
+      };
+    };
+
+    // Phase 3: earliest-finish-time greedy over the survivors, which never
+    // conflict with S, so only conflicts among themselves matter.
+    boolean chosen = false;
+    int lastFinish = 0;
+    for j in [0..n-1] : {
+      if (cand[j]) {
+        if (!chosen || s[j] >= lastFinish) {
+          sel[j] = true;
+          lastFinish = f[j];
+          chosen = true;
+        };
+      };
+    };
+    return sel;
   }
 
   boolean overlap(int j, int k, int[] s, int[] f) {

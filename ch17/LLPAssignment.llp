@@ -3,15 +3,6 @@
 // alternating-path reachability from an unmatched bidder, the standard
 // witness for a violated Hall condition. Advance raises EVERY item in J by
 // one shared slack jump, delta := min over bidders demanding into J of
-// [best surplus - best surplus using an item outside J]: the book's
-// "G[j] := G[j]+delta for every j in J", not a per-item unit raise.
-//
-// J depends only on G, so it is built ONCE per value of G and held in the
-// fields itemInJ/bidderInB; the forbidden test refreshes it when stale and
-// then just reads itemInJ[j], and the advance consumes the same arrays and
-// marks them stale.
-//
-// Assumes the number of bidders equals the number of items.
 
 class LLPAssignment {
   int[] LLPAssignment(int[][] v) {
@@ -38,7 +29,7 @@ class LLPAssignment {
     if (fresh) { return; };
     forall i in [0..n-1] : { itemInJ[i] = false; partner[i] = 0 - 1; };
     forall b in [0..m-1] : bidderInB[b] = false;
-    for b in [0..m-1] : tryMatch(b, new boolean[n]);
+    forall b in [0..m-1] : tryMatch(b, new boolean[n]);
     int u = firstUnmatched();
     if (u < m) { reach(u); };
     fresh = true;
@@ -49,7 +40,7 @@ class LLPAssignment {
   // best surplus outside J.
   void raiseJ() {
     int delta = infinity;
-    for b in [0..m-1] : {
+    forall b in [0..m-1] : {
       if (bidderInB[b]) {
         int drop = bestSurplus(b) - bestOutside(b);
         if (drop < delta) { delta = drop; };
@@ -62,7 +53,7 @@ class LLPAssignment {
   // The lowest bidder the matching leaves unmatched, or m when the matching
   // is already perfect.
   int firstUnmatched() {
-    for b in [0..m-1] : {
+    forall b in [0..m-1] : {
       if (!(exists i in [0..n-1] : partner[i] == b)) { return b; };
     };
     return m;
@@ -73,7 +64,7 @@ class LLPAssignment {
   // bestSurplus restricted to the items outside J.
   int bestOutside(int b) {
     int best = 0 - infinity;
-    for i in [0..n-1] : {
+    forall i in [0..n-1] : {
       if (!itemInJ[i] && v[b][i] - G[i] > best) { best = v[b][i] - G[i]; };
     };
     return best;
@@ -84,7 +75,7 @@ class LLPAssignment {
     if (bidderInB[b]) { return; };
     bidderInB[b] = true;
     int best = bestSurplus(b);
-    for i in [0..n-1] :
+    forall i in [0..n-1] :
       if (v[b][i] - G[i] == best && !itemInJ[i]) {
         itemInJ[i] = true;
         if (partner[i] != 0 - 1) { reach(partner[i]); }

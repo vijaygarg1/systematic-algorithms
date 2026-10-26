@@ -3,19 +3,11 @@
 // unfixed agent advances its wish pointer past houses already owned by
 // fixed agents, building the top-choice graph; (2) ALL node-disjoint
 // cycles in that graph are found at once (every unfixed node has
-// out-degree 1, so each agent either lies on a cycle or on a tail
-// leading into one); (3) every agent on ANY cycle this stage trades
-// and is fixed -- not a single pointer-chasing walk that resolves one
-// cycle at a time and rebuilds the whole graph for each one.
-//
-// Steps 1 and 3 are `forall`s, since each agent is handled independently
-// of the others; only the walk of step 2 is inherently sequential, and
-// even there the two sweeps over the recorded path are `forall`s.
 
 import java.util.*;
 
 public class TTC {
-  public int[] TTC(int[][] pref) {
+  public int[] assign(int[][] pref) {
     int n = pref.length;
     int[] house = new int[n];
     boolean[] fixed = new boolean[n];
@@ -78,7 +70,7 @@ public class TTC {
   public static void main(String[] args) {
     int[][] pref = new int[][] {{0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7, 0}, {2, 3, 4, 5, 6, 7, 0, 1}, {3, 4, 5, 6, 7, 0, 1, 2}, {4, 5, 6, 7, 0, 1, 2, 3}, {5, 6, 7, 0, 1, 2, 3, 4}, {6, 7, 0, 1, 2, 3, 4, 5}, {7, 0, 1, 2, 3, 4, 5, 6}};
     TTC prog = new TTC();
-    int[] result = prog.TTC(pref);
+    int[] result = prog.assign(pref);
     System.out.println(Arrays.toString(result));
   }
 }

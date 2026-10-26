@@ -1,15 +1,5 @@
 // LLP-Boruvka: Boruvka's minimum spanning tree with the component
 // contraction done by LLP pointer jumping instead of recursion.
-//
-// Each round every active component finds its cheapest outgoing edge,
-// points at the component on the other end, and then the guard below
-// jumps those pointers until each chain collapses to one representative:
-// forbidden when G[j] is not yet its own component's root, advance by
-// following one more link. Mutual choices are broken by keeping the lower
-// index as the root, which is what pointTo decides.
-//
-// A round that merges nothing means the graph is disconnected, which is
-// what progress stops on.
 
 import java.util.*;
 
@@ -35,7 +25,7 @@ public class LLPBoruvka {
     G[j] = G[G[j]];
   }
 
-  public boolean[] LLPBoruvka(int n, int[] U, int[] V, int[] W) {
+  public boolean[] mst(int n, int[] U, int[] V, int[] W) {
     this.n = n;
     this.U = U;
     this.V = V;
@@ -148,7 +138,7 @@ public class LLPBoruvka {
     int[] V = new int[] {0, 0, 1, 1};
     int[] W = new int[] {0, 0, 0, 2};
     LLPBoruvka prog = new LLPBoruvka();
-    boolean[] result = prog.LLPBoruvka(U.length, U, V, W);
+    boolean[] result = prog.mst(U.length, U, V, W);
     System.out.println(Arrays.toString(result));
   }
 }

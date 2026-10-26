@@ -3,14 +3,14 @@
 import java.util.*;
 
 public class MergeSort {
-  public void MergeSort(int lo, int hi, int[] G) {
+  public void sort(int lo, int hi, int[] G) {
     if ((lo < hi)) {
       int mid = ((lo + hi) / 2);
       /* [ ... [] ... ]: parallel branches (sequential for now) */
       // branch 0
-      MergeSort(lo, mid, G);
+      sort(lo, mid, G);
       // branch 1
-      MergeSort((mid + 1), hi, G);
+      sort((mid + 1), hi, G);
       Merge(lo, mid, hi, G);
     }
   }
@@ -48,7 +48,7 @@ public class MergeSort {
   public static void main(String[] args) {
     int[] G = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     MergeSort prog = new MergeSort();
-    prog.MergeSort(0, G.length - 1, G);
+    prog.sort(0, G.length - 1, G);
     System.out.println(Arrays.toString(G));
   }
 }

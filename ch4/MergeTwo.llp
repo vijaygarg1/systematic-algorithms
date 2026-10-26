@@ -3,7 +3,7 @@
 // leftover-copy loops, which the book also prints as a single line each.
 
 class MergeTwo {
-  int[] MergeTwo(int[] B, int[] C) {
+  int[] merge(int[] B, int[] C) {
     int m = B.length, n = C.length;
     int[] D = new int[m + n];
     int i = 0, j = 0, k = 0;

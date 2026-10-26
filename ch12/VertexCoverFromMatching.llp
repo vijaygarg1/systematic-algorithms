@@ -3,18 +3,6 @@
 // bxx-matchingReduced.tex Algorithm VertexCoverFromMatching: Z is the set
 // of vertices reachable from an unmatched L-vertex by an alternating path
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
-// intersect Z). The book treats the matching M as given directly as a
-// partner lookup; here it is given as matchL[j] = R-partner of L-vertex
-// j (or -1 if unmatched), with matchR (the same matching read from the
-// R side -- the only direction the book's "partner[w]" needs, since w is
-// always an R-vertex at that point in the algorithm) derived from it.
-//
-// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
-// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
-// some R-vertex has no incident edge. Following "every (w,v) in E \ M"
-// over a dense |L| x |R| matrix would scan all of R for every dequeued
-// L-vertex however few edges exist, and reading such a matrix is already
-// Theta(|L| * |R|).
 
 class VertexCoverFromMatching {
   boolean[] VertexCoverFromMatching(int[][] adj, int nr, int[] matchL) {
@@ -29,7 +17,7 @@ class VertexCoverFromMatching {
     int[] Q = new int[L + R];
     int head = 0;
     int tail = 0;
-    for j in [0..L-1] :
+    forall j in [0..L-1] :
       if (matchL[j] == 0 - 1) {
         inZ[j] = true;
         Q[tail] = j;
@@ -41,13 +29,15 @@ class VertexCoverFromMatching {
       head = head + 1;
       if (w < L) {
         // w in L: follow every (w, v) in E \ M with v not in Z.
-        for t in [0..(adj[w].length) - 1] : {
+        int t = 0;
+        while (t < adj[w].length) {
           int v = adj[w][t];
           if (matchL[w] != v && !inZ[L + v]) {
-          inZ[L + v] = true;
-          Q[tail] = L + v;
-          tail = tail + 1;
+            inZ[L + v] = true;
+            Q[tail] = L + v;
+            tail = tail + 1;
           };
+          t = t + 1;
         };
       } else {
         // w in R: if w is matched and partner[w] not in Z, add it.

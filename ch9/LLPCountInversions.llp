@@ -8,7 +8,7 @@ class LLPCountInversions {
 
   int countLeft(int[] A, int j) {
     int count = 0;
-    for i in [0..j-1] : {
+    forall i in [0..j-1] : {
       if (A[i] > A[j]) { count = count + 1; };
     };
     return count;

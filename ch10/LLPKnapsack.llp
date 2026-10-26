@@ -2,40 +2,6 @@
 // `&&` so they share one fixpoint, with each index carrying its own
 // bound -- i over items, c over capacities.
 
-// Previous version of this file (kept for reference, not used): the
-// book's own simplified incremental step, which this (correctly) models
-// as a single-index forbidden(j) lifting one previous row C[] to admit
-// one new item -- but that step algorithm, and the driver loop that calls
-// it once per item, are both part of the ISPARBOOK-only presentation in
-// bxx-dynamicProgramming.tex and never render in the sequential book. The
-// sequential book's actual (and only) "LLP-Knapsack" is the direct
-// forbidden(i,c) algorithm below.
-//
-// class LLPIncrKnapsack {
-//   int[] LLPIncrKnapsack(int w, int v, int[] C) {
-//     int[] G = 0;
-//     forbidden (j) :
-//       G[j] < C[j] || (j >= w && G[j] < C[j - w] + v)
-//     =>
-//       advance :
-//         G[j] = newValue(j);
-//     return G;
-//   }
-//
-//   // The pointwise maximum of "skip the new item" (C[j]) and
-//   // "take the new item" (C[j - w] + v, only if j >= w).
-//   int newValue(int j) {
-//     int skip = C[j];
-//     if (j >= w) {
-//       int take = C[j - w] + v;
-//       if (take > skip) {
-//         return take;
-//       }
-//     };
-//     return skip;
-//   }
-// }
-
 class LLPKnapsack {
   int[][] LLPKnapsack(int[] w, int[] v, int W) {
     int n = w.length - 1;

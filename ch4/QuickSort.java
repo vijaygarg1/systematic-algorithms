@@ -1,51 +1,39 @@
-// QuickSort, exactly as bxx-sort.tex's Algorithm QuickSort states it:
-//
-// if (low < high) {
-// pivot  := choosePivot()
-// (p, q) := Partition(A, pivot, low, high)
-// QuickSort(A, low, p)
-// QuickSort(A, q, high)
-// }
-//
-// Partition is the sibling ThreeWayPartition program, which returns the
-// pair (p, q) the book names: A[low..p) < pivot, A[p..q) = pivot, and
-// A[q..high) > pivot. LL has no tuple, so the pair comes back as a
-// two-element array and is unpacked into p and q.
-//
-// high is EXCLUSIVE here -- one past the last slot -- which is what the
-// book's own text requires: it hands `high` straight to Partition, whose
-// `k := high; while (q < k)` never reads A[high], and it recurses on
-// (q, high). The guard `low < high` is the non-empty test for that range.
-//
-// Termination: the pivot is an element of the range, so the equal block
-// [p..q) is never empty and both sub-ranges are strictly smaller.
-//
-// choosePivot takes lo/hi rather than low/high only to keep the generated
-// main's bound correct: llc.py reads an aux method that also declares
-// `high` as a signal that the program's high is inclusive, which it is not.
+// Sequential quicksort with Lomuto partition (parallel form in progs-divideConquer/).
 
 import java.util.*;
 
 public class QuickSort {
-  public void QuickSort(int[] A, int low, int high) {
-    if ((low < high)) {
-      int pivot = choosePivot(A, low, high);
-      int[] pq = new ThreeWayPartition().ThreeWayPartition(A, pivot, low, high);
-      int p = pq[0];
-      int q = pq[1];
-      QuickSort(A, low, p);
-      QuickSort(A, q, high);
+  public void sort(int lo, int hi, int[] G) {
+    if ((lo < hi)) {
+      int p = Partition(lo, hi, G);
+      sort(lo, (p - 1), G);
+      sort((p + 1), hi, G);
     }
   }
 
-  public int choosePivot(int[] A, int lo, int hi) {
-    return A[lo];
+  public int Partition(int lo, int hi, int[] G) {
+    int pivot = G[hi];
+    int i = (lo - 1);
+    int j = lo;
+    while ((j <= (hi - 1))) {
+      if ((G[j] <= pivot)) {
+        i = (i + 1);
+        int tmp = G[i];
+        G[i] = G[j];
+        G[j] = tmp;
+      }
+      j = (j + 1);
+    }
+    int tmp = G[(i + 1)];
+    G[(i + 1)] = G[hi];
+    G[hi] = tmp;
+    return (i + 1);
   }
 
   public static void main(String[] args) {
-    int[] A = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
+    int[] G = new int[] {3, 1, 6, 1, 6, 3, 6, 4};
     QuickSort prog = new QuickSort();
-    prog.QuickSort(A, 0, A.length);
-    System.out.println(Arrays.toString(A));
+    prog.sort(0, G.length - 1, G);
+    System.out.println(Arrays.toString(G));
   }
 }

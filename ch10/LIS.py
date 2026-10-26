@@ -6,7 +6,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class LIS:
-    def LIS(self, A):
+    def solve(self, A):
         self.A = A
         self.n = len(self.A)
         self.dp = [0] * (self.n)
@@ -22,6 +22,6 @@ class LIS:
 if __name__ == '__main__':
     A = [3, 1, 6, 1, 6, 3, 6, 4]
     prog = LIS()
-    result = prog.LIS(A)
+    result = prog.solve(A)
     print(result)
 

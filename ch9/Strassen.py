@@ -3,9 +3,6 @@ Splitting each n x n operand into four n/2 quadrants, the product needs
 only SEVEN recursive multiplications instead of the obvious eight, which
 is what drops the exponent from 3 to log2(7) ~ 2.81. The saving comes
 from M1..M7 below: each is one product of sums, and the four output
-quadrants are recovered from them by addition alone.
-
-Sizes are assumed to be powers of two, so every split is exact.
 
 Auto-generated from Strassen.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
@@ -13,7 +10,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class Strassen:
-    def Strassen(self, A, B):
+    def multiply(self, A, B):
         self.n = len(A)
         if (self.n == 1):
             C1 = [[0] * (1) for _ in range(1)]
@@ -28,13 +25,13 @@ class Strassen:
         B12 = self.quadrant(B, 0, h, h)
         B21 = self.quadrant(B, h, 0, h)
         B22 = self.quadrant(B, h, h, h)
-        M1 = self.Strassen(self.add(A11, A22), self.add(B11, B22))
-        M2 = self.Strassen(self.add(A21, A22), B11)
-        M3 = self.Strassen(A11, self.sub(B12, B22))
-        M4 = self.Strassen(A22, self.sub(B21, B11))
-        M5 = self.Strassen(self.add(A11, A12), B22)
-        M6 = self.Strassen(self.sub(A21, A11), self.add(B11, B12))
-        M7 = self.Strassen(self.sub(A12, A22), self.add(B21, B22))
+        M1 = self.multiply(self.add(A11, A22), self.add(B11, B22))
+        M2 = self.multiply(self.add(A21, A22), B11)
+        M3 = self.multiply(A11, self.sub(B12, B22))
+        M4 = self.multiply(A22, self.sub(B21, B11))
+        M5 = self.multiply(self.add(A11, A12), B22)
+        M6 = self.multiply(self.sub(A21, A11), self.add(B11, B12))
+        M7 = self.multiply(self.sub(A12, A22), self.add(B21, B22))
         C11 = self.add(self.sub(self.add(M1, M4), M5), M7)
         C12 = self.add(M3, M5)
         C21 = self.add(M2, M4)
@@ -80,6 +77,6 @@ if __name__ == '__main__':
     A = [[0, 1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 7, 0], [2, 3, 4, 5, 6, 7, 0, 1], [3, 4, 5, 6, 7, 0, 1, 2], [4, 5, 6, 7, 0, 1, 2, 3], [5, 6, 7, 0, 1, 2, 3, 4], [6, 7, 0, 1, 2, 3, 4, 5], [7, 0, 1, 2, 3, 4, 5, 6]]
     B = [[0, 7, 6, 5, 4, 3, 2, 1], [1, 0, 7, 6, 5, 4, 3, 2], [2, 1, 0, 7, 6, 5, 4, 3], [3, 2, 1, 0, 7, 6, 5, 4], [4, 3, 2, 1, 0, 7, 6, 5], [5, 4, 3, 2, 1, 0, 7, 6], [6, 5, 4, 3, 2, 1, 0, 7], [7, 6, 5, 4, 3, 2, 1, 0]]
     prog = Strassen()
-    result = prog.Strassen(A, B)
+    result = prog.multiply(A, B)
     print(result)
 

@@ -3,65 +3,6 @@
 // indices (agent j initially owns house j). wish(i) is the house agent
 // i currently proposes for. S(G), the largest submatching, is the set
 // of agents lying on a cycle of the wish functional graph (i -> wish(i))
-// -- exactly the agents who can all trade among themselves. forbidden:
-// agent j is not itself in S(G) but wishes for a house held by an agent
-// who is; advance moves j to its next preference.
-//
-// S(G) is built for the whole market at once, which is what makes the
-// round cost O(n) and the algorithm O(n^2), as the chapter states: every
-// agent wishes for exactly one house, so the wish graph is functional
-// and its cycles are precisely what survives repeatedly discarding the
-// agents nobody wishes for. Asking the question one agent at a time
-// instead -- following wishes from j until they return to j -- answers
-// it in O(n) per agent and so costs O(n^2) per round, a full factor of n
-// too much. inS[] is rebuilt only after an advance has moved a wish.
-//
-// Earlier version of this file (kept for reference, not used): treated
-// an agent as "in the submatching" whenever no other agent currently
-// wished for the same house -- i.e. current-wish uniqueness -- rather
-// than genuine cycle membership in the wish graph. This is a different,
-// weaker condition: on the book's own running example (G=[0,0,0,0],
-// wishes 0->1, 1->0, 2->0, 3->1, 0-indexed), the old inSubmatching(0,...)
-// returned false (since agent 3 also wishes for house 1... texts differ
-// per index, see the book's own trace) where the book states agents
-// {1,2} (1-indexed) are in S(G) via the mutual wish-cycle 0<->1.
-//
-// class LLPHousingMarket {
-//   int[] LLPHousingMarket(int[][] pref) {
-//     int n = pref.length;
-//     int[] G = new int[n];
-//     forall k in [0..n-1] : G[k] = 0;
-//     forbidden (j) : !inSubmatching(j, G, pref) && wishInSubmatching(j, G, pref) =>
-//       advance : G[j] = G[j] + 1;
-//     return G;
-//   }
-//
-//   boolean inSubmatching(int j, int[] G, int[][] pref) {
-//     int n = G.length;
-//     int target = pref[j][G[j]];
-//     int i = 0;
-//     while (i < n) {
-//       if (i != j && pref[i][G[i]] == target) {
-//         return false;
-//       };
-//       i = i + 1;
-//     };
-//     return true;
-//   }
-//
-//   boolean wishInSubmatching(int j, int[] G, int[][] pref) {
-//     int n = G.length;
-//     int wish = pref[j][G[j]];
-//     int i = 0;
-//     while (i < n) {
-//       if (pref[i][G[i]] == wish && inSubmatching(i, G, pref)) {
-//         return true;
-//       };
-//       i = i + 1;
-//     };
-//     return false;
-//   }
-// }
 
 class LLPHousingMarket {
   int[] LLPHousingMarket(int[][] pref) {
@@ -99,9 +40,9 @@ class LLPHousingMarket {
   void refresh(int[] G, int[][] pref) {
     if (fresh) { return; };
     forall i in [0..n-1] : { inS[i] = true; indeg[i] = 0; };
-    for i in [0..n-1] : indeg[wish(i, G, pref)] = indeg[wish(i, G, pref)] + 1;
+    forall i in [0..n-1] : indeg[wish(i, G, pref)] = indeg[wish(i, G, pref)] + 1;
     int qt = 0;
-    for i in [0..n-1] : {
+    forall i in [0..n-1] : {
       if (indeg[i] == 0) { q[qt] = i; qt = qt + 1; };
     };
     int qh = 0;

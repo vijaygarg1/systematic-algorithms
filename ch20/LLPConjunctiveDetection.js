@@ -1,6 +1,8 @@
 /*
- * Conjunctive predicate detection: forbidden when G[j] -> G[i] (happened-before);
- * advance increments G[j] to the next local state.
+ * Conjunctive predicate detection (bxx-complexity.tex Alg LLP-ConjunctiveDetection).
+ * Forbidden when P_j's selected state is INCOMPATIBLE with another: some i has
+ * vc[i][G[i]][j] > vc[j][G[j]][j]. Restored 2026-10-26 -- `>= G[j]` compared an event
+ * count against a filtered-trace index and rejected equality, losing real solutions.
  *
  * Auto-generated from LLPConjunctiveDetection.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
@@ -20,7 +22,7 @@ class LLPConjunctiveDetection {
     while (_changed) {
         _changed = false;
         for (let j = 0; j <= ((this.n - 1)); j++) {
-            if (this.happenedBefore(j, this.G, this.vc)) {
+            if (this.incompatible(j, this.G, this.vc)) {
                 if ((this.G[j] >= this.T[j])) {
                     return null;
                 } else {
@@ -33,10 +35,10 @@ class LLPConjunctiveDetection {
     return this.G;
   }
 
-  happenedBefore(j, G, vc) {
+  incompatible(j, G, vc) {
     let n = G.length;
     for (let i = 0; i <= ((n - 1)); i++) {
-        if (((i !== j) && (vc[i][G[i]][j] >= G[j]))) {
+        if (((i !== j) && (vc[i][G[i]][j] > vc[j][G[j]][j]))) {
             return true;
         }
     }

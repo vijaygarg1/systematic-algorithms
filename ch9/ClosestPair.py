@@ -1,27 +1,12 @@
 """Classical divide-and-conquer closest pair of points.
 
-Px and Py hold the coordinates, indexed by point number, with the points
-numbered in increasing x order. Ys lists this subproblem's point numbers
-in increasing y order, which is what lets the strip scan stop after a
-constant number of neighbours. G is the running answer: G[0] the best
-SQUARED distance (squared, so no sqrt is ever needed), G[1] and G[2] the
-two points achieving it.
-
-The recursive worker is named ClosestPairOn rather than overloading
-ClosestPair on arity. Java tolerates the overload, but Python does not:
-the second `def ClosestPair` simply replaces the first, so the generated
-ClosestPair.py called the 6-argument body with 5 arguments and died with
-"missing 1 required positional argument: 'G'". The entry point keeps the
-book's algorithm name; ClosestPairOn is the same function over an
-explicit index range lo..hi with the running answer G threaded through.
-
 Auto-generated from ClosestPair.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
 """
 
 
 class ClosestPair:
-    def ClosestPair(self, lo, hi, Px, Py, Ys):
+    def find(self, lo, hi, Px, Py, Ys):
         self.lo = lo
         self.hi = hi
         self.Px = Px
@@ -32,10 +17,10 @@ class ClosestPair:
         self.G[0] = float('inf')
         self.G[1] = (0 - 1)
         self.G[2] = (0 - 1)
-        self.ClosestPairOn(self.lo, self.hi, self.Px, self.Py, self.Ys, self.G)
+        self.ClosestPair(self.lo, self.hi, self.Px, self.Py, self.Ys, self.G)
         return self.G
 
-    def ClosestPairOn(self, lo, hi, Px, Py, Ys, G):
+    def ClosestPair(self, lo, hi, Px, Py, Ys, G):
         if (hi <= lo):
             return
         if ((hi - lo) <= 2):
@@ -62,8 +47,8 @@ class ClosestPair:
                 Rs[nr] = p
                 nr = (nr + 1)
             k = (k + 1)
-        self.ClosestPairOn(lo, mid, Px, Py, Ls, G)
-        self.ClosestPairOn((mid + 1), hi, Px, Py, Rs, G)
+        self.ClosestPair(lo, mid, Px, Py, Ls, G)
+        self.ClosestPair((mid + 1), hi, Px, Py, Rs, G)
         strip = [0] * (n)
         m = 0
         k = 0
@@ -96,6 +81,6 @@ if __name__ == '__main__':
     Py = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
     Ys = [3, 1, 6, 1, 6, 3, 6, 4]
     prog = ClosestPair()
-    result = prog.ClosestPair(0, len(Ys) - 1, Px, Py, Ys)
+    result = prog.find(0, len(Ys) - 1, Px, Py, Ys)
     print(result)
 

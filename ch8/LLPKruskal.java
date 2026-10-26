@@ -1,10 +1,8 @@
 // LLP-Kruskal: edge-inclusion lattice driven by union-find.
-// Calls the sibling UnionFind program (`UnionFind.Find(parent, x)`,
-// `UnionFind.Union(parent, rank, x, y)`) instead of keeping its own
+// Calls the sibling UnionFind program (`UnionFind.find(parent, x)`,
+// `UnionFind.union(parent, rank, x, y)`) instead of keeping its own
 // copy of find/union -- same multi-file treatment as Kruskal.llp. This
 // makes LLPKruskal.java a multi-file program: it requires UnionFind.java
-// alongside it to compile (see JAVA_MULTI_FILE in validate-site.py and
-// the `javaRequires` demo-spec field in llp.js).
 
 import java.util.*;
 
@@ -19,13 +17,13 @@ public class LLPKruskal {
 
   private boolean forbidden(int j) {
     if (G[j]) return false;
-    if (!((new UnionFind().Find(parent, u[j]) != new UnionFind().Find(parent, v[j])))) return false;
+    if (!((new UnionFind().find(parent, u[j]) != new UnionFind().find(parent, v[j])))) return false;
     return true;
   }
 
   private void advance() {
     G[j] = true;
-    new UnionFind().Union(parent, rank, u[j], v[j]);
+    new UnionFind().union(parent, rank, u[j], v[j]);
   }
 
   public boolean[] LLPKruskal(int[] u, int[] v, int[] parent) {

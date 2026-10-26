@@ -2,14 +2,9 @@
 // component picks its own cheapest outgoing edge and all those edges are
 // added at once, so the number of components at least halves per round
 // and O(log n) rounds suffice.
-//
-// T marks the chosen edges; cid[v] is the representative of v's component,
-// recomputed each round by flooding the edges already in T. A round that
-// adds no edge means the graph is disconnected, which is what progress
-// stops on -- otherwise the loop would spin forever below n-1 edges.
 
 class Boruvka {
-  boolean[] Boruvka(int n, int[] U, int[] V, int[] W) {
+  boolean[] mst(int n, int[] U, int[] V, int[] W) {
     int m = U.length, treeEdges = 0;
     boolean[] T = new boolean[m];
     int[] cid = new int[n];
@@ -24,12 +19,12 @@ class Boruvka {
       double[] dist = new double[n];
       forall i in [0..n-1] : mwe[i] = -1;
       forall i in [0..n-1] : dist[i] = infinity;
-      for e in [0..m-1] :
+      forall e in [0..m-1] :
         if (cid[U[e]] != cid[V[e]]) {
           relax(cid[U[e]], e, W, dist, mwe); relax(cid[V[e]], e, W, dist, mwe);
         };
 
-      for i in [0..n-1] :
+      forall i in [0..n-1] :
         if (cid[i] == i && mwe[i] != -1 && !T[mwe[i]]) { T[mwe[i]] = true; treeEdges = treeEdges + 1; };
       progress = treeEdges > roundStart;
     };
@@ -52,24 +47,24 @@ class Boruvka {
     int[] deg = new int[n];
     int[] fill = new int[n];
     int[][] tadj = new int[n][];
-    for e in [0..U.length-1] : {
+    forall e in [0..U.length-1] : {
       if (T[e]) { deg[U[e]] = deg[U[e]] + 1; deg[V[e]] = deg[V[e]] + 1; };
     };
     forall i in [0..n-1] : tadj[i] = new int[deg[i]];
-    for e in [0..U.length-1] : {
+    forall e in [0..U.length-1] : {
       if (T[e]) {
         tadj[U[e]][fill[U[e]]] = V[e]; fill[U[e]] = fill[U[e]] + 1;
         tadj[V[e]][fill[V[e]]] = U[e]; fill[V[e]] = fill[V[e]] + 1;
       };
     };
-    for i in [0..n-1] : {
+    forall i in [0..n-1] : {
       if (!visited[i]) { bfs(i, i, visited, cid, tadj); };
     };
   }
 
   void bfs(int v, int root, boolean[] visited, int[] cid, int[][] tadj) {
     visited[v] = true; cid[v] = root;
-    for q in [0..tadj[v].length-1] : {
+    forall q in [0..tadj[v].length-1] : {
       int u = tadj[v][q];
       if (!visited[u]) { bfs(u, root, visited, cid, tadj); };
     };

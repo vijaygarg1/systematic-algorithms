@@ -1,15 +1,4 @@
 // Classical 2-SAT via Kosaraju's strongly-connected components.
-//
-// Each clause (a or b) contributes the two implications !a -> b and
-// !b -> a, giving a graph on 2n literals. The formula is satisfiable iff
-// no variable shares a component with its own negation, and setting x
-// true exactly when x's component is numbered after !x's is a satisfying
-// assignment -- Kosaraju numbers components in reverse topological order,
-// so the later component is the one implied.
-//
-// Literal x maps to index x and !x to index n + x, which is what litIndex
-// computes. Each literal can source up to 2m implications, so the
-// adjacency rows are sized 2m + 1 rather than by the literal count.
 
 import java.util.*;
 

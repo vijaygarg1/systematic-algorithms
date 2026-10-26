@@ -2,13 +2,8 @@
 // style: fixpoint
 
 class LLPBFS {
-  int[] LLPBFS(set<int>[] pre) {
-    int[] G = infinity;
-    G[0] = 0;
-    forbidden (j in [0..n-1]) :
-      G[j] > (min i in pre[j] where G[i] < infinity : G[i] + 1)
-    =>
-      advance : G[j] = min i in pre[j] where G[i] < infinity : G[i] + 1;
-    return G;
+  void LLPBFS(set<int>[] pre, int[]      G) {
+    forbidden (j in [0..n-1]) : G[j] > (min i in pre[j] : G[i] + 1)  =>
+      advance : G[j] = min i in pre[j] : G[i] + 1;
   }
 }

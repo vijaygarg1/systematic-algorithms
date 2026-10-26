@@ -1,13 +1,6 @@
 // LLP-FractionalKnapsack: items pre-sorted by v/w density; raise each
 // fraction G[j] in [0,1] to its target G*[j], read in O(1) from one
 // prefix scan of the weights.
-//
-// S is the EXCLUSIVE prefix sum, S[k] = w[0] + ... + w[k-1], with
-// S[0] = 0 -- one slot longer than w. That is what removes target's
-// j > 0 special case: the weight before item j is just S[j], and the
-// weight through item j is S[j+1], so both ends of the breakpoint test
-// are plain reads. The scan stays a sequential while loop because
-// S[i+1] depends on S[i]; a forall would not be a prefix sum.
 
 import java.util.*;
 
@@ -18,6 +11,7 @@ public class LLPFractionalKnapsack {
   double W;
   double[] G;
   double[] S;
+  int i;
   int j;
 
   private boolean _forbidden0(int j) {
@@ -36,8 +30,10 @@ public class LLPFractionalKnapsack {
     this.n = v.length;
     this.G = new double[n];
     this.S = new double[(n + 1)];
-    for (int i = 0; i < n; i++) {
+    this.i = 0;
+    while ((i < n)) {
       S[(i + 1)] = (S[i] + w[i]);
+      i = (i + 1);
     }
     {
       boolean changed = true;

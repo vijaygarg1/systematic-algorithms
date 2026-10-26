@@ -3,15 +3,6 @@ item j belongs to an inclusion-minimal overdemanded set J -- found by
 alternating-path reachability from an unmatched bidder, the standard
 witness for a violated Hall condition. Advance raises EVERY item in J by
 one shared slack jump, delta := min over bidders demanding into J of
-[best surplus - best surplus using an item outside J]: the book's
-"G[j] := G[j]+delta for every j in J", not a per-item unit raise.
-
-J depends only on G, so it is built ONCE per value of G and held in the
-fields itemInJ/bidderInB; the forbidden test refreshes it when stale and
-then just reads itemInJ[j], and the advance consumes the same arrays and
-marks them stale.
-
-Assumes the number of bidders equals the number of items.
 
 Auto-generated from LLPAssignment.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.

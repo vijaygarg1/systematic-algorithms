@@ -7,7 +7,7 @@
 
 
 class LIS {
-  LIS(A) {
+  solve(A) {
     this.A = A;
     this.n = this.A.length;
     this.dp = new Array(this.n).fill(0);
@@ -30,6 +30,6 @@ if (typeof module !== 'undefined') module.exports = LIS;
 if (typeof require !== 'undefined' && require.main === module) {
     const A = [3, 1, 6, 1, 6, 3, 6, 4];
     const prog = new LIS();
-    const result = prog.LIS(A);
+    const result = prog.solve(A);
     console.log(JSON.stringify(result));
 }

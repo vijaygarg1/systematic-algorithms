@@ -3,17 +3,9 @@
 // unfixed agent advances its wish pointer past houses already owned by
 // fixed agents, building the top-choice graph; (2) ALL node-disjoint
 // cycles in that graph are found at once (every unfixed node has
-// out-degree 1, so each agent either lies on a cycle or on a tail
-// leading into one); (3) every agent on ANY cycle this stage trades
-// and is fixed -- not a single pointer-chasing walk that resolves one
-// cycle at a time and rebuilds the whole graph for each one.
-//
-// Steps 1 and 3 are `forall`s, since each agent is handled independently
-// of the others; only the walk of step 2 is inherently sequential, and
-// even there the two sweeps over the recorded path are `forall`s.
 
 class TTC {
-  int[] TTC(int[][] pref) {
+  int[] assign(int[][] pref) {
     int n = pref.length;
     int[] house = new int[n];
     boolean[] fixed = new boolean[n];
@@ -61,7 +53,7 @@ class TTC {
       };
 
       // Step 3: implement the trades for every agent on a cycle this stage.
-      for i in [0..n-1] : if (inCycle[i]) {
+      forall i in [0..n-1] : if (inCycle[i]) {
         house[i] = pref[i][G[i]];
         fixed[i] = true;
         numFixed = numFixed + 1;

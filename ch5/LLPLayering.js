@@ -5,16 +5,6 @@
  * A vertex with no predecessors is never forbidden and keeps its initial
  * label 0.
  *
- * Layering is defined only on a directed ACYCLIC graph -- a cycle has no
- * longest path -- so `setAcyclic(pre)` states that as a condition on valid
- * input.  It is the precondition that makes the schedule available: on an
- * acyclic graph every index can be settled once, in topological order, so
- * that when j is advanced all of its predecessors already hold their final
- * values.  That is the schedule the boolean `fixed` array implements in the
- * hand-written ports, and it is what gives the O(n+m) of Section 5.5.
- * Without the promise the program can only relax to a fixpoint, revisiting
- * a vertex every time a predecessor deepens, which costs O(n*m).
- *
  * Auto-generated from LLPLayering.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
  */
@@ -50,7 +40,7 @@ class LLPLayering {
         _h += 1;
         _seen += 1;
         if ((() => { for (const i of this.pre[j]) { if ((this.G[j] <= this.G[i])) return true; } return false; })()) {
-            this.G[j] = (() => { let _a = -2147483647, _s = false; for (const i of this.pre[j]) { const _v = (this.G[i] + 1); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })();
+            this.G[j] = Math.max(0, (() => { let _a = -2147483647, _s = false; for (const i of this.pre[j]) { const _v = (this.G[i] + 1); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })());
         }
         for (const _x of _succ[j]) {
             _indeg[_x] -= 1;

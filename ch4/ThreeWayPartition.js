@@ -11,7 +11,7 @@
 
 
 class ThreeWayPartition {
-  ThreeWayPartition(A, pivot, low, high) {
+  partition(A, pivot, low, high) {
     this.A = A;
     this.pivot = pivot;
     this.low = low;
@@ -47,6 +47,6 @@ if (typeof require !== 'undefined' && require.main === module) {
     const A = [3, 1, 6, 1, 6, 3, 6, 4];
     const pivot = 5;
     const prog = new ThreeWayPartition();
-    const result = prog.ThreeWayPartition(A, pivot, 0, A.length);
+    const result = prog.partition(A, pivot, 0, A.length);
     console.log(JSON.stringify(result));
 }

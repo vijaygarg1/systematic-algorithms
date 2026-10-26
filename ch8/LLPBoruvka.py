@@ -1,23 +1,13 @@
 """LLP-Boruvka: Boruvka's minimum spanning tree with the component
 contraction done by LLP pointer jumping instead of recursion.
 
-Each round every active component finds its cheapest outgoing edge,
-points at the component on the other end, and then the guard below
-jumps those pointers until each chain collapses to one representative:
-forbidden when G[j] is not yet its own component's root, advance by
-following one more link. Mutual choices are broken by keeping the lower
-index as the root, which is what pointTo decides.
-
-A round that merges nothing means the graph is disconnected, which is
-what progress stops on.
-
 Auto-generated from LLPBoruvka.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
 """
 
 
 class LLPBoruvka:
-    def LLPBoruvka(self, n, U, V, W):
+    def mst(self, n, U, V, W):
         self.n = n
         self.U = U
         self.V = V
@@ -94,6 +84,6 @@ if __name__ == '__main__':
     V = [0, 0, 1, 1]
     W = [0, 0, 0, 2]
     prog = LLPBoruvka()
-    result = prog.LLPBoruvka(len(U), U, V, W)
+    result = prog.mst(len(U), U, V, W)
     print(result)
 

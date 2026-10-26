@@ -2,21 +2,6 @@
 // mu = eps*L/nf, then solve the scaled problem exactly by a profit-indexed
 // DP. Rounding loses at most eps*OPT, so the whole thing is polynomial in
 // nf and 1/eps.
-//
-// L is a 2-approximation lower bound on OPT -- the better of a density-greedy
-// solution and the most profitable single item -- rather than the maximum
-// profit M. Two consequences: scaling by L still loses only nf*mu = eps*L
-// <= eps*OPT, and since OPT <= 2L no feasible solution can have scaled
-// profit above 2*nf/eps, so the profit axis is capped there. That axis is
-// O(nf/eps) wide instead of the O(nf^2/eps) that scaling by M forces, which
-// is what takes the table (and the running time) from O(nf^3/eps) to
-// O(nf^2/eps).
-//
-// D[i][p] = least total weight of a subset of the first i feasible items
-// whose scaled profit is at least p, with D[i][0] = 0 and every other
-// cell starting at INF. The answer is the largest p with D[nf][p] <= W;
-// the traceback then walks the rows back, taking item i exactly when
-// including it is what made row i cheaper than row i-1.
 
 import java.util.*;
 

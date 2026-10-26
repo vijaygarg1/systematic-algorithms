@@ -1,10 +1,6 @@
 // GCD2: ascending GCD via ceiling-ratio operations.
 // Equivalent forbidden / advance form of the ensure-clause version
 // G[j] >= max_i (A[j] * G[i] + A[i] - 1) / A[i].
-//
-// Forbidden picks any i for which the bound is currently violated;
-// advance lifts G[j] to that single ratio.  Iterating over forbidden i's
-// converges to the maximum because the ensure constraint is monotone.
 
 import java.util.*;
 

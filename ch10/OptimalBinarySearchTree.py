@@ -6,7 +6,7 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class OptimalBinarySearchTree:
-    def OptimalBinarySearchTree(self, prob):
+    def solve(self, prob):
         self.prob = prob
         self.n = len(self.prob)
         self.dp = [[0.0] * (self.n) for _ in range(self.n)]
@@ -34,6 +34,6 @@ class OptimalBinarySearchTree:
 if __name__ == '__main__':
     prob = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
     prog = OptimalBinarySearchTree()
-    result = prog.OptimalBinarySearchTree(prob)
+    result = prog.solve(prob)
     print(result)
 

@@ -1,20 +1,4 @@
 // LLP-OptimalBinarySearchTree: ensure G[i][j] >= optimal cost over interval [i..j].
-//
-// setPriority, not setContainer: the key j-i is fixed, every index the
-// scheduler offers is already forbidden, and the advance only ever raises
-// G[i][j] to a value it must reach anyway -- so the answer is the same in
-// any order. Shortest intervals first merely reaches the fixpoint in one
-// sweep instead of several.
-//
-// PRECONDITION on the index pair: G[i][j] is the cost of the key range
-// [i..j], which only names a range when i <= j. The guard says so
-// explicitly, because the fixpoint scans the full (i, j) square: without
-// the i <= j conjunct it also fired on the empty ranges below the
-// diagonal, where optCost's forall over k in [i..j] iterates zero times and
-// returns its seed, writing that seed into G[i][j] as though it were a
-// cost. Those cells are never read -- every reference to G is guarded by
-// k > i or k < j -- so the answers above the diagonal were right either
-// way, but the lower triangle came back full of sentinel values.
 
 import java.util.*;
 

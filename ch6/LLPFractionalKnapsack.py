@@ -2,13 +2,6 @@
 fraction G[j] in [0,1] to its target G*[j], read in O(1) from one
 prefix scan of the weights.
 
-S is the EXCLUSIVE prefix sum, S[k] = w[0] + ... + w[k-1], with
-S[0] = 0 -- one slot longer than w. That is what removes target's
-j > 0 special case: the weight before item j is just S[j], and the
-weight through item j is S[j+1], so both ends of the breakpoint test
-are plain reads. The scan stays a sequential while loop because
-S[i+1] depends on S[i]; a forall would not be a prefix sum.
-
 Auto-generated from LLPFractionalKnapsack.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
 """
@@ -22,8 +15,10 @@ class LLPFractionalKnapsack:
         self.n = len(self.v)
         self.G = [0.0] * (self.n)
         self.S = [0.0] * ((self.n + 1))
-        for i in range(0, ((self.n - 1)) + 1):
-            self.S[(i + 1)] = (self.S[i] + self.w[i])
+        self.i = 0
+        while (self.i < self.n):
+            self.S[(self.i + 1)] = (self.S[self.i] + self.w[self.i])
+            self.i = (self.i + 1)
         _changed = True
         while _changed:
             _changed = False

@@ -4,30 +4,6 @@
  * LLP-WeightedVertexCover (fig:llp-wvc). The lattice is indexed by EDGES,
  * as the book's "G: array[E] of real" and "Forbidden(e)" say: G[e] is the
  * price on edge e. A vertex v is tight when its incident prices saturate
- * w[v]; an edge is slack when neither endpoint is tight; slackMin(e)
- * further requires e to be lex-minimal among every slack edge sharing an
- * endpoint with it. Advancing raises the edge's price by the smaller of
- * its two endpoints' remaining budgets, tightening at least one.
- *
- * The graph arrives as an edge list -- eu[e], ev[e] are the endpoints of
- * edge e, with the edges in lex order -- which is the book's
- * "E: set of edges". inc[v] lists the edges incident to v, built once from
- * that list in O(n + m). No n x n structure appears anywhere: the earlier
- * version indexed both the lattice (G[u][v]) and the graph (adj[u][v]) by
- * vertex PAIRS, which cost Theta(n^2) in memory and, because the forbidden
- * clause ranged over pairs, made the rescan enumerate all n^2 of them in
- * every sweep however few edges the graph had. Indexing by edge makes a
- * sweep O(m).
- *
- * Two things keep the predicate cheap. First, price[] is maintained by the
- * advance instead of being re-summed on every call, so tight() is O(1)
- * rather than an O(nv) sum. Second, the lex-minimality test does not scan
- * all edge pairs: with the edges in lex order, the lex-least slack edge at
- * a vertex is simply the first slack one in inc[v], so e is lex-minimal
- * among the slack edges touching it exactly when it is first at both ends.
- * minSlackEdge[] is rebuilt only after an advance has moved a price, and a
- * rebuild consults each vertex's own incident edges only, so it is O(m)
- * rather than O(n^2).
  *
  * Auto-generated from LLPWeightedVertexCover.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.

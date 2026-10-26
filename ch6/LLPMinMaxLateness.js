@@ -2,19 +2,6 @@
  * LLP-MinMaxLate: schedule jobs (sorted by deadline) by raising each start
  * time G[j] to the prefix sum of earlier processing times.
  *
- * The targets are the prefix sums S[j] = t[0] + ... + t[j-1], and they are
- * built once in a left-to-right scan rather than written inline as
- * `sum i in [0..j-1] : t[i]`.  Written inline, that reduction is an O(j)
- * loop the guard re-runs for every j -- and the advance runs it a second
- * time -- so the program costs O(n^2) even though every target is already
- * known from the one before it.  Computing them in a single scan is what
- * makes the stated O(n) bound (Section 6.3, "a left-to-right scan") true
- * of this program and not just of the algorithm it encodes.
- *
- * The deadlines d are the sort order of the input, not something the
- * predicate reads: j's target depends only on the processing times ahead
- * of it in that order.
- *
  * Auto-generated from LLPMinMaxLateness.llp by lang/llcjssrc.py.
  * Do not edit by hand; edit the .llp source and rerun the build.
  */
@@ -40,7 +27,6 @@ class LLPMinMaxLateness {
             }
         }
     }
-    let lateness = (() => { let _a = -2147483647, _s = false; for (let j = 0; j <= ((this.n - 1)); j++) { const _v = Math.max(0, ((this.G[j] + this.t[j]) - this.d[j])); if (!_s || _v > _a) { _a = _v; _s = true; } } return _a; })();
     return this.G;
   }
 }

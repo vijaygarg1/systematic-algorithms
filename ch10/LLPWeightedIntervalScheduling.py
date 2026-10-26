@@ -3,10 +3,6 @@ inequalities, G[j] >= G[j-1] and G[j] >= w[j] + G[p[j]], which is
 exactly what one `ensure` over their maximum says; the forbidden
 predicate and advance are then read off B rather than restated.
 Index 0 is pinned at 0, so the guard ranges over 1..n.
-Since p[j] < j and j-1 < j, priority(j) = j settles each index in one
-advance -- that schedule is what the boolean `fixed` array records in
-the book's earlier presentation, and it is an efficiency choice, not
-part of the predicate.
 
 Auto-generated from LLPWeightedIntervalScheduling.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.

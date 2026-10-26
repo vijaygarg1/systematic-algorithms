@@ -6,11 +6,10 @@ Do not edit by hand; edit the .llp source and rerun the build.
 
 
 class LLPTraversal:
-    def LLPTraversal(self, pre):
+    def LLPTraversal(self, pre, G):
         self.pre = pre
+        self.G = G
         self.n = len(self.pre)
-        self.G = [False] * (self.n)
-        self.G[0] = True
         _changed = True
         while _changed:
             _changed = False
@@ -18,6 +17,5 @@ class LLPTraversal:
                 if ((not self.G[j]) and any(self.G[i] for i in self.pre[j])):
                     self.G[j] = True
                     _changed = True
-        return self.G
 
 

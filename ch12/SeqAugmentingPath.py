@@ -3,15 +3,6 @@ bxx-matchingReduced.tex Algorithm Seq-AugmentingPath (algo:seq-bipartite):
 for each L-vertex j in turn, look for an alternating path to some free
 R-vertex k (S[k] unmatched). The book's abstract "there exists an
 alternating path..." step, plus its "assign S[] along the path"
-follow-up, are both realized here by the alternatingPath(...) DFS --
-the standard way of implementing that check.
-
-The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
-L-vertex j, and nr is |R|, which cannot be recovered from the lists when
-some R-vertex has no incident edge. A dense |L| x |R| matrix would make
-every DFS step scan all of R however few edges exist -- and reading such
-a matrix is Theta(|L| * |R|) before the algorithm starts, so no bound in
-|E| is reachable from it at all.
 
 Auto-generated from SeqAugmentingPath.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.

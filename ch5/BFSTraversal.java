@@ -1,49 +1,32 @@
-// BFS-Traversal, exactly as bxx-graph.tex's Algorithm BFS-Traversal
-// states it:
-//
-// var S: queue of int               // discovered but not yet explored
-// S.enqueue(s); dist[s] := 0
-// while not S.empty():
-// j := S.dequeue()
-// forall k in succ(j):
-// if dist[k] > dist[j] + 1:
-// dist[k] := dist[j] + 1; parent[k] := j; S.enqueue(k)
-// return dist
-//
-// The book's `queue of int` is a list<int> here: add is enqueue and
-// removeFirst is dequeue, so the list is used strictly FIFO.
-//
-// parent is the BFS tree the book declares as a second output: parent[k]
-// is the vertex k was first reached from, and stays -1 for the source and
-// for anything unreachable. Only dist is returned, as the book returns.
+// Sequential BFS distance from a source vertex (FIFO queue).
 
 import java.util.*;
 
 public class BFSTraversal {
-  public int[] BFSTraversal(int[][] succ, int s) {
+  public int[] traverse(int[][] succ, int s) {
     int n = succ.length;
-    int[] dist = new int[n];
-    int[] parent = new int[n];
+    int[] G = new int[n];
     for (int i = 0; i < n; i++) {
-      dist[i] = Integer.MAX_VALUE;
+      G[i] = Integer.MAX_VALUE;
     }
-    for (int i = 0; i < n; i++) {
-      parent[i] = (-1);
-    }
-    LinkedList<Integer> S = new LinkedList<>();
-    S.add(s);
-    dist[s] = 0;
-    while ((!S.isEmpty())) {
-      int j = S.removeFirst();
+    G[s] = 0;
+    int[] Q = new int[n];
+    int head = 0;
+    int tail = 0;
+    Q[tail] = s;
+    tail = (tail + 1);
+    while ((head < tail)) {
+      int j = Q[head];
+      head = (head + 1);
       for (int k : succ[j]) {
-        if ((dist[k] > (dist[j] + 1))) {
-          dist[k] = (dist[j] + 1);
-          parent[k] = j;
-          S.add(k);
+        if ((G[k] > (G[j] + 1))) {
+          G[k] = (G[j] + 1);
+          Q[tail] = k;
+          tail = (tail + 1);
         }
       }
     }
-    return dist;
+    return G;
   }
 
   public static void main(String[] args) {

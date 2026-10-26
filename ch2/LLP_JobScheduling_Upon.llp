@@ -3,16 +3,10 @@
 // distributed programs: "at j, when G[j] is too small, raise it".
 // Compiles to the same Java as the forbidden and ensure forms.
 
-// Prerequisites are acyclic -- a job cannot transitively depend on
-// itself -- so `setAcyclic(pre)` states that as a condition on valid
-// input.  It lets the jobs be settled once each, in dependency order,
-// which is the schedule LLPJobSchedulingFixed writes out by hand with
-// its `fixed` array.  Without it the program can only relax to a
-// fixpoint, revisiting a job every time a prerequisite moves.
 int[] LLP_JobScheduling_Upon(int[0..n-1] t, set<int>[0..n-1] pre) {
   int[0..n-1] G = 0;
   setAcyclic(pre);
-  forall k in [0..n-1] : G[k] = t[k];
+  forall k in [0..n] : G[k] = t[k];
   upon G[j] < max i in pre[j] : G[i] + t[j] {
     G[j] = max i in pre[j] : G[i] + t[j];
   }

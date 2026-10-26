@@ -3,18 +3,6 @@
 // bxx-matchingReduced.tex Algorithm VertexCoverFromMatching: Z is the set
 // of vertices reachable from an unmatched L-vertex by an alternating path
 // (non-matching edge, then matching edge, ...); C := (L \ Z) union (R
-// intersect Z). The book treats the matching M as given directly as a
-// partner lookup; here it is given as matchL[j] = R-partner of L-vertex
-// j (or -1 if unmatched), with matchR (the same matching read from the
-// R side -- the only direction the book's "partner[w]" needs, since w is
-// always an R-vertex at that point in the algorithm) derived from it.
-//
-// The graph is the book's (L, R, E): adj[j] lists the R-neighbours of the
-// L-vertex j, and nr is |R|, which cannot be recovered from the lists when
-// some R-vertex has no incident edge. Following "every (w,v) in E \ M"
-// over a dense |L| x |R| matrix would scan all of R for every dequeued
-// L-vertex however few edges exist, and reading such a matrix is already
-// Theta(|L| * |R|).
 
 import java.util.*;
 
@@ -46,15 +34,15 @@ public class VertexCoverFromMatching {
       int w = Q[head];
       head = (head + 1);
       if ((w < L)) {
-        for (int t = 0; t < adj[w].length; t++) {
-          {
-            int v = adj[w][t];
-            if (((matchL[w] != v) && (!inZ[(L + v)]))) {
-              inZ[(L + v)] = true;
-              Q[tail] = (L + v);
-              tail = (tail + 1);
-            }
+        int t = 0;
+        while ((t < adj[w].length)) {
+          int v = adj[w][t];
+          if (((matchL[w] != v) && (!inZ[(L + v)]))) {
+            inZ[(L + v)] = true;
+            Q[tail] = (L + v);
+            tail = (tail + 1);
           }
+          t = (t + 1);
         }
       } else {
         int r = (w - L);

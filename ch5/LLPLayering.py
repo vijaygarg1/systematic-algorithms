@@ -4,16 +4,6 @@ incoming edges, so no index is forbidden exactly when B_layer holds.
 A vertex with no predecessors is never forbidden and keeps its initial
 label 0.
 
-Layering is defined only on a directed ACYCLIC graph -- a cycle has no
-longest path -- so `setAcyclic(pre)` states that as a condition on valid
-input.  It is the precondition that makes the schedule available: on an
-acyclic graph every index can be settled once, in topological order, so
-that when j is advanced all of its predecessors already hold their final
-values.  That is the schedule the boolean `fixed` array implements in the
-hand-written ports, and it is what gives the O(n+m) of Section 5.5.
-Without the promise the program can only relax to a fixpoint, revisiting
-a vertex every time a predecessor deepens, which costs O(n*m).
-
 Auto-generated from LLPLayering.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
 """
@@ -44,7 +34,7 @@ class LLPLayering:
             _h += 1
             _seen += 1
             if any((self.G[j] <= self.G[i]) for i in self.pre[j]):
-                self.G[j] = max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647)
+                self.G[j] = max(0, max(((self.G[i] + 1) for i in self.pre[j]), default=-2147483647))
             for _x in _succ[j]:
                 _indeg[_x] -= 1
                 if _indeg[_x] == 0:

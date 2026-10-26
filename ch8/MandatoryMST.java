@@ -3,13 +3,6 @@
 // mandatory edge closes a cycle with previously committed mandatory
 // edges; equivalently, when M itself is not acyclic.  Composed onto
 // LLP-Kruskal via predicate conjunction:
-// [ LLP-Kruskal(E, w, G) && MandatoryMST(M, G) ].
-// Calls the sibling UnionFind program (`UnionFind.Find(parent, x)`,
-// `UnionFind.Union(parent, rank, x, y)`) instead of keeping its own
-// copy of find/union -- same multi-file treatment as Kruskal.llp. This
-// makes MandatoryMST.java a multi-file program: it requires
-// UnionFind.java alongside it to compile (see JAVA_MULTI_FILE in
-// validate-site.py and the `javaRequires` demo-spec field in llp.js).
 
 import java.util.*;
 
@@ -31,11 +24,11 @@ public class MandatoryMST {
   }
 
   private boolean[] advance() {
-    if ((new UnionFind().Find(parent, u[j]) == new UnionFind().Find(parent, v[j]))) {
+    if ((new UnionFind().find(parent, u[j]) == new UnionFind().find(parent, v[j]))) {
       return null;
     }
     G[j] = true;
-    new UnionFind().Union(parent, rank, u[j], v[j]);
+    new UnionFind().union(parent, rank, u[j], v[j]);
     return _NO_EARLY_EXIT;
   }
 

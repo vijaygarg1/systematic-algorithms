@@ -2,7 +2,7 @@
 
 int MaxElement(int[] A) {
   int max = A[0];
-  for i in [1..A.length-1] : {
+  forall i in [1..A.length-1] : {
     if (A[i] > max) { max = A[i]; };
   };
   return max;

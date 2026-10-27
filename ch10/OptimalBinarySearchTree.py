@@ -9,26 +9,26 @@ class OptimalBinarySearchTree:
     def solve(self, prob):
         self.prob = prob
         self.n = len(self.prob)
-        self.dp = [[0.0] * (self.n) for _ in range(self.n)]
+        self.G = [[0.0] * (self.n) for _ in range(self.n)]
         self.s = [[0.0] * (self.n) for _ in range(self.n)]
         for i in range(0, ((self.n - 1)) + 1):
-            self.dp[i][i] = self.prob[i]
+            self.G[i][i] = self.prob[i]
             self.s[i][i] = self.prob[i]
         for len_ in range(1, ((self.n - 1)) + 1):
             for lo in range(0, (((self.n - 1) - len_)) + 1):
                 hi = (lo + len_)
                 self.s[lo][hi] = (self.s[lo][(hi - 1)] + self.prob[hi])
-                self.dp[lo][hi] = float('inf')
+                self.G[lo][hi] = float('inf')
                 for r in range(lo, (hi) + 1):
                     left = 0.0
                     right = 0.0
                     if (r > lo):
-                        left = self.dp[lo][(r - 1)]
+                        left = self.G[lo][(r - 1)]
                     if (r < hi):
-                        right = self.dp[(r + 1)][hi]
+                        right = self.G[(r + 1)][hi]
                     cost = ((self.s[lo][hi] + left) + right)
-                    self.dp[lo][hi] = min(self.dp[lo][hi], cost)
-        return self.dp
+                    self.G[lo][hi] = min(self.G[lo][hi], cost)
+        return self.G
 
 
 if __name__ == '__main__':

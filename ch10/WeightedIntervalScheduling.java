@@ -10,25 +10,25 @@ public class WeightedIntervalScheduling {
   public int[] schedule(int[] s, int[] f, int[] w) {
     int n = s.length;
     int[] p = new int[n];
-    int[] opt = new int[n];
     int[] G = new int[n];
+    int[] sel = new int[n];
     for (int j = 1; j < n; j++) {
       p[j] = lastCompatible(j, s, f);
     }
-    opt[0] = 0;
+    G[0] = 0;
     for (int cur = 1; cur < n; cur++) {
-      opt[cur] = Math.max((w[cur] + opt[p[cur]]), opt[(cur - 1)]);
+      G[cur] = Math.max((w[cur] + G[p[cur]]), G[(cur - 1)]);
     }
     int cur = (n - 1);
     while ((cur > 0)) {
-      if (((w[cur] + opt[p[cur]]) >= opt[(cur - 1)])) {
-        G[cur] = 1;
+      if (((w[cur] + G[p[cur]]) >= G[(cur - 1)])) {
+        sel[cur] = 1;
         cur = p[cur];
       } else {
         cur = (cur - 1);
       }
     }
-    return G;
+    return sel;
   }
 
   public int lastCompatible(int j, int[] s, int[] f) {

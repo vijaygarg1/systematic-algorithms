@@ -5,11 +5,11 @@ import java.util.*;
 public class OptimalBinarySearchTree {
   public double[][] solve(double[] prob) {
     int n = prob.length;
-    double[][] dp = new double[n][n];
+    double[][] G = new double[n][n];
     double[][] s = new double[n][n];
     for (int i = 0; i < n; i++) {
       {
-        dp[i][i] = prob[i];
+        G[i][i] = prob[i];
         s[i][i] = prob[i];
       }
     }
@@ -18,25 +18,25 @@ public class OptimalBinarySearchTree {
         {
           int hi = (lo + len);
           s[lo][hi] = (s[lo][(hi - 1)] + prob[hi]);
-          dp[lo][hi] = Double.POSITIVE_INFINITY;
+          G[lo][hi] = Double.POSITIVE_INFINITY;
           for (int r = lo; r <= hi; r++) {
             {
               double left = 0.0;
               double right = 0.0;
               if ((r > lo)) {
-                left = dp[lo][(r - 1)];
+                left = G[lo][(r - 1)];
               }
               if ((r < hi)) {
-                right = dp[(r + 1)][hi];
+                right = G[(r + 1)][hi];
               }
               double cost = ((s[lo][hi] + left) + right);
-              dp[lo][hi] = Math.min(dp[lo][hi], cost);
+              G[lo][hi] = Math.min(G[lo][hi], cost);
             }
           }
         }
       }
     }
-    return dp;
+    return G;
   }
 
   public static void main(String[] args) {

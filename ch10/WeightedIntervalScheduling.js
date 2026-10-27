@@ -17,25 +17,25 @@ class WeightedIntervalScheduling {
     this.w = w;
     this.n = this.s.length;
     this.p = new Array(this.n).fill(0);
-    this.opt = new Array(this.n).fill(0);
     this.G = new Array(this.n).fill(0);
+    this.sel = new Array(this.n).fill(0);
     for (let j = 1; j <= ((this.n - 1)); j++) {
         this.p[j] = this.lastCompatible(j, this.s, this.f);
     }
-    this.opt[0] = 0;
+    this.G[0] = 0;
     for (let cur = 1; cur <= ((this.n - 1)); cur++) {
-        this.opt[cur] = Math.max((this.w[cur] + this.opt[this.p[cur]]), this.opt[(cur - 1)]);
+        this.G[cur] = Math.max((this.w[cur] + this.G[this.p[cur]]), this.G[(cur - 1)]);
     }
     let cur = (this.n - 1);
     while ((cur > 0)) {
-        if (((this.w[cur] + this.opt[this.p[cur]]) >= this.opt[(cur - 1)])) {
-            this.G[cur] = 1;
+        if (((this.w[cur] + this.G[this.p[cur]]) >= this.G[(cur - 1)])) {
+            this.sel[cur] = 1;
             cur = this.p[cur];
         } else {
             cur = (cur - 1);
         }
     }
-    return this.G;
+    return this.sel;
   }
 
   lastCompatible(j, s, f) {

@@ -9,14 +9,14 @@ class LIS:
     def solve(self, A):
         self.A = A
         self.n = len(self.A)
-        self.dp = [0] * (self.n)
+        self.G = [0] * (self.n)
         for i in range(0, ((self.n - 1)) + 1):
-            self.dp[i] = 1
+            self.G[i] = 1
         for i in range(1, ((self.n - 1)) + 1):
             for j in range(0, ((i - 1)) + 1):
                 if (self.A[j] < self.A[i]):
-                    self.dp[i] = max(self.dp[i], (self.dp[j] + 1))
-        return self.dp
+                    self.G[i] = max(self.G[i], (self.G[j] + 1))
+        return self.G
 
 
 if __name__ == '__main__':

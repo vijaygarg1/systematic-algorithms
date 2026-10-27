@@ -10,18 +10,18 @@ class LIS {
   solve(A) {
     this.A = A;
     this.n = this.A.length;
-    this.dp = new Array(this.n).fill(0);
+    this.G = new Array(this.n).fill(0);
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        this.dp[i] = 1;
+        this.G[i] = 1;
     }
     for (let i = 1; i <= ((this.n - 1)); i++) {
         for (let j = 0; j <= ((i - 1)); j++) {
             if ((this.A[j] < this.A[i])) {
-                this.dp[i] = Math.max(this.dp[i], (this.dp[j] + 1));
+                this.G[i] = Math.max(this.G[i], (this.G[j] + 1));
             }
         }
     }
-    return this.dp;
+    return this.G;
   }
 }
 

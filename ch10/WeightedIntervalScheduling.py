@@ -16,21 +16,21 @@ class WeightedIntervalScheduling:
         self.w = w
         self.n = len(self.s)
         self.p = [0] * (self.n)
-        self.opt = [0] * (self.n)
         self.G = [0] * (self.n)
+        self.sel = [0] * (self.n)
         for j in range(1, ((self.n - 1)) + 1):
             self.p[j] = self.lastCompatible(j, self.s, self.f)
-        self.opt[0] = 0
+        self.G[0] = 0
         for cur in range(1, ((self.n - 1)) + 1):
-            self.opt[cur] = max((self.w[cur] + self.opt[self.p[cur]]), self.opt[(cur - 1)])
+            self.G[cur] = max((self.w[cur] + self.G[self.p[cur]]), self.G[(cur - 1)])
         cur = (self.n - 1)
         while (cur > 0):
-            if ((self.w[cur] + self.opt[self.p[cur]]) >= self.opt[(cur - 1)]):
-                self.G[cur] = 1
+            if ((self.w[cur] + self.G[self.p[cur]]) >= self.G[(cur - 1)]):
+                self.sel[cur] = 1
                 cur = self.p[cur]
             else:
                 cur = (cur - 1)
-        return self.G
+        return self.sel
 
     def lastCompatible(self, j, s, f):
         lo = 1

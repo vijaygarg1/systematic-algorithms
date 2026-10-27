@@ -8,24 +8,24 @@ class WeightedIntervalScheduling {
   int[] schedule(int[] s, int[] f, int[] w) {
     int n = s.length;
     int[] p = new int[n];
-    int[] opt = new int[n];
-    int[] G   = new int[n];
+    int[] G = new int[n];
+    int[] sel   = new int[n];
     forall j in [1..n-1] : p[j] = lastCompatible(j, s, f);
     // Phase 1: compute optimal values.
-    opt[0] = 0;
+    G[0] = 0;
     forall cur in [1..n-1] :
-      opt[cur] = max(w[cur] + opt[p[cur]], opt[cur - 1]);
+      G[cur] = max(w[cur] + G[p[cur]], G[cur - 1]);
     // Phase 2: backtrack to find selected intervals.
     int cur = n - 1;
     while (cur > 0) {
-      if (w[cur] + opt[p[cur]] >= opt[cur - 1]) {
-        G[cur] = 1;
+      if (w[cur] + G[p[cur]] >= G[cur - 1]) {
+        sel[cur] = 1;
         cur = p[cur];
       } else {
         cur = cur - 1;
       }
     };
-    return G;
+    return sel;
   }
 
   // The largest i < j whose interval finishes no later than j starts, or 0

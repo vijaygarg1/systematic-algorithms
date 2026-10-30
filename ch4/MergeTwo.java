@@ -6,6 +6,16 @@ import java.util.*;
 
 public class MergeTwo {
   public int[] merge(int[] B, int[] C) {
+    boolean t1 = true;
+    for (int i = 0; i <= (B.length - 2); i++) {
+      if (!((B[i] <= B[(i + 1)]))) { t1 = false; break; }
+    }
+    assert (t1);
+    boolean t2 = true;
+    for (int i = 0; i <= (C.length - 2); i++) {
+      if (!((C[i] <= C[(i + 1)]))) { t2 = false; break; }
+    }
+    assert (t2);
     int m = B.length;
     int n = C.length;
     int[] D = new int[(m + n)];
@@ -32,6 +42,11 @@ public class MergeTwo {
       j = (j + 1);
       k = (k + 1);
     }
+    boolean t4 = true;
+    for (int k$3 = 0; k$3 <= (D.length - 2); k$3++) {
+      if (!((D[k$3] <= D[(k$3 + 1)]))) { t4 = false; break; }
+    }
+    assert (t4);
     return D;
   }
 

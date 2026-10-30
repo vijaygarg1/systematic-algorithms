@@ -8,6 +8,11 @@ import java.util.*;
 
 public class Kruskal {
   public boolean[] mst(int n, int[] U, int[] V, int[] W) {
+    boolean t1 = true;
+    for (int e = 0; e <= (W.length - 2); e++) {
+      if (!((W[e] <= W[(e + 1)]))) { t1 = false; break; }
+    }
+    assert (t1);
     int m = U.length;
     boolean[] T = new boolean[m];
     int[] parent = new int[n];

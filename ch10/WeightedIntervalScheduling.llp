@@ -6,6 +6,7 @@
 
 class WeightedIntervalScheduling {
   int[] schedule(int[] s, int[] f, int[] w) {
+    requires forall j in [1..f.length-2] : f[j] <= f[j+1];
     int n = s.length;
     int[] p = new int[n];
     int[] G = new int[n];
@@ -41,6 +42,7 @@ class WeightedIntervalScheduling {
     int hi = j - 1;
     int best = 0;
     while (lo <= hi) {
+      invariant lo >= 1 && hi <= j - 1;
       int mid = (lo + hi) / 2;
       if (f[mid] <= s[j]) { best = mid; lo = mid + 1; } else { hi = mid - 1; };
     };

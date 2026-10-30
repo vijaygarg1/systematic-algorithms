@@ -6,6 +6,7 @@
 
 class Kruskal {
   boolean[] mst(int n, int[] U, int[] V, int[] W) {
+    requires forall e in [0..W.length-2] : W[e] <= W[e+1];
     int m = U.length;
     boolean[] T = new boolean[m];
     int[] parent = new int[n];

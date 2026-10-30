@@ -4,6 +4,9 @@
 
 class MergeTwo {
   int[] merge(int[] B, int[] C) {
+    requires forall i in [0..B.length-2] : B[i] <= B[i+1];
+    requires forall i in [0..C.length-2] : C[i] <= C[i+1];
+    ensures forall k in [0..D.length-2] : D[k] <= D[k+1];
     int m = B.length, n = C.length;
     int[] D = new int[m + n];
     int i = 0, j = 0, k = 0;

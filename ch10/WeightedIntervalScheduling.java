@@ -8,6 +8,11 @@ import java.util.*;
 
 public class WeightedIntervalScheduling {
   public int[] schedule(int[] s, int[] f, int[] w) {
+    boolean t1 = true;
+    for (int j = 1; j <= (f.length - 2); j++) {
+      if (!((f[j] <= f[(j + 1)]))) { t1 = false; break; }
+    }
+    assert (t1);
     int n = s.length;
     int[] p = new int[n];
     int[] G = new int[n];
@@ -35,6 +40,7 @@ public class WeightedIntervalScheduling {
     int lo = 1;
     int hi = (j - 1);
     int best = 0;
+    assert (((lo >= 1) && (hi <= (j - 1))));
     while ((lo <= hi)) {
       int mid = ((lo + hi) / 2);
       if ((f[mid] <= s[j])) {
@@ -43,6 +49,7 @@ public class WeightedIntervalScheduling {
       } else {
         hi = (mid - 1);
       }
+      assert (((lo >= 1) && (hi <= (j - 1))));
     }
     return best;
   }

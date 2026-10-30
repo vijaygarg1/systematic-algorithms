@@ -33,6 +33,7 @@ class Boruvka {
 
   // Record e as the cheapest outgoing edge seen so far for component comp.
   void relax(int comp, int e, int[] W, double[] dist, int[] mwe) {
+    ensures dist[comp] <= old(dist[comp]);
     if (W[e] < dist[comp]) { dist[comp] = W[e]; mwe[comp] = e; }
   }
 

@@ -41,10 +41,12 @@ public class Boruvka {
   }
 
   public void relax(int comp, int e, int[] W, double[] dist, int[] mwe) {
+    final var __old0 = dist[comp];
     if ((W[e] < dist[comp])) {
       dist[comp] = W[e];
       mwe[comp] = e;
     }
+    assert ((dist[comp] <= __old0));
   }
 
   public void components(int n, int[] U, int[] V, boolean[] T, int[] cid) {

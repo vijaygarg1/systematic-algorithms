@@ -16,26 +16,27 @@ class WeightedIntervalScheduling {
     this.f = f;
     this.w = w;
     this.n = this.s.length;
-    this.p = new Array(this.n).fill(0);
-    this.G = new Array(this.n).fill(0);
-    this.sel = new Array(this.n).fill(0);
-    for (let j = 1; j <= ((this.n - 1)); j++) {
-        this.p[j] = this.lastCompatible(j, this.s, this.f);
+    let n = this.s.length;
+    let p = new Array(n).fill(0);
+    let G = new Array(n).fill(0);
+    let sel = new Array(n).fill(0);
+    for (let j = 1; j <= ((n - 1)); j++) {
+        p[j] = this.lastCompatible(j, this.s, this.f);
     }
-    this.G[0] = 0;
-    for (let cur = 1; cur <= ((this.n - 1)); cur++) {
-        this.G[cur] = Math.max((this.w[cur] + this.G[this.p[cur]]), this.G[(cur - 1)]);
+    G[0] = 0;
+    for (let cur = 1; cur <= ((n - 1)); cur++) {
+        G[cur] = Math.max((this.w[cur] + G[p[cur]]), G[(cur - 1)]);
     }
-    let cur = (this.n - 1);
+    let cur = (n - 1);
     while ((cur > 0)) {
-        if (((this.w[cur] + this.G[this.p[cur]]) >= this.G[(cur - 1)])) {
-            this.sel[cur] = 1;
-            cur = this.p[cur];
+        if (((this.w[cur] + G[p[cur]]) >= G[(cur - 1)])) {
+            sel[cur] = 1;
+            cur = p[cur];
         } else {
             cur = (cur - 1);
         }
     }
-    return this.sel;
+    return sel;
   }
 
   lastCompatible(j, s, f) {

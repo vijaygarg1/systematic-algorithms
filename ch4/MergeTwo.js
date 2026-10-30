@@ -12,33 +12,34 @@ class MergeTwo {
   merge(B, C) {
     this.B = B;
     this.C = C;
-    this.m = this.B.length;
-    this.n = this.C.length;
-    this.D = new Array((this.m + this.n)).fill(0);
-    this.i = 0;
-    this.j = 0;
-    this.k = 0;
-    while (((this.i < this.m) && (this.j < this.n))) {
-        if ((this.B[this.i] <= this.C[this.j])) {
-            this.D[this.k] = this.B[this.i];
-            this.i = (this.i + 1);
+    this.n = this.B.length;
+    let m = this.B.length;
+    let n = this.C.length;
+    let D = new Array((m + n)).fill(0);
+    let i = 0;
+    let j = 0;
+    let k = 0;
+    while (((i < m) && (j < n))) {
+        if ((this.B[i] <= this.C[j])) {
+            D[k] = this.B[i];
+            i = (i + 1);
         } else {
-            this.D[this.k] = this.C[this.j];
-            this.j = (this.j + 1);
+            D[k] = this.C[j];
+            j = (j + 1);
         }
-        this.k = (this.k + 1);
+        k = (k + 1);
     }
-    while ((this.i < this.m)) {
-        this.D[this.k] = this.B[this.i];
-        this.i = (this.i + 1);
-        this.k = (this.k + 1);
+    while ((i < m)) {
+        D[k] = this.B[i];
+        i = (i + 1);
+        k = (k + 1);
     }
-    while ((this.j < this.n)) {
-        this.D[this.k] = this.C[this.j];
-        this.j = (this.j + 1);
-        this.k = (this.k + 1);
+    while ((j < n)) {
+        D[k] = this.C[j];
+        j = (j + 1);
+        k = (k + 1);
     }
-    return this.D;
+    return D;
   }
 }
 

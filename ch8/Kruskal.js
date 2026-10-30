@@ -45,23 +45,23 @@ class Kruskal {
     this.U = U;
     this.V = V;
     this.W = W;
-    this.m = this.U.length;
-    this.T = new Array(this.m).fill(false);
-    this.parent = new Array(this.n).fill(0);
-    this.rank = new Array(this.n).fill(0);
+    let m = this.U.length;
+    let T = new Array(m).fill(false);
+    let parent = new Array(this.n).fill(0);
+    let rank = new Array(this.n).fill(0);
     for (let i = 0; i <= ((this.n - 1)); i++) {
-        this.parent[i] = i;
+        parent[i] = i;
     }
     let chosen = 0;
     let e = 0;
-    while (((e < this.m) && (chosen < (this.n - 1)))) {
-        if (new UnionFind().union(this.parent, this.rank, this.U[e], this.V[e])) {
-            this.T[e] = true;
+    while (((e < m) && (chosen < (this.n - 1)))) {
+        if (new UnionFind().union(parent, rank, this.U[e], this.V[e])) {
+            T[e] = true;
             chosen = (chosen + 1);
         }
         e = (e + 1);
     }
-    return this.T;
+    return T;
   }
 }
 

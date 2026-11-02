@@ -1,4 +1,4 @@
-// Sequential quicksort with Lomuto partition (parallel form in progs-divideConquer/).
+// Sequential quicksort with Lomuto partition (parallel form in progs-09-divideConquer/).
 
 import java.util.*;
 

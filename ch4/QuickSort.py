@@ -1,4 +1,4 @@
-"""Sequential quicksort with Lomuto partition (parallel form in progs-divideConquer/).
+"""Sequential quicksort with Lomuto partition (parallel form in progs-09-divideConquer/).
 
 Auto-generated from QuickSort.llp by lang/llcpy.py.
 Do not edit by hand; edit the .llp source and rerun the build.
